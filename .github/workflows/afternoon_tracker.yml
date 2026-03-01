@@ -1,0 +1,81 @@
+name: Market Tracker - Afternoon & Evening Session
+
+on:
+  schedule:
+    # Run at 15:30 IST = 10:00 UTC (Mon-Fri)
+    - cron: '0 10 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      manual_trigger:
+        description: 'Manual afternoon session trigger'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: write
+
+jobs:
+  afternoon-tracker:
+    runs-on: ubuntu-latest
+    # Timeout after 6 hours (covers 15:35, 18:00, 21:00 slots)
+    timeout-minutes: 360
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Create .env file
+        run: |
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" > .env
+          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+      
+      - name: Run Afternoon Session (6 hours)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "Starting afternoon session at $(date)"
+          echo "Will run for 360 minutes covering slots: 15:35, 18:00, 21:00"
+          
+          # Run scheduler for 360 minutes (6 hours)
+          python -m tracker --schedule --run-for-minutes 360
+          
+          echo "Afternoon session complete at $(date)"
+      
+      - name: Upload data artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: afternoon-data-${{ github.run_number }}
+          path: |
+            data/excel/*.xlsx
+            data/snapshots/**/*.json
+            data/daily/*.json
+            data/backup/*.zip
+          retention-days: 30
+      
+      - name: Commit data updates
+        if: success()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/
+          git diff --staged --quiet || git commit -m "Afternoon session data - $(date +'%Y-%m-%d %H:%M IST')"
+          git push
+      
+      - name: Create daily backup
+        if: success()
+        run: |
+          echo "Creating end-of-day backup..."
+          python -m tracker --backup
