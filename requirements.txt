@@ -2,3 +2,8 @@ requests>=2.31.0
 python-dotenv>=1.0.0
 openpyxl>=3.1.2
 schedule>=1.2.0
+
+# Google Drive Integration (optional)
+google-api-python-client>=2.100.0
+google-auth-httplib2>=0.1.1
+google-auth-oauthlib>=1.1.0

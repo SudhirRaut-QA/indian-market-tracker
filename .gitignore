@@ -4,3 +4,7 @@ __pycache__/
 data/
 snapshots/
 *.xlsx
+credentials/
+*.json
+!requirements.txt
+!.github/**/*.yml

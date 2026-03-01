@@ -3,26 +3,29 @@ Excel Manager v3.0 - Market Data Logger with Backup Strategy
 ===============================================================
 
 Storage Strategy:
-- Monthly Excel workbook: data/excel/market_tracker_YYYY_MM.xlsx
-  Contains ALL sheets for the month
+- MASTER Excel workbook: data/excel/market_tracker_master.xlsx
+  Single continuous file with ALL data (appends each run)
 - Daily JSON snapshots: data/snapshots/YYYY/MM/DD/snapshot_HHMMSS.json
 - Daily summary: data/daily/YYYY-MM-DD.json (end-of-day aggregate)
 - Backup archive: data/backup/backup_YYYY_MM_DD.zip
 
-Sheets in master workbook:
- 1. Dashboard      — Today's summary (key numbers at a glance)
- 2. FII_DII        — Daily FII/DII data with running totals
- 3. Indices        — Daily index values with OHLC
- 4. Sectors        — Sector heatmap data
+Sheets in master workbook (all data appends to same file):
+ 1. Dashboard      — Latest snapshot summary (overwrites each run)
+ 2. FII_DII        — ALL FII/DII data (one row per run, never deleted)
+ 3. Indices        — ALL index values (historical log)
+ 4. Sectors        — ALL sector data (timestamped entries)
  5. Stocks         — Individual stock data from sectors
- 6. Commodities    — Gold, Silver, commodity ETF prices
- 7. Forex          — USD/INR, EUR, GBP, JPY daily rates
- 8. Options        — PCR, max pain, OI buildup
+ 6. Commodities    — ALL commodity prices (historical)
+ 7. Forex          — ALL forex rates (historical)
+ 8. Options        — ALL PCR, max pain, OI data
  9. Corporate      — Actions log (dividends, splits, bonus)
 10. Insider        — Insider trading (PIT) log
 11. Block_Deals    — Block deal transactions
 12. Bulk_Deals     — Bulk deal transactions
 13. Alerts_52W     — 52-week high/low proximity alerts
+
+Data Retention: All sheets append data continuously. Dashboard is the only
+sheet that gets overwritten each run. All other sheets keep historical data.
 """
 
 import json
@@ -138,18 +141,19 @@ def _upsert_row(ws, key_cols: List[int], key_vals: List[Any], start_row: int = 2
 
 
 class ExcelManager:
-    """Manages monthly Excel workbooks for market data logging."""
+    """Manages single master Excel workbook - appends all data continuously."""
 
     def __init__(self, path: str = None):
-        self.monthly_path = str(config.get_monthly_excel_path())
+        # Single master file for all data
+        self.master_path = str(config.get_monthly_excel_path())  # Now returns master file
         self.legacy_path = str(config.EXCEL_FILE)
-        os.makedirs(os.path.dirname(self.monthly_path) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(self.master_path) or ".", exist_ok=True)
         os.makedirs(os.path.dirname(self.legacy_path) or ".", exist_ok=True)
 
     def log_snapshot(self, snapshot: Dict, delta: Optional[Dict] = None, slot_label: str = "Manual Run"):
-        """Log all snapshot data to monthly Excel workbook."""
+        """Log all snapshot data to master Excel workbook (appends to existing data)."""
         try:
-            wb = _get_wb(self.monthly_path)
+            wb = _get_wb(self.master_path)
             ts = datetime.now().strftime("%Y-%m-%d %H:%M")
             date_str = datetime.now().strftime("%Y-%m-%d")
 
@@ -188,8 +192,8 @@ class ExcelManager:
                 if ws.max_row == 1 and ws.max_column == 1 and not ws.cell(1, 1).value:
                     wb.remove(ws)
 
-            wb.save(self.monthly_path)
-            logger.info(f"Excel saved: {self.monthly_path}")
+            wb.save(self.master_path)
+            logger.info(f"Excel saved: {self.master_path} (data appended)")
 
         except Exception as e:
             logger.error(f"Excel save error: {e}", exc_info=True)

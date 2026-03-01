@@ -44,6 +44,7 @@ from .telegram_bot import (
     format_delta_alert,
 )
 from .excel_manager import ExcelManager, BackupManager
+from .google_drive_uploader import GoogleDriveUploader, format_drive_summary
 
 
 logging.basicConfig(
@@ -82,6 +83,7 @@ def run_once(
     bot = TelegramBot()
     excel = ExcelManager()
     backup = BackupManager()
+    drive = GoogleDriveUploader()
 
     # 1. Collect snapshot
     logger.info("Collecting market snapshot...")
@@ -195,6 +197,29 @@ def run_once(
     # 6. Save daily summary
     if save_daily:
         backup.save_daily_summary(snapshot)
+    
+    # 7. Upload to Google Drive (if configured)
+    excel_uploaded = 0
+    snapshots_uploaded = 0
+    if drive.enabled:
+        try:
+            # Upload Excel files
+            if save_excel:
+                excel_uploaded = drive.upload_excel_files(config.EXCEL_DIR)
+                logger.info(f"Google Drive: {excel_uploaded} Excel file(s) uploaded")
+            
+            # Upload recent snapshots
+            if save_json:
+                snapshots_uploaded = drive.upload_snapshots(config.SNAPSHOT_DIR, max_files=5)
+                logger.info(f"Google Drive: {snapshots_uploaded} snapshot(s) uploaded")
+            
+            # Add Drive summary to Telegram
+            if send_telegram and (excel_uploaded > 0 or snapshots_uploaded > 0):
+                drive_msg = format_drive_summary(drive, excel_uploaded, snapshots_uploaded)
+                if drive_msg:
+                    bot.send(drive_msg)
+        except Exception as e:
+            logger.error(f"Google Drive upload error: {e}")
 
     # Summary
     parts = []

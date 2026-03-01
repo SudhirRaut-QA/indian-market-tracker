@@ -120,9 +120,9 @@ BACKUP_DIR = DATA_DIR / "backup"
 DELTA_FILE = DATA_DIR / "last_snapshot.json"
 
 def get_monthly_excel_path() -> Path:
-    """Get current month's Excel workbook path."""
-    now = datetime.now()
-    return EXCEL_DIR / f"market_tracker_{now.strftime('%Y_%m')}.xlsx"
+    """Get single master Excel workbook path (appends all data)."""
+    # Single continuous file - all data in one place
+    return EXCEL_DIR / "market_tracker_master.xlsx"
 
 def get_snapshot_dir() -> Path:
     """Get today's snapshot directory."""
