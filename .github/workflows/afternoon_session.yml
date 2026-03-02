@@ -44,6 +44,8 @@ jobs:
           echo "GOOGLE_SERVICE_ACCOUNT_JSON=${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}" >> .env
 
       - name: Run afternoon scheduler
+        env:
+          TZ: Asia/Kolkata
         run: |
           MINUTES=${{ github.event.inputs.minutes || '350' }}
           echo "🌇 Afternoon session — running for ${MINUTES} minutes"

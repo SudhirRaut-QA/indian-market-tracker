@@ -121,11 +121,17 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
 
     # Market status
     status = snapshot.get("market_status", {})
-    for mkt, info in status.items():
-        st = info.get("status", "")
-        if "Capital" in mkt or "Equit" in mkt:
-            emoji = "🟢" if "Open" in st or "open" in st else "🔴" if "Close" in st else "🟡"
-            lines.append(f"{emoji} {mkt}: <b>{st}</b>")
+    if status:
+        for mkt, info in status.items():
+            if not info or not isinstance(info, dict):
+                continue
+            st = info.get("status", "")
+            # Ensure st is a string (not None)
+            if not st or not isinstance(st, str):
+                continue
+            if "Capital" in mkt or "Equit" in mkt:
+                emoji = "🟢" if "Open" in st or "open" in st else "🔴" if "Close" in st else "🟡"
+                lines.append(f"{emoji} {mkt}: <b>{st}</b>")
 
     lines.append("")
 

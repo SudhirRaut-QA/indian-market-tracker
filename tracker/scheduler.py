@@ -96,7 +96,9 @@ SLOT_CONFIG = {
 
 
 def is_weekday() -> bool:
-    return datetime.now().weekday() < 5  # Mon=0 to Fri=4
+    """Check if today is a weekday in IST."""
+    ist_now = datetime.now(IST)
+    return ist_now.weekday() < 5  # Mon=0 to Fri=4
 
 
 def setup_schedule(run_fn: Callable):
