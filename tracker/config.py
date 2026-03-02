@@ -70,8 +70,13 @@ KEY_INDICES = [
     "INDIA VIX",
 ]
 
-# Commodity ETF proxies
-COMMODITY_ETFS = ["GOLDBEES", "SILVERBEES"]
+# Commodity ETF proxies (Tata doesn't have commodity ETFs - using alternatives)
+COMMODITY_ETFS = [
+    "KOTAKGOLD",    # Kotak Mahindra Gold ETF (alternative to GOLDBEES)
+    "ICICIGOLD",    # ICICI Prudential Gold ETF
+    "SILVERBEES",   # Nippon India Silver ETF (most liquid for silver)
+    "LIQUIDBEES",   # Liquid ETF (money market proxy)
+]
 
 # =============================================================================
 # NSE

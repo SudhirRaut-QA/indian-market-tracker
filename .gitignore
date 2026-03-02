@@ -9,10 +9,11 @@ venv/
 .env
 credentials/
 
-# Data (generated at runtime)
-data/
-snapshots/
-*.xlsx
+# Data - Track essential files, ignore temporary
+data/daily/
+data/backup/
+data/snapshots/*.json
+!data/snapshots/last_snapshot.json
 logs/
 
 # IDE

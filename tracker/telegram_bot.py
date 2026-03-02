@@ -318,7 +318,12 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     comms = snapshot.get("commodities", {})
     if comms:
         lines.append("<b>🥇 Commodity ETFs</b>")
-        names = {"GOLDBEES": "Gold", "SILVERBEES": "Silver"}
+        names = {
+            "KOTAKGOLD": "Gold (Kotak)",
+            "ICICIGOLD": "Gold (ICICI)",
+            "SILVERBEES": "Silver",
+            "LIQUIDBEES": "Liquid",
+        }
         for sym, data in comms.items():
             e = _emoji_pct(data.get("pct", 0))
             name = names.get(sym, sym)
