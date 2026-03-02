@@ -101,6 +101,16 @@ def is_weekday() -> bool:
     return ist_now.weekday() < 5  # Mon=0 to Fri=4
 
 
+class JobTimeout(Exception):
+    """Raised when a job exceeds its timeout."""
+    pass
+
+
+def timeout_handler(signum, frame):
+    """Signal handler for job timeout."""
+    raise JobTimeout("Job execution exceeded timeout")
+
+
 def setup_schedule(run_fn: Callable):
     """
     Set up all scheduled jobs.
@@ -117,7 +127,17 @@ def setup_schedule(run_fn: Callable):
                     logger.info(f"Skipping {lbl} — weekend")
                     return
                 logger.info(f"Running: {lbl} ({t})")
+                
+                # Set 10-minute timeout for each job (max time for data collection)
+                job_start = time.time()
+                job_timeout = 600  # 10 minutes
+                
                 try:
+                    # Try to set alarm signal (Unix only)
+                    if hasattr(signal, 'SIGALRM'):
+                        signal.signal(signal.SIGALRM, timeout_handler)
+                        signal.alarm(job_timeout)
+                    
                     run_fn(
                         include_preopen=cfg.get("include_preopen", False),
                         include_sectors=cfg.get("include_sectors", True),
@@ -126,8 +146,22 @@ def setup_schedule(run_fn: Callable):
                         include_insider=cfg.get("include_insider", False),
                         label=lbl,
                     )
+                    
+                    # Cancel alarm if job completed
+                    if hasattr(signal, 'SIGALRM'):
+                        signal.alarm(0)
+                        
+                except JobTimeout:
+                    logger.error(f"Job {lbl} exceeded {job_timeout}s timeout - terminated")
                 except Exception as e:
                     logger.error(f"Job {lbl} failed: {e}")
+                finally:
+                    # Always cancel alarm
+                    if hasattr(signal, 'SIGALRM'):
+                        signal.alarm(0)
+                    
+                    elapsed = time.time() - job_start
+                    logger.info(f"Job {lbl} completed in {elapsed:.1f}s")
             return job
 
         schedule.every().day.at(time_str).do(make_job())
@@ -135,8 +169,7 @@ def setup_schedule(run_fn: Callable):
 
 
 def run_loop(run_for_minutes: int = 0):
-    """
-    Run the scheduler loop.
+    """Run the scheduler loop with proper timeout handling.
     
     Args:
         run_for_minutes: Exit after this many minutes (0 = run forever).
@@ -150,10 +183,20 @@ def run_loop(run_for_minutes: int = 0):
     deadline = start_time + (run_for_minutes * 60) if run_for_minutes > 0 else None
     
     while True:
-        schedule.run_pending()
-        
+        # Check deadline BEFORE running jobs or sleeping
         if deadline and time.time() >= deadline:
-            logger.info(f"Scheduler reached {run_for_minutes}-minute limit. Exiting.")
+            elapsed = (time.time() - start_time) / 60
+            logger.info(f"Scheduler reached {run_for_minutes}-minute limit ({elapsed:.1f}m elapsed). Exiting.")
             break
         
+        # Run any pending scheduled jobs
+        schedule.run_pending()
+        
+        # Check deadline again after jobs complete (in case a job took a long time)
+        if deadline and time.time() >= deadline:
+            elapsed = (time.time() - start_time) / 60
+            logger.info(f"Scheduler reached deadline after job completion ({elapsed:.1f}m). Exiting.")
+            break
+        
+        # Sleep for 30 seconds before next check
         time.sleep(30)
