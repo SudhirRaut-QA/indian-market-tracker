@@ -319,9 +319,9 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     if comms:
         lines.append("<b>🥇 Commodity ETFs</b>")
         names = {
-            "KOTAKGOLD": "Gold (Kotak)",
-            "ICICIGOLD": "Gold (ICICI)",
-            "SILVERBEES": "Silver",
+            "TATAGOLD": "Gold (Tata)",
+            "TATSILV": "Silver (Tata)",
+            "GOLDBEES": "Gold (Nippon)",
             "LIQUIDBEES": "Liquid",
         }
         for sym, data in comms.items():
