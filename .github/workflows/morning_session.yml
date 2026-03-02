@@ -1,0 +1,71 @@
+name: Morning Session (09:00–11:00 IST)
+
+# Triggered once at 08:45 IST → runs internal scheduler for 2.5 hours.
+# Covers: 09:00 Pre-Open, 09:08 Pre-Open Final, 09:15 Market Open,
+#          09:30 Early Session, 11:00 Mid-Morning
+
+on:
+  schedule:
+    - cron: '15 3 * * 1-5'   # 08:45 IST = 03:15 UTC  (Mon-Fri)
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: 'Override run duration (minutes)'
+        required: false
+        default: '150'
+
+permissions:
+  contents: write
+
+jobs:
+  morning-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 170      # 2h 50m hard limit
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create .env
+        run: |
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" > .env
+          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "GOOGLE_DRIVE_FOLDER_ID=${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}" >> .env
+          echo "GOOGLE_SERVICE_ACCOUNT_JSON=${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}" >> .env
+
+      - name: Run morning scheduler
+        run: |
+          MINUTES=${{ github.event.inputs.minutes || '150' }}
+          echo "🌅 Morning session — running for ${MINUTES} minutes"
+          echo "Slots: 09:00, 09:08, 09:15, 09:30, 11:00 IST"
+          python -m tracker --schedule --run-for-minutes ${MINUTES}
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: morning-${{ github.run_number }}
+          path: |
+            data/excel/*.xlsx
+            data/snapshots/**/*.json
+          retention-days: 7
+
+      - name: Commit data
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/ || true
+          git diff --staged --quiet || git commit -m "📊 Morning session $(date -u +'%Y-%m-%d')"
+          git push || true

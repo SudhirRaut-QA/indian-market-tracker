@@ -15,27 +15,15 @@ Scheduler - Smart Market Hours Scheduling
 """
 
 import logging
-import signal
-import sys
 import time
-from datetime import datetime, timedelta
-from typing import Callable, Optional
+from datetime import datetime
+from typing import Callable
 
 import schedule
 
 from . import config
 
 logger = logging.getLogger(__name__)
-
-# Global flag for graceful shutdown
-_shutdown_requested = False
-
-
-def _signal_handler(signum, frame):
-    """Handle interrupt signals for graceful shutdown."""
-    global _shutdown_requested
-    logger.info(f"Received signal {signum}, initiating graceful shutdown...")
-    _shutdown_requested = True
 
 
 # Time-slot → what data to include
@@ -94,20 +82,15 @@ SLOT_CONFIG = {
         "include_sectors": True,
         "include_options": False,
         "include_corporate": True,
-        "include_ipos": True,
         "include_insider": False,
-        "include_block_deals": True,
-        "include_bulk_deals": True,
     },
     "21:00": {
         "label": "Evening Digest",
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
-        "include_corporate": False,
+        "include_corporate": True,
         "include_insider": True,
-        "include_block_deals": True,
-        "include_bulk_deals": True,
     },
 }
 
@@ -138,10 +121,7 @@ def setup_schedule(run_fn: Callable):
                         include_sectors=cfg.get("include_sectors", True),
                         include_options=cfg.get("include_options", False),
                         include_corporate=cfg.get("include_corporate", False),
-                        include_ipos=cfg.get("include_ipos", False),
                         include_insider=cfg.get("include_insider", False),
-                        include_block_deals=cfg.get("include_block_deals", False),
-                        include_bulk_deals=cfg.get("include_bulk_deals", False),
                         label=lbl,
                     )
                 except Exception as e:
@@ -152,44 +132,26 @@ def setup_schedule(run_fn: Callable):
         logger.info(f"Scheduled: {label} at {time_str}")
 
 
-def run_loop(run_for_minutes: Optional[int] = None):
-    """Run the scheduler loop for specified duration or forever.
+def run_loop(run_for_minutes: int = 0):
+    """
+    Run the scheduler loop.
     
     Args:
-        run_for_minutes: If set, scheduler will exit after this many minutes.
-                        Useful for GitHub Actions windowed runs.
-                        None = run forever.
+        run_for_minutes: Exit after this many minutes (0 = run forever).
     """
-    global _shutdown_requested
-    
-    # Set up signal handlers for graceful shutdown
-    signal.signal(signal.SIGINT, _signal_handler)
-    signal.signal(signal.SIGTERM, _signal_handler)
-    
-    start_time = datetime.now()
-    end_time = start_time + timedelta(minutes=run_for_minutes) if run_for_minutes else None
-    
-    if run_for_minutes:
-        logger.info(f"Scheduler started for {run_for_minutes} minutes (until {end_time.strftime('%H:%M')} IST)")
+    if run_for_minutes > 0:
+        logger.info(f"Scheduler started. Will run for {run_for_minutes} minutes.")
     else:
-        logger.info("Scheduler started in continuous mode")
+        logger.info("Scheduler started. Running until stopped.")
     
-    logger.info("Waiting for next job...")
+    start_time = time.time()
+    deadline = start_time + (run_for_minutes * 60) if run_for_minutes > 0 else None
     
-    try:
-        while not _shutdown_requested:
-            schedule.run_pending()
-            
-            # Check if we've exceeded the time window
-            if end_time and datetime.now() >= end_time:
-                logger.info(f"Time window expired ({run_for_minutes} minutes elapsed)")
-                break
-            
-            time.sleep(30)
-    
-    except KeyboardInterrupt:
-        logger.info("Keyboard interrupt received")
-    
-    finally:
-        logger.info("Scheduler shutdown complete")
-        schedule.clear()
+    while True:
+        schedule.run_pending()
+        
+        if deadline and time.time() >= deadline:
+            logger.info(f"Scheduler reached {run_for_minutes}-minute limit. Exiting.")
+            break
+        
+        time.sleep(30)

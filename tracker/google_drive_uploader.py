@@ -66,27 +66,33 @@ class GoogleDriveUploader:
             credentials_info = json.loads(self.credentials_json)
             credentials = service_account.Credentials.from_service_account_info(
                 credentials_info,
-                scopes=['https://www.googleapis.com/auth/drive.file']
+                scopes=['https://www.googleapis.com/auth/drive']
             )
         else:
             # It's a file path
             credentials = service_account.Credentials.from_service_account_file(
                 self.credentials_json,
-                scopes=['https://www.googleapis.com/auth/drive.file']
+                scopes=['https://www.googleapis.com/auth/drive']
             )
         
         self.service = build('drive', 'v3', credentials=credentials)
         logger.info("Google Drive API initialized")
     
     def upload_file(self, file_path: str, folder_id: Optional[str] = None, 
-                   mime_type: Optional[str] = None) -> Optional[str]:
+                   mime_type: Optional[str] = None,
+                   drive_name: Optional[str] = None) -> Optional[str]:
         """
-        Upload a single file to Google Drive.
+        Upload or update a file in Google Drive.
+        
+        Service accounts cannot create new files in personal Drive (Google
+        policy since Sep 2024). This method only UPDATES pre-existing files.
+        If the file doesn't exist in Drive, it logs a reminder to upload manually.
         
         Args:
-            file_path: Path to file to upload
+            file_path: Local path to file
             folder_id: Override default folder ID
             mime_type: MIME type (auto-detected if not provided)
+            drive_name: Name to search for in Drive (defaults to local filename)
         
         Returns:
             File ID on success, None on failure
@@ -106,50 +112,42 @@ class GoogleDriveUploader:
             return None
         
         target_folder = folder_id or self.folder_id
-        file_name = file_path.name
+        file_name = drive_name or file_path.name
         
         # Auto-detect MIME type
         if mime_type is None:
-            if file_path.suffix == '.xlsx':
-                mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            elif file_path.suffix == '.json':
-                mime_type = 'application/json'
-            elif file_path.suffix == '.zip':
-                mime_type = 'application/zip'
-            else:
-                mime_type = 'application/octet-stream'
+            suffix = file_path.suffix.lower()
+            mime_map = {
+                '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                '.json': 'application/json',
+                '.zip': 'application/zip',
+            }
+            mime_type = mime_map.get(suffix, 'application/octet-stream')
         
         try:
             # Check if file already exists (by name in folder)
             existing_file_id = self._find_file_by_name(file_name, target_folder)
             
-            file_metadata = {
-                'name': file_name,
-                'parents': [target_folder]
-            }
+            if not existing_file_id:
+                logger.warning(
+                    f"'{file_name}' not found in Drive folder. "
+                    f"Please upload it manually once, then auto-update will work."
+                )
+                return None
             
             media = MediaFileUpload(str(file_path), mimetype=mime_type, resumable=True)
             
-            if existing_file_id:
-                # Update existing file
-                file = self.service.files().update(
-                    fileId=existing_file_id,
-                    media_body=media
-                ).execute()
-                logger.info(f"Updated: {file_name} (ID: {file['id']})")
-            else:
-                # Create new file
-                file = self.service.files().create(
-                    body=file_metadata,
-                    media_body=media,
-                    fields='id, name, webViewLink'
-                ).execute()
-                logger.info(f"Uploaded: {file_name} (ID: {file['id']})")
-            
+            # Update existing file (no storage quota issue)
+            file = self.service.files().update(
+                fileId=existing_file_id,
+                media_body=media,
+                supportsAllDrives=True
+            ).execute()
+            logger.info(f"Drive updated: {file_name} (ID: {file['id']})")
             return file['id']
             
         except Exception as e:
-            logger.error(f"Failed to upload {file_name}: {e}")
+            logger.error(f"Drive update failed for {file_name}: {e}")
             return None
     
     def _find_file_by_name(self, file_name: str, folder_id: str) -> Optional[str]:
@@ -159,7 +157,9 @@ class GoogleDriveUploader:
             results = self.service.files().list(
                 q=query,
                 fields='files(id, name)',
-                spaces='drive'
+                spaces='drive',
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True
             ).execute()
             
             files = results.get('files', [])
@@ -171,12 +171,16 @@ class GoogleDriveUploader:
             logger.warning(f"Error searching for file: {e}")
             return None
     
-    def upload_excel_files(self, excel_dir: str) -> int:
+    def upload_excel_files(self, excel_dir: str, drive_name: str = "market_tracker.xlsx") -> int:
         """
-        Upload all Excel files from directory.
+        Upload (update) the master Excel file to Google Drive.
+        
+        The file must already exist in Drive (manually uploaded once).
+        Subsequent calls update the existing file automatically.
         
         Args:
             excel_dir: Path to directory containing Excel files
+            drive_name: Name of the file in Google Drive to update
         
         Returns:
             Number of files successfully uploaded
@@ -189,12 +193,19 @@ class GoogleDriveUploader:
             logger.warning(f"Excel directory not found: {excel_dir}")
             return 0
         
-        uploaded = 0
-        for xlsx_file in excel_dir.glob("*.xlsx"):
-            if self.upload_file(str(xlsx_file)):
-                uploaded += 1
+        # Find the local Excel file (prefer market_tracker.xlsx)
+        target = excel_dir / drive_name
+        if not target.exists():
+            # Fallback: use the first .xlsx file found
+            xlsx_files = list(excel_dir.glob("*.xlsx"))
+            if not xlsx_files:
+                logger.info("No Excel files found to upload")
+                return 0
+            target = xlsx_files[0]
         
-        return uploaded
+        if self.upload_file(str(target), drive_name=drive_name):
+            return 1
+        return 0
     
     def upload_snapshots(self, snapshots_dir: str, max_files: int = 10) -> int:
         """
@@ -254,7 +265,8 @@ class GoogleDriveUploader:
             
             folder = self.service.files().create(
                 body=file_metadata,
-                fields='id, name, webViewLink'
+                fields='id, name, webViewLink',
+                supportsAllDrives=True
             ).execute()
             
             logger.info(f"Created folder: {folder_name} (ID: {folder['id']})")
@@ -291,7 +303,9 @@ class GoogleDriveUploader:
                 q=query,
                 pageSize=max_results,
                 fields='files(id, name, size, modifiedTime, webViewLink)',
-                orderBy='modifiedTime desc'
+                orderBy='modifiedTime desc',
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True
             ).execute()
             
             return results.get('files', [])

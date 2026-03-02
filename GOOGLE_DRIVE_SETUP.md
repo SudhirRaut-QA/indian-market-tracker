@@ -104,7 +104,7 @@ Still in the Share dialog:
 3. Update your `.env` file:
    ```env
    GOOGLE_DRIVE_FOLDER_ID=1a2b3c4d5e6f7g8h9i0
-   GOOGLE_SERVICE_ACCOUNT_JSON=credentials/service-account.json
+   GOOGLE_SERVICE_ACCOUNT_JSON=credentials/indian-stock-market-tracker-44b12e07c515.json
    ```
 
 4. Add to `.gitignore` (already there):
