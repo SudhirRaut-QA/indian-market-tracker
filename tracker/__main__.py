@@ -228,6 +228,10 @@ Examples:
     parser.add_argument("--schedule", action="store_true", help="Start scheduler (8 daily slots)")
     parser.add_argument("--run-for-minutes", type=int, default=0,
                         help="Auto-exit scheduler after N minutes (0 = forever)")
+    parser.add_argument("--slots", type=str, default="",
+                        help="Comma-separated slot times to schedule (e.g. '09:00,09:15,11:00')")
+    parser.add_argument("--catch-up", action="store_true",
+                        help="Run one snapshot immediately on late start")
     parser.add_argument("--setup", action="store_true", help="Verify setup and connections")
 
     # Data flags
@@ -251,8 +255,13 @@ Examples:
 
     if args.schedule:
         from .scheduler import setup_schedule, run_loop
-        setup_schedule(run_once)
-        run_loop(run_for_minutes=args.run_for_minutes)
+        slots = [s.strip() for s in args.slots.split(",") if s.strip()] or None
+        setup_schedule(run_once, slots=slots)
+        run_loop(
+            run_for_minutes=args.run_for_minutes,
+            run_immediately=args.catch_up,
+            run_fn=run_once,
+        )
         return
 
     if args.now:

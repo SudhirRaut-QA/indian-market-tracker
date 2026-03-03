@@ -51,7 +51,10 @@ jobs:
           MINUTES=${{ github.event.inputs.minutes || '150' }}
           echo "🌅 Morning session — running for ${MINUTES} minutes"
           echo "Slots: 09:00, 09:08, 09:15, 09:30, 11:00 IST"
-          python -m tracker --schedule --run-for-minutes ${MINUTES}
+          python -m tracker --schedule \
+            --slots "09:00,09:08,09:15,09:30,11:00" \
+            --catch-up \
+            --run-for-minutes ${MINUTES}
 
       - name: Upload artifacts
         if: always()

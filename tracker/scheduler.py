@@ -12,18 +12,35 @@ Scheduler - Smart Market Hours Scheduling
 15:35 → Market close (full snapshot + day delta)
 18:00 → Post-market (FII/DII final + corporate actions)
 21:00 → Evening digest (full summary + insider trading)
+
+NOTE: All times are IST. GitHub Actions must set TZ=Asia/Kolkata.
 """
 
 import logging
+import os
+import signal
 import time
-from datetime import datetime
-from typing import Callable
+from datetime import datetime, timedelta, timezone
+from typing import Callable, Optional
 
 import schedule
 
 from . import config
 
 logger = logging.getLogger(__name__)
+
+# Indian Standard Time offset: UTC + 5:30
+IST = timezone(timedelta(hours=5, minutes=30))
+
+
+def _now_ist() -> datetime:
+    """Get current time in IST. Uses TZ env var if set, else explicit offset."""
+    return datetime.now(IST)
+
+
+def is_weekday() -> bool:
+    """Check if today is a weekday in IST."""
+    return _now_ist().weekday() < 5  # Mon=0 to Fri=4
 
 
 # Time-slot → what data to include
@@ -95,108 +112,130 @@ SLOT_CONFIG = {
 }
 
 
-def is_weekday() -> bool:
-    """Check if today is a weekday in IST."""
-    ist_now = datetime.now(IST)
-    return ist_now.weekday() < 5  # Mon=0 to Fri=4
-
-
 class JobTimeout(Exception):
     """Raised when a job exceeds its timeout."""
     pass
 
 
-def timeout_handler(signum, frame):
-    """Signal handler for job timeout."""
+def _timeout_handler(signum, frame):
     raise JobTimeout("Job execution exceeded timeout")
 
 
-def setup_schedule(run_fn: Callable):
+def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
+    """Execute a single job with timeout protection and error handling."""
+    if not is_weekday():
+        logger.info(f"Skipping {label} — weekend")
+        return
+
+    now_ist = _now_ist().strftime("%H:%M:%S")
+    logger.info(f"▶ Running: {label} at {now_ist} IST")
+
+    job_start = time.time()
+    job_timeout = 600  # 10 minutes max per job
+
+    try:
+        # Set alarm on Unix (GitHub Actions is Linux)
+        if hasattr(signal, 'SIGALRM'):
+            signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(job_timeout)
+
+        run_fn(
+            include_preopen=cfg.get("include_preopen", False),
+            include_sectors=cfg.get("include_sectors", True),
+            include_options=cfg.get("include_options", False),
+            include_corporate=cfg.get("include_corporate", False),
+            include_insider=cfg.get("include_insider", False),
+            label=label,
+        )
+    except JobTimeout:
+        logger.error(f"✖ Job {label} exceeded {job_timeout}s timeout — terminated")
+    except Exception as e:
+        logger.error(f"✖ Job {label} failed: {e}", exc_info=True)
+    finally:
+        if hasattr(signal, 'SIGALRM'):
+            signal.alarm(0)
+        elapsed = time.time() - job_start
+        logger.info(f"✔ Job {label} finished in {elapsed:.1f}s")
+
+
+def setup_schedule(run_fn: Callable, slots: Optional[list] = None):
     """
-    Set up all scheduled jobs.
-    
-    run_fn should accept keyword args matching SLOT_CONFIG keys.
+    Set up scheduled jobs.
+
+    Args:
+        run_fn: Function to call for each slot (accepts keyword args).
+        slots:  List of time strings to schedule (e.g. ["09:00","09:30"]).
+                If None, schedules ALL slots in NOTIFICATION_TIMES.
     """
-    for time_str in config.NOTIFICATION_TIMES:
+    # Clear any previously scheduled jobs (important for re-setup)
+    schedule.clear()
+
+    times_to_schedule = slots if slots else config.NOTIFICATION_TIMES
+
+    for time_str in times_to_schedule:
         slot_cfg = SLOT_CONFIG.get(time_str, {})
         label = slot_cfg.get("label", time_str)
 
         def make_job(t=time_str, cfg=slot_cfg, lbl=label):
             def job():
-                if not is_weekday():
-                    logger.info(f"Skipping {lbl} — weekend")
-                    return
-                logger.info(f"Running: {lbl} ({t})")
-                
-                # Set 10-minute timeout for each job (max time for data collection)
-                job_start = time.time()
-                job_timeout = 600  # 10 minutes
-                
-                try:
-                    # Try to set alarm signal (Unix only)
-                    if hasattr(signal, 'SIGALRM'):
-                        signal.signal(signal.SIGALRM, timeout_handler)
-                        signal.alarm(job_timeout)
-                    
-                    run_fn(
-                        include_preopen=cfg.get("include_preopen", False),
-                        include_sectors=cfg.get("include_sectors", True),
-                        include_options=cfg.get("include_options", False),
-                        include_corporate=cfg.get("include_corporate", False),
-                        include_insider=cfg.get("include_insider", False),
-                        label=lbl,
-                    )
-                    
-                    # Cancel alarm if job completed
-                    if hasattr(signal, 'SIGALRM'):
-                        signal.alarm(0)
-                        
-                except JobTimeout:
-                    logger.error(f"Job {lbl} exceeded {job_timeout}s timeout - terminated")
-                except Exception as e:
-                    logger.error(f"Job {lbl} failed: {e}")
-                finally:
-                    # Always cancel alarm
-                    if hasattr(signal, 'SIGALRM'):
-                        signal.alarm(0)
-                    
-                    elapsed = time.time() - job_start
-                    logger.info(f"Job {lbl} completed in {elapsed:.1f}s")
+                _run_job_safe(run_fn, cfg, lbl)
             return job
 
         schedule.every().day.at(time_str).do(make_job())
-        logger.info(f"Scheduled: {label} at {time_str}")
+        logger.info(f"  📌 Scheduled: {label} at {time_str} IST")
+
+    logger.info(f"Total slots: {len(times_to_schedule)}")
 
 
-def run_loop(run_for_minutes: int = 0):
-    """Run the scheduler loop with proper timeout handling.
-    
+def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
+             run_fn: Optional[Callable] = None):
+    """Run the scheduler loop with proper timeout and late-start handling.
+
     Args:
         run_for_minutes: Exit after this many minutes (0 = run forever).
+        run_immediately: If True, run one job NOW before waiting for schedule.
+        run_fn:          The run function (needed if run_immediately=True).
     """
+    ist_start = _now_ist().strftime("%H:%M:%S %Z")
     if run_for_minutes > 0:
-        logger.info(f"Scheduler started. Will run for {run_for_minutes} minutes.")
+        logger.info(f"Scheduler started at {ist_start}. Will run for {run_for_minutes} minutes.")
     else:
-        logger.info("Scheduler started. Running until stopped.")
-    
+        logger.info(f"Scheduler started at {ist_start}. Running until stopped.")
+
+    # ── Late-start catch-up: run one snapshot immediately ──
+    if run_immediately and run_fn:
+        now = _now_ist()
+        logger.info(f"Running immediate catch-up snapshot at {now.strftime('%H:%M')} IST...")
+        # Pick the most recent past slot as config
+        now_hm = now.strftime("%H:%M")
+        best_slot = None
+        for t in sorted(SLOT_CONFIG.keys()):
+            if t <= now_hm:
+                best_slot = t
+        if best_slot:
+            cfg = SLOT_CONFIG[best_slot]
+            label = cfg.get("label", best_slot) + " (catch-up)"
+            _run_job_safe(run_fn, cfg, label)
+        else:
+            logger.info("No past slots to catch up on.")
+
     start_time = time.time()
     deadline = start_time + (run_for_minutes * 60) if run_for_minutes > 0 else None
-    
+
     while True:
-        # Check deadline BEFORE running jobs or sleeping
+        # Check deadline BEFORE running jobs
         if deadline and time.time() >= deadline:
             elapsed = (time.time() - start_time) / 60
-            logger.info(f"Scheduler reached {run_for_minutes}-minute limit ({elapsed:.1f}m elapsed). Exiting.")
+            logger.info(f"⏱ Scheduler reached {run_for_minutes}-minute limit ({elapsed:.1f}m). Exiting.")
             break
-        
+
         # Run any pending scheduled jobs
         schedule.run_pending()
-        
-        # Check deadline again after jobs complete (in case a job took a long time)
+
+        # Check deadline AFTER jobs (in case a job took a long time)
         if deadline and time.time() >= deadline:
             elapsed = (time.time() - start_time) / 60
-            logger.info(f"Scheduler reached deadline after job completion ({elapsed:.1f}m). Exiting.")
+            logger.info(f"⏱ Scheduler reached deadline after job ({elapsed:.1f}m). Exiting.")
             break
-        
-        # Sleep for 30 seconds before next check
+
         time.sleep(30)
