@@ -95,6 +95,7 @@ SLOT_CONFIG = {
     },
     "18:00": {
         "label": "Post-Market",
+        "use_cache": True,  # Use cached market close data + fresh forex
         "include_preopen": False,
         "include_sectors": True,
         "include_options": False,
@@ -104,6 +105,7 @@ SLOT_CONFIG = {
     },
     "21:00": {
         "label": "Evening Digest",
+        "use_cache": True,  # Use cached market close data + fresh forex
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -123,7 +125,7 @@ def _timeout_handler(signum, frame):
     raise JobTimeout("Job execution exceeded timeout")
 
 
-def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
+def _run_job_safe(run_fn: Callable, cfg: dict, label: str, on_complete: Optional[Callable] = None):
     """Execute a single job with timeout protection and error handling."""
     if not is_weekday():
         logger.info(f"Skipping {label} — weekend")
@@ -148,6 +150,7 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
             include_corporate=cfg.get("include_corporate", False),
             include_insider=cfg.get("include_insider", False),
             include_bulk_deals=cfg.get("include_bulk_deals", False),
+            use_cache=cfg.get("use_cache", False),
             label=label,
         )
     except JobTimeout:
@@ -159,9 +162,13 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
             signal.alarm(0)
         elapsed = time.time() - job_start
         logger.info(f"✔ Job {label} finished in {elapsed:.1f}s")
+        
+        # Notify completion
+        if on_complete:
+            on_complete()
 
 
-def setup_schedule(run_fn: Callable, slots: Optional[list] = None) -> List[str]:
+def setup_schedule(run_fn: Callable, slots: Optional[list] = None, completion_tracker: Optional[dict] = None) -> List[str]:
     """
     Set up scheduled jobs.
 
@@ -169,6 +176,7 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None) -> List[str]:
         run_fn: Function to call for each slot (accepts keyword args).
         slots:  List of time strings to schedule (e.g. ["09:00","09:30"]).
                 If None, schedules ALL slots in NOTIFICATION_TIMES.
+        completion_tracker: Dict with 'completed' and 'jobs_to_track' keys for tracking.
     
     Returns:
         List of time strings that were scheduled.
@@ -184,7 +192,12 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None) -> List[str]:
 
         def make_job(t=time_str, cfg=slot_cfg, lbl=label):
             def job():
-                _run_job_safe(run_fn, cfg, lbl)
+                def on_complete():
+                    if completion_tracker:
+                        completion_tracker['completed'] += 1
+                        if t in completion_tracker['jobs_to_track']:
+                            completion_tracker['jobs_to_track'].remove(t)
+                _run_job_safe(run_fn, cfg, lbl, on_complete=on_complete)
             return job
 
         schedule.every().day.at(time_str).do(make_job())
@@ -195,23 +208,41 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None) -> List[str]:
 
 
 def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
-             run_fn: Optional[Callable] = None, scheduled_slots: Optional[List[str]] = None):
+             run_fn: Optional[Callable] = None, slots: Optional[List[str]] = None):
     """Run the scheduler loop with proper timeout and late-start handling.
 
     Args:
         run_for_minutes: Exit after this many minutes (0 = run forever).
         run_immediately: If True, run ALL missed slots NOW before waiting.
-        run_fn:          The run function (needed if run_immediately=True).
-        scheduled_slots: List of slot times that were scheduled (for catch-up).
+        run_fn:          The run function to execute for each slot.
+        slots:           List of slot times to schedule (if None, schedules all).
     """
+    if run_fn is None:
+        logger.error("❌ run_fn is required for scheduler")
+        return
+    
+    # Track job completion for early exit
+    completed_jobs = 0
+    jobs_to_track = set()
+    completion_tracker = {
+        'completed': completed_jobs,
+        'jobs_to_track': jobs_to_track
+    }
+    
+    # Set up scheduled jobs with completion tracking
+    scheduled_slots = setup_schedule(run_fn, slots=slots, completion_tracker=completion_tracker)
+    total_jobs = len(scheduled_slots)
+    jobs_to_track.update(scheduled_slots)
+    
     ist_start = _now_ist().strftime("%H:%M:%S %Z")
     if run_for_minutes > 0:
         logger.info(f"Scheduler started at {ist_start}. Will run for {run_for_minutes} minutes.")
     else:
         logger.info(f"Scheduler started at {ist_start}. Running until stopped.")
 
+
     # ── Late-start catch-up: run ALL missed slots immediately ──
-    if run_immediately and run_fn and scheduled_slots:
+    if run_immediately:
         now = _now_ist()
         now_hm = now.strftime("%H:%M")
         
@@ -228,7 +259,13 @@ def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
                     cfg = SLOT_CONFIG[slot_time]
                     label = cfg.get("label", slot_time) + " (catch-up)"
                     logger.info(f"   ▶ Catching up: {label}")
-                    _run_job_safe(run_fn, cfg, label)
+                    
+                    def on_complete():
+                        completion_tracker['completed'] += 1
+                        if slot_time in completion_tracker['jobs_to_track']:
+                            completion_tracker['jobs_to_track'].remove(slot_time)
+                    
+                    _run_job_safe(run_fn, cfg, label, on_complete=on_complete)
             
             logger.info(f"✅ Catch-up complete. Resuming normal schedule...")
         else:
@@ -238,6 +275,12 @@ def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
     deadline = start_time + (run_for_minutes * 60) if run_for_minutes > 0 else None
 
     while True:
+        # Check if all scheduled jobs completed (early exit)
+        if total_jobs > 0 and completion_tracker['completed'] >= total_jobs:
+            elapsed = (time.time() - start_time) / 60
+            logger.info(f"✅ All {total_jobs} scheduled jobs completed in {elapsed:.1f}m. Exiting early.")
+            break
+
         # Check deadline BEFORE running jobs
         if deadline and time.time() >= deadline:
             elapsed = (time.time() - start_time) / 60

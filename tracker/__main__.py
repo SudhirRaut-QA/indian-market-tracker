@@ -55,8 +55,15 @@ def run_once(
     save_excel: bool = True,
     save_json: bool = True,
     label: str = "Manual Run",
+    use_cache: bool = False,
 ):
-    """Run a single data collection + notification cycle."""
+    """Run a single data collection + notification cycle.
+    
+    Args:
+        use_cache: If True, use cached market data (indices, sectors, FII/DII) from last 
+                   snapshot and only scrape fresh forex/corporate data. Useful for evening 
+                   slots when NSE API is unavailable.
+    """
     # Start timing and get IST timestamp
     start_time = time.time()
     ist = ZoneInfo('Asia/Kolkata')
@@ -65,6 +72,8 @@ def run_once(
     logger.info("=" * 70)
     logger.info(f"START: {label}")
     logger.info(f"Time: {start_ist}")
+    if use_cache:
+        logger.info("🗂 Mode: CACHE (using saved market data + fresh forex/corporate)")
     logger.info("=" * 70)
 
     scraper = MarketScraper()
@@ -72,16 +81,55 @@ def run_once(
     bot = TelegramBot()
     excel = ExcelManager()
 
-    # 1. Collect snapshot
-    logger.info("Collecting market snapshot...")
-    snapshot = scraper.get_snapshot(
-        include_sectors=include_sectors,
-        include_options=include_options,
-        include_preopen=include_preopen,
-        include_corporate=include_corporate,
-        include_insider=include_insider,
-        include_bulk_deals=include_bulk_deals,
-    )
+    # 1. Collect snapshot (with cache mode support)
+    if use_cache:
+        # Load cached market data
+        cached = delta_engine.load_previous()
+        if cached:
+            logger.info(f"✓ Loaded cached snapshot from {cached.get('timestamp', 'unknown')}")
+            snapshot = cached.copy()
+            
+            # Scrape only fresh data (forex, corporate, insider, bulk deals)
+            logger.info("Collecting fresh forex and corporate data...")
+            fresh = scraper.get_snapshot(
+                include_sectors=False,
+                include_options=False,
+                include_preopen=False,
+                include_corporate=include_corporate,
+                include_insider=include_insider,
+                include_bulk_deals=include_bulk_deals,
+            )
+            
+            # Merge fresh data into cached snapshot
+            if fresh.get("forex"):
+                snapshot["forex"] = fresh["forex"]
+            if fresh.get("corporate_actions"):
+                snapshot["corporate_actions"] = fresh["corporate_actions"]
+            if fresh.get("insider_trading"):
+                snapshot["insider_trading"] = fresh["insider_trading"]
+            if fresh.get("bulk_deals"):
+                snapshot["bulk_deals"] = fresh["bulk_deals"]
+            if fresh.get("block_deals"):
+                snapshot["block_deals"] = fresh["block_deals"]
+            
+            # Update timestamp
+            snapshot["timestamp"] = start_ist
+            logger.info("✓ Merged fresh data with cached snapshot")
+        else:
+            logger.warning("⚠ No cached data available, falling back to live scraping")
+            use_cache = False  # Fall back to normal mode
+    
+    if not use_cache:
+        # Normal mode: scrape everything fresh
+        logger.info("Collecting market snapshot...")
+        snapshot = scraper.get_snapshot(
+            include_sectors=include_sectors,
+            include_options=include_options,
+            include_preopen=include_preopen,
+            include_corporate=include_corporate,
+            include_insider=include_insider,
+            include_bulk_deals=include_bulk_deals,
+        )
 
     if snapshot.get("errors"):
         logger.warning(f"Errors: {snapshot['errors']}")
@@ -293,14 +341,13 @@ Examples:
         return
 
     if args.schedule:
-        from .scheduler import setup_schedule, run_loop
+        from .scheduler import run_loop
         slots = [s.strip() for s in args.slots.split(",") if s.strip()] or None
-        scheduled_times = setup_schedule(run_once, slots=slots)
         run_loop(
             run_for_minutes=args.run_for_minutes,
             run_immediately=args.catch_up,
             run_fn=run_once,
-            scheduled_slots=scheduled_times,
+            slots=slots,
         )
         return
 
