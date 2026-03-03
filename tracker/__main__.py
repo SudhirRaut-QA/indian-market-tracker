@@ -256,11 +256,12 @@ Examples:
     if args.schedule:
         from .scheduler import setup_schedule, run_loop
         slots = [s.strip() for s in args.slots.split(",") if s.strip()] or None
-        setup_schedule(run_once, slots=slots)
+        scheduled_times = setup_schedule(run_once, slots=slots)
         run_loop(
             run_for_minutes=args.run_for_minutes,
             run_immediately=args.catch_up,
             run_fn=run_once,
+            scheduled_slots=scheduled_times,
         )
         return
 

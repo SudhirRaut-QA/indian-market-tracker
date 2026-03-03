@@ -21,7 +21,7 @@ import os
 import signal
 import time
 from datetime import datetime, timedelta, timezone
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 import schedule
 
@@ -158,7 +158,7 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
         logger.info(f"✔ Job {label} finished in {elapsed:.1f}s")
 
 
-def setup_schedule(run_fn: Callable, slots: Optional[list] = None):
+def setup_schedule(run_fn: Callable, slots: Optional[list] = None) -> List[str]:
     """
     Set up scheduled jobs.
 
@@ -166,6 +166,9 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None):
         run_fn: Function to call for each slot (accepts keyword args).
         slots:  List of time strings to schedule (e.g. ["09:00","09:30"]).
                 If None, schedules ALL slots in NOTIFICATION_TIMES.
+    
+    Returns:
+        List of time strings that were scheduled.
     """
     # Clear any previously scheduled jobs (important for re-setup)
     schedule.clear()
@@ -185,16 +188,18 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None):
         logger.info(f"  📌 Scheduled: {label} at {time_str} IST")
 
     logger.info(f"Total slots: {len(times_to_schedule)}")
+    return list(times_to_schedule)
 
 
 def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
-             run_fn: Optional[Callable] = None):
+             run_fn: Optional[Callable] = None, scheduled_slots: Optional[List[str]] = None):
     """Run the scheduler loop with proper timeout and late-start handling.
 
     Args:
         run_for_minutes: Exit after this many minutes (0 = run forever).
-        run_immediately: If True, run one job NOW before waiting for schedule.
+        run_immediately: If True, run ALL missed slots NOW before waiting.
         run_fn:          The run function (needed if run_immediately=True).
+        scheduled_slots: List of slot times that were scheduled (for catch-up).
     """
     ist_start = _now_ist().strftime("%H:%M:%S %Z")
     if run_for_minutes > 0:
@@ -202,22 +207,29 @@ def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
     else:
         logger.info(f"Scheduler started at {ist_start}. Running until stopped.")
 
-    # ── Late-start catch-up: run one snapshot immediately ──
-    if run_immediately and run_fn:
+    # ── Late-start catch-up: run ALL missed slots immediately ──
+    if run_immediately and run_fn and scheduled_slots:
         now = _now_ist()
-        logger.info(f"Running immediate catch-up snapshot at {now.strftime('%H:%M')} IST...")
-        # Pick the most recent past slot as config
         now_hm = now.strftime("%H:%M")
-        best_slot = None
-        for t in sorted(SLOT_CONFIG.keys()):
-            if t <= now_hm:
-                best_slot = t
-        if best_slot:
-            cfg = SLOT_CONFIG[best_slot]
-            label = cfg.get("label", best_slot) + " (catch-up)"
-            _run_job_safe(run_fn, cfg, label)
+        
+        # Find all scheduled slots that have already passed
+        missed = [s for s in sorted(scheduled_slots) if s <= now_hm]
+        
+        if missed:
+            logger.info(f"🚨 Catch-up mode: {len(missed)} missed slot(s) detected")
+            logger.info(f"   Missed: {', '.join(missed)}")
+            logger.info(f"   Running all missed slots now...")
+            
+            for slot_time in missed:
+                if slot_time in SLOT_CONFIG:
+                    cfg = SLOT_CONFIG[slot_time]
+                    label = cfg.get("label", slot_time) + " (catch-up)"
+                    logger.info(f"   ▶ Catching up: {label}")
+                    _run_job_safe(run_fn, cfg, label)
+            
+            logger.info(f"✅ Catch-up complete. Resuming normal schedule...")
         else:
-            logger.info("No past slots to catch up on.")
+            logger.info("No missed slots to catch up on.")
 
     start_time = time.time()
     deadline = start_time + (run_for_minutes * 60) if run_for_minutes > 0 else None

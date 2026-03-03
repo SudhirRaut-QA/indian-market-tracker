@@ -63,6 +63,71 @@ def _bar(val: float, width: int = 5) -> str:
     return "░" * (width - filled) + "▓" * filled
 
 
+def _format_prev_time(timestamp_str: str) -> str:
+    """Format ISO timestamp to readable time like (9:00 AM)."""
+    if not timestamp_str:
+        return ""
+    try:
+        dt = datetime.fromisoformat(timestamp_str)
+        if os.name != "nt":
+            return f" ({dt.strftime('%-I:%M %p')})"
+        else:
+            return f" ({dt.strftime('%I:%M %p').lstrip('0')})"
+    except:
+        return ""
+
+
+def _make_table(headers: List[str], rows: List[List[str]], align: Optional[List[str]] = None) -> str:
+    """Create ASCII table with proper alignment for <pre> blocks.
+    
+    Args:
+        headers: List of column headers
+        rows: List of rows, each row is a list of cell values
+        align: Optional alignment for each column ('left', 'right', 'center')
+               Default is 'left' for all columns
+    
+    Returns:
+        Formatted table string (without <pre> tags)
+    """
+    if not align:
+        align = ['left'] * len(headers)
+    
+    # Calculate column widths
+    col_widths = [len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            col_widths[i] = max(col_widths[i], len(cell))
+    
+    # Format rows
+    lines = []
+    header_line = []
+    for i, (h, width, al) in enumerate(zip(headers, col_widths, align)):
+        if al == 'right':
+            header_line.append(h.rjust(width))
+        elif al == 'center':
+            header_line.append(h.center(width))
+        else:
+            header_line.append(h.ljust(width))
+    lines.append("  ".join(header_line))
+    
+    # Add separator
+    lines.append("  ".join(["-" * w for w in col_widths]))
+    
+    # Add data rows
+    for row in rows:
+        row_line = []
+        for i, (cell, width, al) in enumerate(zip(row, col_widths, align)):
+            if al == 'right':
+                row_line.append(cell.rjust(width))
+            elif al == 'center':
+                row_line.append(cell.center(width))
+            else:
+                row_line.append(cell.ljust(width))
+        lines.append("  ".join(row_line))
+    
+    return "\n".join(lines)
+
+
 class TelegramBot:
     """Sends formatted messages to Telegram."""
 
@@ -146,17 +211,26 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         lines.append(f"Signal: {sig_emoji} <b>{sig}</b>")
         lines.append(f"💡 {fd.get('interpretation', '')}")
         lines.append("")
-        lines.append(f"🌍 FII: Buy {_cr(fd['fii']['buy'])} | Sell {_cr(fd['fii']['sell'])}")
-        lines.append(f"   Net: <b>{_cr(fd['fii']['net'])}</b>")
-        lines.append(f"🏠 DII: Buy {_cr(fd['dii']['buy'])} | Sell {_cr(fd['dii']['sell'])}")
-        lines.append(f"   Net: <b>{_cr(fd['dii']['net'])}</b>")
-        lines.append(f"📊 Total Net: <b>{_cr(fd.get('total_net', 0))}</b>")
+        
+        # FII/DII table format
+        headers = ["", "Buy", "Sell", "Net"]
+        rows = [
+            ["🌍 FII", _cr(fd['fii']['buy']), _cr(-abs(fd['fii']['sell'])), _cr(fd['fii']['net'])],
+            ["🏠 DII", _cr(fd['dii']['buy']), _cr(-abs(fd['dii']['sell'])), _cr(fd['dii']['net'])]
+        ]
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        lines.append(f"📊 <b>Total Net: {_cr(fd.get('total_net', 0))}</b>")
 
         # Delta for FII/DII
         if delta and delta.get("fii_dii"):
             dd = delta["fii_dii"]
+            prev_time_str = _format_prev_time(delta.get("prev_time", ""))
+            
             lines.append("")
-            lines.append("<b>🔄 Changes vs Last Check:</b>")
+            lines.append(f"<b>🔄 Changes vs Last Check{prev_time_str}:</b>")
             if dd.get("fii_reversal"):
                 lines.append(f"  ⚠️ {dd['fii_reversal']}")
             if dd.get("dii_reversal"):
@@ -201,8 +275,9 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
             best = id_d.get("best", {})
             worst = id_d.get("worst", {})
             if best and worst:
+                prev_time_str = _format_prev_time(delta.get("prev_time", ""))
                 lines.append("")
-                lines.append("<b>📊 Since Last Check:</b>")
+                lines.append(f"<b>📊 Since Last Check{prev_time_str}:</b>")
                 lines.append(f"  Best:  {best['name']} {best['signal']} ({_pct(best['pct_change'])})")
                 lines.append(f"  Worst: {worst['name']} {worst['signal']} ({_pct(worst['pct_change'])})")
 
@@ -255,9 +330,30 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     for name, data in sectors.items():
         for s in data.get("most_traded", [])[:3]:
             all_traded.append({**s, "sector": name.replace("NIFTY ", "")})
-    all_traded.sort(key=lambda x: x["value_cr"], reverse=True)
-    for s in all_traded[:5]:
-        lines.append(f"  💰 {s['symbol']}: ₹{s['value_cr']:,.0f} Cr ({_pct(s['pct'])})")
+    
+    # Deduplicate by symbol - keep highest value_cr for each stock
+    seen = {}
+    for s in all_traded:
+        sym = s["symbol"]
+        if sym not in seen or s["value_cr"] > seen[sym]["value_cr"]:
+            seen[sym] = s
+    
+    all_traded_unique = list(seen.values())
+    all_traded_unique.sort(key=lambda x: x["value_cr"], reverse=True)
+    
+    if all_traded_unique[:5]:
+        headers = ["Symbol", "Value (Cr)", "Change"]
+        rows = []
+        for s in all_traded_unique[:5]:
+            rows.append([
+                s['symbol'],
+                f"₹{s['value_cr']:,.0f}",
+                _pct(s['pct'])
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
 
     # Delta: stock movers between snapshots
     if delta and delta.get("sectors"):
@@ -267,8 +363,9 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
                 movers_all.append({**m, "sector": name.replace("NIFTY ", "")})
         if movers_all:
             movers_all.sort(key=lambda x: abs(x["price_chg_pct"]), reverse=True)
+            prev_time_str = _format_prev_time(delta.get("prev_time", ""))
             lines.append("")
-            lines.append("<b>🔄 Big Movers Since Last Check</b>")
+            lines.append(f"<b>🔄 Big Movers Since Last Check{prev_time_str}</b>")
             for m in movers_all[:8]:
                 lines.append(f"  {m['signal']} {m['symbol']}: {_pct(m['price_chg_pct'])} (₹{m['price_prev']:.1f}→₹{m['price_curr']:.1f})")
 
