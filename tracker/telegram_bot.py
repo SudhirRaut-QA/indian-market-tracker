@@ -42,6 +42,34 @@ def _pct(val: float) -> str:
     return f"{sign}{val:.2f}%"
 
 
+def _extract_dividend_amount(subject: str) -> float:
+    """Extract dividend amount from subject string.
+    
+    Examples:
+      'Interim Dividend - Rs 10 Per Share' -> 10.0
+      'Final Dividend - Re 1.50 Per Share' -> 1.50
+      'Dividend Rs. 5.25 per share' -> 5.25
+    """
+    import re
+    if not subject:
+        return 0.0
+    
+    # Match patterns like "Rs 10", "Re 1.50", "Rs. 5.25"
+    patterns = [
+        r'Rs\.?\s*(\d+(?:\.\d+)?)',  # Rs 10, Rs. 10.5
+        r'Re\.?\s*(\d+(?:\.\d+)?)',  # Re 1, Re. 1.5
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, subject, re.IGNORECASE)
+        if match:
+            try:
+                return float(match.group(1))
+            except (ValueError, IndexError):
+                continue
+    return 0.0
+
+
 def _emoji_pct(val: float) -> str:
     if val >= 2:
         return "🟢🟢"
@@ -631,55 +659,101 @@ def format_corporate_msg(snapshot: Dict) -> str:
         splits = [a for a in actions if "split" in a.get("subject", "").lower()]
         bonus = [a for a in actions if "bonus" in a.get("subject", "").lower()]
         
-        # Combined table for all corporate actions
-        all_actions_for_table = []
-        for a in dividends[:5]:
-            all_actions_for_table.append(("💰", a, "Dividend"))
-        for a in splits[:3]:
-            all_actions_for_table.append(("✂️", a, "Split"))
-        for a in bonus[:3]:
-            all_actions_for_table.append(("🎁", a, "Bonus"))
-        
-        if all_actions_for_table:
-            headers = ["Type", "Symbol", "LTP", "PE", "Ex-Date", "Details"]
-            rows = []
-            for emoji, a, action_type in all_actions_for_table[:10]:
-                # Truncate subject to fit
-                subject = a.get('subject', '')[:30]
+        # === DIVIDENDS (with yield calculation) ===
+        if dividends:
+            lines.append("<b>💰 Dividends:</b>")
+            for a in dividends[:8]:
+                sym = a.get('symbol', '')
+                subject = a.get('subject', '')
+                ex_date = a.get('ex_date', 'N/A')
+                rec_date = a.get('record_date', 'N/A')
                 ltp = a.get('ltp', 0)
                 pe = a.get('pe', 0)
-                # Ensure numeric types
+                
+                # Extract dividend amount from subject (e.g., "Rs 10 Per Share" → 10)
+                div_amt = _extract_dividend_amount(subject)
+                
+                # Calculate yield
                 try:
                     ltp_val = float(ltp) if ltp else 0
                     pe_val = float(pe) if pe else 0
+                    yield_pct = (div_amt / ltp_val * 100) if (ltp_val and div_amt) else 0
                 except (ValueError, TypeError):
-                    ltp_val, pe_val = 0, 0
-                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "-"
-                pe_str = f"{pe_val:.1f}" if pe_val else "-"
-                rows.append([
-                    emoji,
-                    a['symbol'][:10],
-                    ltp_str,
-                    pe_str,
-                    a['ex_date'][:10],
-                    subject
-                ])
-            table = _make_table(headers, rows, align=['center', 'left', 'right', 'right', 'left', 'left'])
-            lines.append("<pre>")
-            lines.append(table)
-            lines.append("</pre>")
-        else:
+                    ltp_val, pe_val, yield_pct = 0, 0, 0
+                
+                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
+                pe_str = f"{pe_val:.1f}" if pe_val else "N/A"
+                div_str = f"₹{div_amt:.2f}" if div_amt else "N/A"
+                yield_str = f"{yield_pct:.2f}%" if yield_pct else "N/A"
+                
+                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str} | PE: {pe_str}")
+                lines.append(f"  Dividend: {div_str} | Yield: {yield_str}")
+                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
+                lines.append("")
+        
+        # === SPLITS ===
+        if splits:
+            lines.append("<b>✂️ Stock Splits:</b>")
+            for a in splits[:5]:
+                sym = a.get('symbol', '')
+                subject = a.get('subject', '')[:50]
+                ex_date = a.get('ex_date', 'N/A')
+                rec_date = a.get('record_date', 'N/A')
+                ltp = a.get('ltp', 0)
+                
+                try:
+                    ltp_val = float(ltp) if ltp else 0
+                except (ValueError, TypeError):
+                    ltp_val = 0
+                
+                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
+                
+                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str}")
+                lines.append(f"  {subject}")
+                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
+                lines.append("")
+        
+        # === BONUS ===
+        if bonus:
+            lines.append("<b>🎁 Bonus Issues:</b>")
+            for a in bonus[:5]:
+                sym = a.get('symbol', '')
+                subject = a.get('subject', '')[:50]
+                ex_date = a.get('ex_date', 'N/A')
+                rec_date = a.get('record_date', 'N/A')
+                ltp = a.get('ltp', 0)
+                
+                try:
+                    ltp_val = float(ltp) if ltp else 0
+                except (ValueError, TypeError):
+                    ltp_val = 0
+                
+                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
+                
+                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str}")
+                lines.append(f"  {subject}")
+                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
+                lines.append("")
+        
+        if not (dividends or splits or bonus):
             lines.append("<i>No significant corporate actions</i>")
     else:
         lines.append("No corporate actions this week")
 
+    lines.append("")
+    lines.append("─" * 40)
     lines.append("")
 
     # Insider trading
     insiders = snapshot.get("insider_trading")
     if insiders:
         lines.append(f"<b>🔍 Insider Trading ({len(insiders)} trades)</b>")
-        lines.append("<i>Promoter/Director buying or selling in their own company</i>")
+        lines.append("<i>When promoters/directors buy or sell in their own company</i>")
+        lines.append("")
+        lines.append("<b>📖 Understanding Signals:</b>")
+        lines.append("  🟢 <b>Bullish Signal</b>: Insider buying = confidence in company")
+        lines.append("  🔴 <b>Caution Signal</b>: Insider selling = possible concerns")
+        lines.append("  ⚠️ Large insider trades often precede major price moves")
         lines.append("")
 
         big_buys = sorted([t for t in insiders if t["buy_value"] > t["sell_value"]], 

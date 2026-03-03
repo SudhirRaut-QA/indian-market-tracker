@@ -16,7 +16,9 @@ import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime
+import pytz
 
 from dotenv import load_dotenv
 
@@ -55,7 +57,15 @@ def run_once(
     label: str = "Manual Run",
 ):
     """Run a single data collection + notification cycle."""
-    logger.info(f"=== {label} ===")
+    # Start timing and get IST timestamp
+    start_time = time.time()
+    ist = pytz.timezone('Asia/Kolkata')
+    start_ist = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S IST")
+    
+    logger.info("=" * 70)
+    logger.info(f"START: {label}")
+    logger.info(f"Time: {start_ist}")
+    logger.info("=" * 70)
 
     scraper = MarketScraper()
     delta_engine = DeltaEngine()
@@ -173,7 +183,25 @@ def run_once(
     if snapshot.get("block_deals"):
         parts.append(f"{len(snapshot['block_deals'])} block deals")
 
-    logger.info(f"Complete: {', '.join(parts)}")
+    # End timing and calculate duration
+    end_time = time.time()
+    elapsed = end_time - start_time
+    end_ist = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S IST")
+    
+    # Format elapsed time
+    if elapsed < 60:
+        elapsed_str = f"{elapsed:.1f}s"
+    else:
+        mins = int(elapsed // 60)
+        secs = int(elapsed % 60)
+        elapsed_str = f"{mins}m {secs}s"
+    
+    logger.info("=" * 70)
+    logger.info(f"COMPLETE: {', '.join(parts)}")
+    logger.info(f"End Time: {end_ist}")
+    logger.info(f"Duration: {elapsed_str}")
+    logger.info("=" * 70)
+    
     return snapshot
 
 
