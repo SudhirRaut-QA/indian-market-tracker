@@ -77,6 +77,45 @@ def _format_prev_time(timestamp_str: str) -> str:
         return ""
 
 
+def _vol(val: float) -> str:
+    """Format volume in compact form (M for millions, K for thousands)."""
+    if val >= 1e7:
+        return f"{val / 1e7:.1f}Cr"
+    elif val >= 1e6:
+        return f"{val / 1e6:.1f}M"
+    elif val >= 1e3:
+        return f"{val / 1e3:.0f}K"
+    else:
+        return f"{int(val)}"
+
+
+def _52w_position(current: float, low: float, high: float) -> str:
+    """Calculate where current price sits in 52-week range.
+    Returns percentage string like '85%' (85% from low to high).
+    """
+    if high == low or high == 0:
+        return "N/A"
+    position = ((current - low) / (high - low)) * 100
+    return f"{position:.0f}%"
+
+
+def _52w_emoji(current: float, low: float, high: float) -> str:
+    """Emoji indicator for 52-week position."""
+    if high == low or high == 0:
+        return "⚪"
+    position = ((current - low) / (high - low)) * 100
+    if position >= 95:
+        return "🔥"  # Near 52W high
+    elif position >= 80:
+        return "🟢"  # Strong zone
+    elif position <= 5:
+        return "💎"  # Near 52W low (potential value)
+    elif position <= 20:
+        return "🔵"  # Low zone
+    else:
+        return "⚪"  # Mid-range
+
+
 def _make_table(headers: List[str], rows: List[List[str]], align: Optional[List[str]] = None) -> str:
     """Create ASCII table with proper alignment for <pre> blocks.
     
@@ -314,14 +353,40 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
             all_losers.append({**s, "sector": name.replace("NIFTY ", "")})
 
     all_gainers.sort(key=lambda x: x["pct"], reverse=True)
-    for s in all_gainers[:8]:
-        lines.append(f"  🟢 {s['symbol']}: {_pct(s['pct'])} (₹{s['last']:,.1f}) [{s['sector']}]")
+    if all_gainers[:8]:
+        headers = ["Symbol", "LTP", "%Chg", "Volume", "Sector"]
+        rows = []
+        for s in all_gainers[:8]:
+            rows.append([
+                s['symbol'][:10],
+                f"₹{s['last']:,.0f}",
+                _pct(s['pct']),
+                _vol(s.get('volume', 0)),
+                s['sector'][:12]
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'left'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
 
     lines.append("")
     lines.append("<b>📉 Top Losers (all sectors)</b>")
     all_losers.sort(key=lambda x: x["pct"])
-    for s in all_losers[:8]:
-        lines.append(f"  🔴 {s['symbol']}: {_pct(s['pct'])} (₹{s['last']:,.1f}) [{s['sector']}]")
+    if all_losers[:8]:
+        headers = ["Symbol", "LTP", "%Chg", "Volume", "Sector"]
+        rows = []
+        for s in all_losers[:8]:
+            rows.append([
+                s['symbol'][:10],
+                f"₹{s['last']:,.0f}",
+                _pct(s['pct']),
+                _vol(s.get('volume', 0)),
+                s['sector'][:12]
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'left'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
 
     # High volume stocks
     lines.append("")
@@ -342,18 +407,85 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     all_traded_unique.sort(key=lambda x: x["value_cr"], reverse=True)
     
     if all_traded_unique[:5]:
-        headers = ["Symbol", "Value (Cr)", "Change"]
+        headers = ["Symbol", "LTP", "Volume", "Value", "%Chg", "52W"]
         rows = []
         for s in all_traded_unique[:5]:
+            w52_pos = _52w_position(s['last'], s.get('year_low', 0), s.get('year_high', 0))
+            w52_emoji = _52w_emoji(s['last'], s.get('year_low', 0), s.get('year_high', 0))
             rows.append([
-                s['symbol'],
-                f"₹{s['value_cr']:,.0f}",
-                _pct(s['pct'])
+                s['symbol'][:10],
+                f"₹{s['last']:,.0f}",
+                _vol(s.get('volume', 0)),
+                f"₹{s['value_cr']:,.0f}Cr",
+                _pct(s['pct']),
+                f"{w52_emoji}{w52_pos}"
             ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right'])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right', 'center'])
         lines.append("<pre>")
         lines.append(table)
         lines.append("</pre>")
+        lines.append("<i>52W: 🔥=Near High | 💎=Near Low | Position in 52W range</i>")
+
+    # 52-Week Alerts - stocks near breakout/breakdown
+    lines.append("")
+    lines.append("<b>🎯 52-Week Alerts</b>")
+    all_stocks = []
+    for name, data in sectors.items():
+        all_stocks.extend(data.get("stocks", []))
+    
+    # Find stocks near 52W high (>= 95%) or 52W low (<= 5%)
+    near_high = []
+    near_low = []
+    for s in all_stocks:
+        if s.get('year_high', 0) == 0 or s.get('year_low', 0) == 0:
+            continue
+        pos_pct = ((s['last'] - s['year_low']) / (s['year_high'] - s['year_low'])) * 100
+        if pos_pct >= 95:
+            near_high.append({**s, 'pos_pct': pos_pct})
+        elif pos_pct <= 5:
+            near_low.append({**s, 'pos_pct': pos_pct})
+    
+    near_high = sorted(near_high, key=lambda x: x['pos_pct'], reverse=True)[:5]
+    near_low = sorted(near_low, key=lambda x: x['pos_pct'])[:5]
+    
+    if near_high:
+        lines.append("<i>🔥 Near 52-Week High (Breakout Zone):</i>")
+        headers = ["Symbol", "LTP", "52W High", "Dist", "%Chg"]
+        rows = []
+        for s in near_high:
+            dist_pct = ((s['year_high'] - s['last']) / s['last']) * 100
+            rows.append([
+                s['symbol'][:10],
+                f"₹{s['last']:,.1f}",
+                f"₹{s['year_high']:,.1f}",
+                f"{dist_pct:+.1f}%",
+                _pct(s['pct'])
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+    
+    if near_low:
+        lines.append("<i>💎 Near 52-Week Low (Value Zone):</i>")
+        headers = ["Symbol", "LTP", "52W Low", "Dist", "%Chg"]
+        rows = []
+        for s in near_low:
+            dist_pct = ((s['last'] - s['year_low']) / s['last']) * 100
+            rows.append([
+                s['symbol'][:10],
+                f"₹{s['last']:,.1f}",
+                f"₹{s['year_low']:,.1f}",
+                f"{dist_pct:+.1f}%",
+                _pct(s['pct'])
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+    
+    if not near_high and not near_low:
+        lines.append("<i>No stocks near 52-week extremes currently</i>")
 
     # Delta: stock movers between snapshots
     if delta and delta.get("sectors"):
@@ -422,44 +554,73 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     if comms:
         lines.append("<b>🥇 Commodity ETFs</b>")
         names = {
-            "TATAGOLD": "Gold (Tata)",
-            "TATSILV": "Silver (Tata)",
-            "GOLDBEES": "Gold (Nippon)",
+            "TATAGOLD": "Gold Tata",
+            "TATSILV": "Silv Tata",
+            "GOLDBEES": "Gold Nip",
             "LIQUIDBEES": "Liquid",
         }
+        headers = ["Commodity", "LTP", "%Chg", "52W Low", "52W High", "Position"]
+        rows = []
         for sym, data in comms.items():
-            e = _emoji_pct(data.get("pct", 0))
             name = names.get(sym, sym)
-            lines.append(f"{e} {name} ({sym}): <b>₹{data['last']:,.2f}</b> ({_pct(data['pct'])})")
-            lines.append(f"   52W: ₹{data.get('week52_low', 0):,.2f} — ₹{data.get('week52_high', 0):,.2f}")
+            w52_pos = _52w_position(data['last'], data.get('week52_low', 0), data.get('week52_high',0))
+            w52_emoji = _52w_emoji(data['last'], data.get('week52_low', 0), data.get('week52_high', 0))
+            rows.append([
+                name[:10],
+                f"₹{data['last']:,.0f}",
+                _pct(data['pct']),
+                f"₹{data.get('week52_low', 0):,.0f}",
+                f"₹{data.get('week52_high', 0):,.0f}",
+                f"{w52_emoji}{w52_pos}"
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right', 'center'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
         lines.append("")
 
     # Commodity indices
     indices = snapshot.get("indices", {})
     commodity_indices = ["NIFTY COMMODITIES", "NIFTY OIL & GAS", "NIFTY ENERGY"]
+    comm_idx_list = []
     for name in commodity_indices:
         if name in indices:
             idx = indices[name]
-            e = _emoji_pct(idx.get("pct", 0))
-            short = name.replace("NIFTY ", "")
-            lines.append(f"{e} {short}: <b>{idx['last']:,.1f}</b> ({_pct(idx['pct'])})")
-
-    lines.append("")
+            comm_idx_list.append((name.replace("NIFTY ", ""), idx['last'], idx['pct']))
+    
+    if comm_idx_list:
+        lines.append("<b>📈 Commodity Indices</b>")
+        headers = ["Index", "Level", "%Change"]
+        rows = []
+        for name, last, pct in comm_idx_list:
+            rows.append([name, f"{last:,.0f}", _pct(pct)])
+        table = _make_table(headers, rows, align=['left', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        lines.append("")
 
     # Forex
     forex = snapshot.get("forex")
     if forex:
         lines.append("<b>💱 Currency Rates</b>")
-        lines.append(f"🇺🇸→🇮🇳 USD/INR: <b>₹{forex['usdinr']:.4f}</b>")
+        headers = ["Pair", "Rate", "Change"]
+        rows = [["USD/INR", f"₹{forex['usdinr']:.4f}", ""]]
+        
         if forex.get("usdeur"):
-            lines.append(f"🇺🇸→🇪🇺 USD/EUR: €{forex['usdeur']:.4f}")
+            rows.append(["USD/EUR", f"€{forex['usdeur']:.4f}", ""])
         if forex.get("usdgbp"):
-            lines.append(f"🇺🇸→🇬🇧 USD/GBP: £{forex['usdgbp']:.4f}")
+            rows.append(["USD/GBP", f"£{forex['usdgbp']:.4f}", ""])
 
         # Forex delta
         if delta and delta.get("forex"):
             fd = delta["forex"]
-            lines.append(f"   {fd['direction']} ({fd['change']:+.4f})")
+            rows[0][2] = f"{fd['direction']} {fd['change']:+.4f}"
+        
+        table = _make_table(headers, rows, align=['left', 'right', 'left'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
 
     return "\n".join(lines)
 
@@ -472,44 +633,39 @@ def format_corporate_msg(snapshot: Dict) -> str:
     actions = snapshot.get("corporate_actions")
     if actions:
         lines.append(f"<b>📌 Corporate Actions ({len(actions)} items)</b>")
+        lines.append("")
 
         dividends = [a for a in actions if "dividend" in a.get("subject", "").lower()]
         splits = [a for a in actions if "split" in a.get("subject", "").lower()]
-        rights = [a for a in actions if "right" in a.get("subject", "").lower()]
         bonus = [a for a in actions if "bonus" in a.get("subject", "").lower()]
-        others = [a for a in actions if a not in dividends + splits + rights + bonus]
-
-        if dividends:
-            lines.append("")
-            lines.append("💰 <b>Dividends:</b>")
-            for a in dividends[:5]:
-                lines.append(f"  {a['symbol']}: {a['subject'][:60]}")
-                lines.append(f"  📅 Ex-Date: {a['ex_date']}")
-
-        if splits:
-            lines.append("")
-            lines.append("✂️ <b>Stock Splits:</b>")
-            for a in splits[:5]:
-                lines.append(f"  {a['symbol']}: {a['subject'][:60]}")
-                lines.append(f"  📅 Ex-Date: {a['ex_date']}")
-
-        if rights:
-            lines.append("")
-            lines.append("📜 <b>Rights Issues:</b>")
-            for a in rights[:5]:
-                lines.append(f"  {a['symbol']}: {a['subject'][:60]}")
-
-        if bonus:
-            lines.append("")
-            lines.append("🎁 <b>Bonus Issues:</b>")
-            for a in bonus[:5]:
-                lines.append(f"  {a['symbol']}: {a['subject'][:60]}")
-
-        if others:
-            lines.append("")
-            lines.append("📎 <b>Other Actions:</b>")
-            for a in others[:3]:
-                lines.append(f"  {a['symbol']}: {a['subject'][:60]}")
+        
+        # Combined table for all corporate actions
+        all_actions_for_table = []
+        for a in dividends[:5]:
+            all_actions_for_table.append(("💰", a, "Dividend"))
+        for a in splits[:3]:
+            all_actions_for_table.append(("✂️", a, "Split"))
+        for a in bonus[:3]:
+            all_actions_for_table.append(("🎁", a, "Bonus"))
+        
+        if all_actions_for_table:
+            headers = ["Type", "Symbol", "Ex-Date", "Details"]
+            rows = []
+            for emoji, a, action_type in all_actions_for_table[:10]:
+                # Truncate subject to fit
+                subject = a.get('subject', '')[:35]
+                rows.append([
+                    emoji,
+                    a['symbol'][:10],
+                    a['ex_date'][:10],
+                    subject
+                ])
+            table = _make_table(headers, rows, align=['center', 'left', 'left', 'left'])
+            lines.append("<pre>")
+            lines.append(table)
+            lines.append("</pre>")
+        else:
+            lines.append("<i>No significant corporate actions</i>")
     else:
         lines.append("No corporate actions this week")
 
@@ -519,32 +675,57 @@ def format_corporate_msg(snapshot: Dict) -> str:
     insiders = snapshot.get("insider_trading")
     if insiders:
         lines.append(f"<b>🔍 Insider Trading ({len(insiders)} trades)</b>")
-        lines.append("<i>Who is buying/selling their own company stock?</i>")
+        lines.append("<i>Promoter/Director buying or selling in their own company</i>")
         lines.append("")
 
-        big_buys = [t for t in insiders if t["buy_value"] > t["sell_value"]][:5]
-        big_sells = [t for t in insiders if t["sell_value"] > t["buy_value"]][:5]
+        big_buys = sorted([t for t in insiders if t["buy_value"] > t["sell_value"]], 
+                         key=lambda x: x["buy_value"], reverse=True)[:5]
+        big_sells = sorted([t for t in insiders if t["sell_value"] > t["buy_value"]], 
+                          key=lambda x: x["sell_value"], reverse=True)[:5]
 
         if big_buys:
             lines.append("🟢 <b>Top Insider Buys (Bullish Signal):</b>")
+            headers = ["Symbol", "Buyer", "Value"]
+            rows = []
             for t in big_buys:
                 val = t["buy_value"]
-                unit = "Cr" if val >= 1e7 else "L"
-                amt = val / 1e7 if val >= 1e7 else val / 1e5
-                lines.append(f"  {t['symbol']}: ₹{amt:,.1f} {unit} by {t['acquirer'][:30]}")
+                if val >= 1e7:
+                    val_str = f"₹{val/1e7:.1f}Cr"
+                else:
+                    val_str = f"₹{val/1e5:.1f}L"
+                rows.append([
+                    t['symbol'][:10],
+                    t['acquirer'][:20],
+                    val_str
+                ])
+            table = _make_table(headers, rows, align=['left', 'left', 'right'])
+            lines.append("<pre>")
+            lines.append(table)
+            lines.append("</pre>")
             lines.append("")
 
         if big_sells:
             lines.append("🔴 <b>Top Insider Sells (Caution Signal):</b>")
+            headers = ["Symbol", "Seller", "Value"]
+            rows = []
             for t in big_sells:
                 val = t["sell_value"]
-                unit = "Cr" if val >= 1e7 else "L"
-                amt = val / 1e7 if val >= 1e7 else val / 1e5
-                lines.append(f"  {t['symbol']}: ₹{amt:,.1f} {unit} by {t['acquirer'][:30]}")
+                if val >= 1e7:
+                    val_str = f"₹{val/1e7:.1f}Cr"
+                else:
+                    val_str = f"₹{val/1e5:.1f}L"
+                rows.append([
+                    t['symbol'][:10],
+                    t['acquirer'][:20],
+                    val_str
+                ])
+            table = _make_table(headers, rows, align=['left', 'left', 'right'])
+            lines.append("<pre>")
+            lines.append(table)
+            lines.append("</pre>")
+            lines.append("")
 
-        lines.append("")
-        lines.append("💡 <i>Insiders buying = they think price will go UP</i>")
-        lines.append("💡 <i>Insiders selling = could be profit-booking or concern</i>")
+        lines.append("💡 <i>Insider buying = Bullish | Insider selling = Caution</i>")
     else:
         lines.append("No insider trading data this week")
 
