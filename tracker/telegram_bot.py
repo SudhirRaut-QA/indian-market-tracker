@@ -55,14 +55,6 @@ def _emoji_pct(val: float) -> str:
         return "🔴🔴"
 
 
-def _bar(val: float, width: int = 5) -> str:
-    """Simple visual bar."""
-    filled = int(min(abs(val), width))
-    if val >= 0:
-        return "▓" * filled + "░" * (width - filled)
-    return "░" * (width - filled) + "▓" * filled
-
-
 def _format_prev_time(timestamp_str: str) -> str:
     """Format ISO timestamp to readable time like (9:00 AM)."""
     if not timestamp_str:
@@ -649,18 +641,24 @@ def format_corporate_msg(snapshot: Dict) -> str:
             all_actions_for_table.append(("🎁", a, "Bonus"))
         
         if all_actions_for_table:
-            headers = ["Type", "Symbol", "Ex-Date", "Details"]
+            headers = ["Type", "Symbol", "LTP", "PE", "Ex-Date", "Details"]
             rows = []
             for emoji, a, action_type in all_actions_for_table[:10]:
                 # Truncate subject to fit
-                subject = a.get('subject', '')[:35]
+                subject = a.get('subject', '')[:30]
+                ltp = a.get('ltp', 0)
+                pe = a.get('pe', 0)
+                ltp_str = f"₹{ltp:,.0f}" if ltp else "-"
+                pe_str = f"{pe:.1f}" if pe else "-"
                 rows.append([
                     emoji,
                     a['symbol'][:10],
+                    ltp_str,
+                    pe_str,
                     a['ex_date'][:10],
                     subject
                 ])
-            table = _make_table(headers, rows, align=['center', 'left', 'left', 'left'])
+            table = _make_table(headers, rows, align=['center', 'left', 'right', 'right', 'left', 'left'])
             lines.append("<pre>")
             lines.append(table)
             lines.append("</pre>")
@@ -758,6 +756,69 @@ def format_preopen_msg(snapshot: Dict) -> str:
 
     lines.append("")
     lines.append("💡 <i>Pre-open shows where stocks will start trading today</i>")
+    return "\n".join(lines)
+
+
+def format_52w_alerts_msg(snapshot: Dict) -> Optional[str]:
+    """Standalone 52-week alerts message (used by interactive_bot)."""
+    sectors = snapshot.get("sectors", {})
+    if not sectors:
+        return None
+
+    all_stocks = []
+    for name, data in sectors.items():
+        for s in data.get("stocks", []):
+            s_copy = {**s, "sector": name.replace("NIFTY ", "")}
+            all_stocks.append(s_copy)
+
+    near_high, near_low = [], []
+    for s in all_stocks:
+        yh, yl = s.get("year_high", 0), s.get("year_low", 0)
+        if yh == 0 or yl == 0 or yh == yl:
+            continue
+        pos = ((s["last"] - yl) / (yh - yl)) * 100
+        if pos >= 95:
+            near_high.append({**s, "pos_pct": pos})
+        elif pos <= 5:
+            near_low.append({**s, "pos_pct": pos})
+
+    if not near_high and not near_low:
+        return None
+
+    lines = ["<b>🎯 52-Week Alerts</b>", ""]
+    if near_high:
+        near_high.sort(key=lambda x: x["pos_pct"], reverse=True)
+        lines.append("<b>🔥 Near 52-Week High (Breakout Zone):</b>")
+        headers = ["Symbol", "LTP", "52W High", "Dist", "Sector"]
+        rows = []
+        for s in near_high[:10]:
+            dist = ((s["year_high"] - s["last"]) / s["last"]) * 100
+            rows.append([
+                s["symbol"][:10], f"₹{s['last']:,.1f}",
+                f"₹{s['year_high']:,.1f}", f"{dist:+.1f}%",
+                s["sector"][:12],
+            ])
+        lines.append("<pre>")
+        lines.append(_make_table(headers, rows, align=["left", "right", "right", "right", "left"]))
+        lines.append("</pre>")
+        lines.append("")
+
+    if near_low:
+        near_low.sort(key=lambda x: x["pos_pct"])
+        lines.append("<b>💎 Near 52-Week Low (Value Zone):</b>")
+        headers = ["Symbol", "LTP", "52W Low", "Dist", "Sector"]
+        rows = []
+        for s in near_low[:10]:
+            dist = ((s["last"] - s["year_low"]) / s["last"]) * 100
+            rows.append([
+                s["symbol"][:10], f"₹{s['last']:,.1f}",
+                f"₹{s['year_low']:,.1f}", f"{dist:+.1f}%",
+                s["sector"][:12],
+            ])
+        lines.append("<pre>")
+        lines.append(_make_table(headers, rows, align=["left", "right", "right", "right", "left"]))
+        lines.append("</pre>")
+
     return "\n".join(lines)
 
 

@@ -83,6 +83,8 @@ class ExcelManager:
             self._log_sectors(wb, snapshot, ts)
             self._log_commodities(wb, snapshot, ts)
             self._log_forex(wb, snapshot, ts)
+            self._log_options(wb, snapshot, ts)
+            self._log_preopen(wb, snapshot, ts)
 
             if snapshot.get("corporate_actions"):
                 self._log_corporate(wb, snapshot, date)
@@ -242,7 +244,8 @@ class ExcelManager:
             ws = wb.create_sheet(name)
             _header_row(ws, [
                 "Log Date", "Symbol", "Company", "Subject",
-                "Ex-Date", "Record Date",
+                "Ex-Date", "Record Date", "LTP", "PE",
+                "52W High", "52W Low",
             ])
         else:
             ws = wb[name]
@@ -252,6 +255,8 @@ class ExcelManager:
             vals = [
                 date, a["symbol"], a["company"], a["subject"],
                 a["ex_date"], a.get("record_date", ""),
+                a.get("ltp", 0), a.get("pe", 0),
+                a.get("week52_high", 0), a.get("week52_low", 0),
             ]
             for i, v in enumerate(vals, 1):
                 ws.cell(row=row, column=i, value=v).border = THIN_BORDER
@@ -281,3 +286,68 @@ class ExcelManager:
             for i, v in enumerate(vals, 1):
                 cell = ws.cell(row=row, column=i, value=v)
                 cell.border = THIN_BORDER
+
+    def _log_options(self, wb: Workbook, snapshot: Dict, ts: str):
+        name = "Options"
+        oc = snapshot.get("option_chain")
+        if not oc:
+            return
+
+        if name not in wb.sheetnames:
+            ws = wb.create_sheet(name)
+            _header_row(ws, [
+                "Timestamp", "Symbol", "PCR (OI)", "PCR (Vol)", "Signal",
+                "Max Pain", "CE OI Total", "PE OI Total",
+                "Top CE Strike 1", "Top CE OI 1",
+                "Top PE Strike 1", "Top PE OI 1",
+            ])
+        else:
+            ws = wb[name]
+
+        for sym, data in oc.items():
+            row = ws.max_row + 1
+            top_ce = data.get("top_ce", [{}])
+            top_pe = data.get("top_pe", [{}])
+            ce1 = top_ce[0] if top_ce else {}
+            pe1 = top_pe[0] if top_pe else {}
+            vals = [
+                ts, sym,
+                data.get("pcr_oi", 0), data.get("pcr_vol", 0),
+                data.get("signal", ""),
+                data.get("max_pain", 0),
+                data.get("ce_oi_total", 0), data.get("pe_oi_total", 0),
+                ce1.get("strike", 0), ce1.get("oi", 0),
+                pe1.get("strike", 0), pe1.get("oi", 0),
+            ]
+            for i, v in enumerate(vals, 1):
+                cell = ws.cell(row=row, column=i, value=v)
+                cell.border = THIN_BORDER
+
+    def _log_preopen(self, wb: Workbook, snapshot: Dict, ts: str):
+        name = "PreOpen"
+        po = snapshot.get("preopen")
+        if not po:
+            return
+
+        if name not in wb.sheetnames:
+            ws = wb.create_sheet(name)
+            _header_row(ws, [
+                "Timestamp", "Index", "Advances", "Declines",
+                "Top Gainer", "G IEP", "G %",
+                "Top Loser", "L IEP", "L %",
+            ])
+        else:
+            ws = wb[name]
+
+        row = ws.max_row + 1
+        g = po.get("gainers", [{}])[0] if po.get("gainers") else {}
+        l = po.get("losers", [{}])[0] if po.get("losers") else {}
+        vals = [
+            ts, po.get("key", "NIFTY"),
+            po.get("advances", 0), po.get("declines", 0),
+            g.get("symbol", ""), g.get("iep", 0), g.get("pct", 0),
+            l.get("symbol", ""), l.get("iep", 0), l.get("pct", 0),
+        ]
+        for i, v in enumerate(vals, 1):
+            cell = ws.cell(row=row, column=i, value=v)
+            cell.border = THIN_BORDER

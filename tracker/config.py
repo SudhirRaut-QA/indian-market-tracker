@@ -79,6 +79,14 @@ COMMODITY_ETFS = [
 ]
 
 # =============================================================================
+# SIGNAL DETECTOR THRESHOLDS
+# =============================================================================
+NEAR_52W_HIGH_PCT = 2.0   # Within 2% of 52-week high → breakout zone
+NEAR_52W_LOW_PCT = 5.0    # Within 5% of 52-week low → value zone
+HIGH_DELIVERY_PCT = 60.0  # Delivery % above this = genuine accumulation
+LOW_DELIVERY_PCT = 25.0   # Delivery % below this = speculative
+
+# =============================================================================
 # NSE
 # =============================================================================
 NSE_BASE_URL = "https://www.nseindia.com"
@@ -98,7 +106,7 @@ EXCEL_DIR = DATA_DIR / "excel"
 EXCEL_FILE = EXCEL_DIR / "market_tracker.xlsx"
 DRIVE_EXCEL_NAME = "market_tracker.xlsx"  # Permanent name for Google Drive
 SNAPSHOT_DIR = DATA_DIR / "snapshots"   # JSON snapshots for delta comparison
-DELTA_FILE = DATA_DIR / "last_snapshot.json"  # Most recent snapshot for delta calc
+# Note: DeltaEngine saves last_snapshot.json inside SNAPSHOT_DIR
 
 # =============================================================================
 # LOGGING

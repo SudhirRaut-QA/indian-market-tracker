@@ -432,6 +432,75 @@ class MarketScraper:
 
     # ── 9. Commodity ETF Quotes ──────────────────────────────────────────────
 
+    def get_stock_quote(self, symbol: str) -> Optional[Dict]:
+        """Fetch a single stock's quote (LTP, PE, 52W, volume, etc.)."""
+        raw = self.nse.api_get(self._url(f"/api/quote-equity?symbol={symbol}"))
+        if not raw:
+            return None
+        try:
+            pi = raw.get("priceInfo", {})
+            wk = pi.get("weekHighLow", {})
+            info = raw.get("info", {})
+            meta = raw.get("metadata", {})
+            ind = raw.get("industryInfo", {})
+            sec_info = raw.get("securityInfo", {})
+            return {
+                "symbol": symbol,
+                "last": pi.get("lastPrice", 0),
+                "change": pi.get("change", 0),
+                "pct": pi.get("pChange", 0),
+                "open": pi.get("open", 0),
+                "high": pi.get("intraDayHighLow", {}).get("max", 0),
+                "low": pi.get("intraDayHighLow", {}).get("min", 0),
+                "prev_close": pi.get("previousClose", 0),
+                "week52_high": wk.get("max", 0),
+                "week52_low": wk.get("min", 0),
+                "pe": meta.get("pdSymbolPe", 0) or sec_info.get("pe", 0),
+                "sector": meta.get("industry", ind.get("industry", "")),
+                "face_value": sec_info.get("faceValue", 0),
+            }
+        except Exception as e:
+            logger.error(f"Stock quote {symbol} error: {e}")
+            return None
+
+    def enrich_corporate_actions(self, actions: List[Dict], max_enrich: int = 10) -> List[Dict]:
+        """Enrich corporate actions with LTP, PE from stock quotes.
+        Only enriches the first `max_enrich` actions to avoid too many API calls.
+        """
+        if not actions:
+            return actions
+        enriched = 0
+        seen_symbols = set()
+        quote_cache = {}
+        for a in actions:
+            sym = a.get("symbol", "")
+            if not sym or enriched >= max_enrich:
+                continue
+            if sym in seen_symbols:
+                # Reuse cached quote
+                if sym in quote_cache:
+                    q = quote_cache[sym]
+                    a["ltp"] = q.get("last", 0)
+                    a["pe"] = q.get("pe", 0)
+                    a["week52_high"] = q.get("week52_high", 0)
+                    a["week52_low"] = q.get("week52_low", 0)
+                continue
+            seen_symbols.add(sym)
+            try:
+                q = self.get_stock_quote(sym)
+                if q:
+                    quote_cache[sym] = q
+                    a["ltp"] = q.get("last", 0)
+                    a["pe"] = q.get("pe", 0)
+                    a["week52_high"] = q.get("week52_high", 0)
+                    a["week52_low"] = q.get("week52_low", 0)
+                    enriched += 1
+            except Exception as e:
+                logger.warning(f"Enrich {sym}: {e}")
+            time.sleep(1)
+        logger.info(f"Enriched {enriched} corporate actions with LTP/PE")
+        return actions
+
     def get_commodity_etfs(self) -> Dict:
         results = {}
         for symbol in config.COMMODITY_ETFS:
@@ -534,11 +603,7 @@ class MarketScraper:
 
         # Sectors
         if include_sectors:
-            priority = sector_list or [
-                "NIFTY 50", "NIFTY BANK", "NIFTY IT", "NIFTY AUTO",
-                "NIFTY PHARMA", "NIFTY METAL", "NIFTY PSU BANK",
-                "NIFTY INDIA DEFENCE", "NIFTY OIL & GAS",
-            ]
+            priority = sector_list or list(config.SECTORS.keys())
             for name in priority:
                 try:
                     d = self.get_sector_stocks(name)
@@ -571,6 +636,11 @@ class MarketScraper:
         if include_corporate:
             try:
                 snapshot["corporate_actions"] = self.get_corporate_actions()
+                # Enrich with LTP, PE from stock quotes
+                if snapshot["corporate_actions"]:
+                    snapshot["corporate_actions"] = self.enrich_corporate_actions(
+                        snapshot["corporate_actions"], max_enrich=15
+                    )
             except Exception as e:
                 snapshot["errors"].append(f"Corp actions: {e}")
             time.sleep(1.5)
