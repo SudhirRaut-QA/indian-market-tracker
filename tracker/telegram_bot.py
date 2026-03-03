@@ -300,7 +300,7 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     lines.append("")
 
     # Key Indices
-    indices = snapshot.get("indices", {})
+    indices = snapshot.get("indices") or {}
     if indices:
         lines.append("<b>📈 Key Indices</b>")
         top5 = ["NIFTY 50", "NIFTY BANK", "NIFTY NEXT 50", "NIFTY MIDCAP 100", "NIFTY SMALLCAP 100"]
@@ -347,7 +347,7 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     """Sector heatmap + top movers per sector."""
     lines = ["<b>🏭 Sector Analysis</b>", ""]
 
-    sectors = snapshot.get("sectors", {})
+    sectors = snapshot.get("sectors") or {}
     if not sectors:
         lines.append("No sector data available")
         return "\n".join(lines)
@@ -528,7 +528,7 @@ def format_options_msg(snapshot: Dict) -> str:
     """Option chain PCR analysis."""
     lines = ["<b>📊 Options Analysis</b>", ""]
 
-    oc = snapshot.get("option_chain", {})
+    oc = snapshot.get("option_chain") or {}
     if not oc:
         lines.append("No options data available")
         return "\n".join(lines)
@@ -570,7 +570,7 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     lines = ["<b>🏆 Commodities & Forex</b>", ""]
 
     # Commodity ETFs
-    comms = snapshot.get("commodities", {})
+    comms = snapshot.get("commodities") or {}
     if comms:
         lines.append("<b>🥇 Commodity ETFs</b>")
         names = {
@@ -600,7 +600,7 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         lines.append("")
 
     # Commodity indices
-    indices = snapshot.get("indices", {})
+    indices = snapshot.get("indices") or {}
     commodity_indices = ["NIFTY COMMODITIES", "NIFTY OIL & GAS", "NIFTY ENERGY"]
     comm_idx_list = []
     for name in commodity_indices:
@@ -841,7 +841,7 @@ def format_preopen_msg(snapshot: Dict) -> str:
 
 def format_52w_alerts_msg(snapshot: Dict) -> Optional[str]:
     """Standalone 52-week alerts message (used by interactive_bot)."""
-    sectors = snapshot.get("sectors", {})
+    sectors = snapshot.get("sectors") or {}
     if not sectors:
         return None
 
