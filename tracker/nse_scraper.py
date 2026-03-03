@@ -539,6 +539,7 @@ class MarketScraper:
                 if sym in quote_cache:
                     q = quote_cache[sym]
                     a["ltp"] = q.get("last", 0)
+                    a["pct"] = q.get("pct", 0)
                     a["pe"] = q.get("pe", 0)
                     a["week52_high"] = q.get("week52_high", 0)
                     a["week52_low"] = q.get("week52_low", 0)
@@ -549,6 +550,7 @@ class MarketScraper:
                 if q:
                     quote_cache[sym] = q
                     a["ltp"] = q.get("last", 0)
+                    a["pct"] = q.get("pct", 0)
                     a["pe"] = q.get("pe", 0)
                     a["week52_high"] = q.get("week52_high", 0)
                     a["week52_low"] = q.get("week52_low", 0)
