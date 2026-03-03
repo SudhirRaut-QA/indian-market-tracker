@@ -5,7 +5,7 @@ name: Afternoon Session (15:35–21:00 IST)
 
 on:
   schedule:
-    - cron: '45 9 * * 1-5'    # 15:15 IST = 09:45 UTC  (Mon-Fri)
+    - cron: '42 9 * * 1-5'    # 15:12 IST = 09:42 UTC  (Mon-Fri)
   workflow_dispatch:
     inputs:
       minutes:

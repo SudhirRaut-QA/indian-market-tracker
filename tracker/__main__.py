@@ -18,7 +18,7 @@ import os
 import sys
 import time
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
@@ -59,7 +59,7 @@ def run_once(
     """Run a single data collection + notification cycle."""
     # Start timing and get IST timestamp
     start_time = time.time()
-    ist = pytz.timezone('Asia/Kolkata')
+    ist = ZoneInfo('Asia/Kolkata')
     start_ist = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S IST")
     
     logger.info("=" * 70)

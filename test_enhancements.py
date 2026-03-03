@@ -135,16 +135,16 @@ def test_logging_improvements():
     print("\n🔄 Testing Logging Improvements\n")
     
     try:
-        # Import to check if pytz is available and imports work
+        # Import to check if zoneinfo is available and imports work
         from tracker.__main__ import run_once
-        import pytz
+        from zoneinfo import ZoneInfo
         
-        print("✅ pytz import: PASSED")
+        print("✅ zoneinfo import: PASSED (stdlib)")
         print("✅ IST timezone support: Available")
         
         # Test IST timezone
         from datetime import datetime
-        ist = pytz.timezone('Asia/Kolkata')
+        ist = ZoneInfo('Asia/Kolkata')
         now_ist = datetime.now(ist)
         print(f"   Current IST time: {now_ist.strftime('%Y-%m-%d %H:%M:%S IST')}")
         

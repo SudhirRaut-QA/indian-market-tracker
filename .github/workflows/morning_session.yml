@@ -6,7 +6,7 @@ name: Morning Session (09:00–11:00 IST)
 
 on:
   schedule:
-    - cron: '09 3 * * 1-5'   # 08:39 IST = 03:09 UTC  (Mon-Fri)
+    - cron: '07 3 * * 1-5'   # 08:37 IST = 03:07 UTC  (Mon-Fri)
   workflow_dispatch:
     inputs:
       minutes:
