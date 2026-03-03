@@ -100,6 +100,7 @@ SLOT_CONFIG = {
         "include_options": False,
         "include_corporate": True,
         "include_insider": False,
+        "include_bulk_deals": True,
     },
     "21:00": {
         "label": "Evening Digest",
@@ -108,6 +109,7 @@ SLOT_CONFIG = {
         "include_options": True,
         "include_corporate": True,
         "include_insider": True,
+        "include_bulk_deals": True,
     },
 }
 
@@ -145,6 +147,7 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str):
             include_options=cfg.get("include_options", False),
             include_corporate=cfg.get("include_corporate", False),
             include_insider=cfg.get("include_insider", False),
+            include_bulk_deals=cfg.get("include_bulk_deals", False),
             label=label,
         )
     except JobTimeout:

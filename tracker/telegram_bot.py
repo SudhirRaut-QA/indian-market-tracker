@@ -648,8 +648,14 @@ def format_corporate_msg(snapshot: Dict) -> str:
                 subject = a.get('subject', '')[:30]
                 ltp = a.get('ltp', 0)
                 pe = a.get('pe', 0)
-                ltp_str = f"₹{ltp:,.0f}" if ltp else "-"
-                pe_str = f"{pe:.1f}" if pe else "-"
+                # Ensure numeric types
+                try:
+                    ltp_val = float(ltp) if ltp else 0
+                    pe_val = float(pe) if pe else 0
+                except (ValueError, TypeError):
+                    ltp_val, pe_val = 0, 0
+                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "-"
+                pe_str = f"{pe_val:.1f}" if pe_val else "-"
                 rows.append([
                     emoji,
                     a['symbol'][:10],
@@ -819,6 +825,221 @@ def format_52w_alerts_msg(snapshot: Dict) -> Optional[str]:
         lines.append(_make_table(headers, rows, align=["left", "right", "right", "right", "left"]))
         lines.append("</pre>")
 
+    return "\n".join(lines)
+
+
+def format_bulk_deals_msg(snapshot: Dict) -> str:
+    """Bulk & Block Deals - Large off-market and on-exchange trades.
+    
+    Analysis includes:
+    - Client accumulation/distribution patterns
+    - Stock-wise buy vs sell pressure
+    - Institutional vs retail participation signals
+    """
+    lines = ["<b>💼 Bulk & Block Deals</b>", ""]
+    
+    bulk_deals = snapshot.get("bulk_deals") or []
+    block_deals = snapshot.get("block_deals") or []
+    
+    if not bulk_deals and not block_deals:
+        lines.append("No large deals reported today")
+        return "\n".join(lines)
+    
+    # === BULK DEALS (off-market) ===
+    if bulk_deals:
+        lines.append(f"<b>📦 Bulk Deals ({len(bulk_deals)})</b>")
+        lines.append("<i>Off-market large volume trades (>0.5% of shares)</i>")
+        lines.append("")
+        
+        # Separate buys and sells
+        buys = [d for d in bulk_deals if d["trade_type"] == "BUY"]
+        sells = [d for d in bulk_deals if d["trade_type"] == "SELL"]
+        
+        # Accumulation analysis
+        symbol_net = {}
+        for d in bulk_deals:
+            sym = d["symbol"]
+            val = d["value_cr"] if d["trade_type"] == "BUY" else -d["value_cr"]
+            symbol_net[sym] = symbol_net.get(sym, 0) + val
+        
+        # Top buys
+        if buys:
+            lines.append(f"<b>🟢 Top Bulk Buys ({len(buys)} deals):</b>")
+            headers = ["Symbol", "Client", "Qty", "Price", "Value"]
+            rows = []
+            for d in buys[:8]:
+                client = d["client"][:20]
+                if len(d["client"]) > 20:
+                    client += "..."
+                rows.append([
+                    d["symbol"][:10],
+                    client,
+                    _vol(d["qty"]),
+                    f"₹{d['price']:,.1f}",
+                    f"₹{d['value_cr']:.1f}Cr"
+                ])
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=["left", "left", "right", "right", "right"]))
+            lines.append("</pre>")
+            lines.append("")
+        
+        # Top sells
+        if sells:
+            lines.append(f"<b>🔴 Top Bulk Sells ({len(sells)} deals):</b>")
+            headers = ["Symbol", "Client", "Qty", "Price", "Value"]
+            rows = []
+            for d in sells[:8]:
+                client = d["client"][:20]
+                if len(d["client"]) > 20:
+                    client += "..."
+                rows.append([
+                    d["symbol"][:10],
+                    client,
+                    _vol(d["qty"]),
+                    f"₹{d['price']:,.1f}",
+                    f"₹{d['value_cr']:.1f}Cr"
+                ])
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=["left", "left", "right", "right", "right"]))
+            lines.append("</pre>")
+            lines.append("")
+        
+        # Net accumulation by symbol
+        top_acc = sorted(symbol_net.items(), key=lambda x: x[1], reverse=True)[:5]
+        top_dist = sorted(symbol_net.items(), key=lambda x: x[1])[:5]
+        
+        if top_acc and top_acc[0][1] > 0:
+            lines.append("<b>📊 Most Accumulated (Net Buying):</b>")
+            for sym, net_val in top_acc:
+                if net_val > 0:
+                    lines.append(f"  🟢 {sym}: +₹{net_val:.1f}Cr")
+            lines.append("")
+        
+        if top_dist and top_dist[0][1] < 0:
+            lines.append("<b>📊 Most Distributed (Net Selling):</b>")
+            for sym, net_val in top_dist:
+                if net_val < 0:
+                    lines.append(f"  🔴 {sym}: ₹{net_val:.1f}Cr")
+            lines.append("")
+    
+    # === BLOCK DEALS (on-exchange) ===
+    if block_deals:
+        lines.append(f"<b>🏛️ Block Deals ({len(block_deals)})</b>")
+        lines.append("<i>Large institutional trades on exchange (>₹10Cr)</i>")
+        lines.append("")
+        
+        # Separate buys and sells
+        b_buys = [d for d in block_deals if d["trade_type"] == "BUY"]
+        b_sells = [d for d in block_deals if d["trade_type"] == "SELL"]
+        
+        # Top block buys
+        if b_buys:
+            lines.append(f"<b>🟢 Top Block Buys ({len(b_buys)} deals):</b>")
+            headers = ["Symbol", "Client", "Qty", "Price", "Value"]
+            rows = []
+            for d in b_buys[:8]:
+                client = d["client"][:20]
+                if len(d["client"]) > 20:
+                    client += "..."
+                rows.append([
+                    d["symbol"][:10],
+                    client,
+                    _vol(d["qty"]),
+                    f"₹{d['price']:,.1f}",
+                    f"₹{d['value_cr']:.1f}Cr"
+                ])
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=["left", "left", "right", "right", "right"]))
+            lines.append("</pre>")
+            lines.append("")
+        
+        # Top block sells
+        if b_sells:
+            lines.append(f"<b>🔴 Top Block Sells ({len(b_sells)} deals):</b>")
+            headers = ["Symbol", "Client", "Qty", "Price", "Value"]
+            rows = []
+            for d in b_sells[:8]:
+                client = d["client"][:20]
+                if len(d["client"]) > 20:
+                    client += "..."
+                rows.append([
+                    d["symbol"][:10],
+                    client,
+                    _vol(d["qty"]),
+                    f"₹{d['price']:,.1f}",
+                    f"₹{d['value_cr']:.1f}Cr"
+                ])
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=["left", "left", "right", "right", "right"]))
+            lines.append("</pre>")
+            lines.append("")
+    
+    # === ANALYSIS & PREDICTION ===
+    lines.append("<b>🔮 Analysis & Signals:</b>")
+    
+    # Combine all deals for analysis
+    all_deals = (bulk_deals or []) + (block_deals or [])
+    
+    if all_deals:
+        # Stock-level buy/sell ratio
+        stock_pressure = {}
+        for d in all_deals:
+            sym = d["symbol"]
+            if sym not in stock_pressure:
+                stock_pressure[sym] = {"buy": 0, "sell": 0}
+            if d["trade_type"] == "BUY":
+                stock_pressure[sym]["buy"] += d["value_cr"]
+            else:
+                stock_pressure[sym]["sell"] += d["value_cr"]
+        
+        # Find stocks with strong buying pressure
+        strong_buys = []
+        strong_sells = []
+        for sym, pressure in stock_pressure.items():
+            buy, sell = pressure["buy"], pressure["sell"]
+            total = buy + sell
+            if total > 5:  # Minimum ₹5Cr total activity
+                buy_ratio = buy / total if total else 0
+                if buy_ratio >= 0.75:  # 75%+ buying
+                    strong_buys.append((sym, buy, sell, buy_ratio))
+                elif buy_ratio <= 0.25:  # 75%+ selling
+                    strong_sells.append((sym, buy, sell, buy_ratio))
+        
+        if strong_buys:
+            lines.append("<b>🐂 Strong Buying Pressure (Bullish):</b>")
+            strong_buys.sort(key=lambda x: x[1], reverse=True)
+            for sym, buy, sell, ratio in strong_buys[:5]:
+                lines.append(f"  💚 {sym}: Buy ₹{buy:.1f}Cr vs Sell ₹{sell:.1f}Cr ({ratio*100:.0f}% buy)")
+        
+        if strong_sells:
+            lines.append("<b>🐻 Strong Selling Pressure (Bearish):</b>")
+            strong_sells.sort(key=lambda x: x[2], reverse=True)
+            for sym, buy, sell, ratio in strong_sells[:5]:
+                lines.append(f"  ❤️ {sym}: Sell ₹{sell:.1f}Cr vs Buy ₹{buy:.1f}Cr ({(1-ratio)*100:.0f}% sell)")
+        
+        if not strong_buys and not strong_sells:
+            lines.append("  ⚖️ Balanced activity - no clear directional bias")
+        
+        # Total money flow
+        total_buy = sum(d["value_cr"] for d in all_deals if d["trade_type"] == "BUY")
+        total_sell = sum(d["value_cr"] for d in all_deals if d["trade_type"] == "SELL")
+        
+        lines.append("")
+        lines.append(f"<b>💰 Overall Flow:</b>")
+        lines.append(f"  Buy: ₹{total_buy:.1f}Cr | Sell: ₹{total_sell:.1f}Cr")
+        if total_buy > total_sell * 1.2:
+            lines.append(f"  ✅ <b>Net Bullish</b> - institutional buying dominates")
+        elif total_sell > total_buy * 1.2:
+            lines.append(f"  ⚠️ <b>Net Bearish</b> - institutional selling dominates")
+        else:
+            lines.append(f"  ➡️ <b>Neutral</b> - balanced activity")
+    else:
+        lines.append("  No deals to analyze")
+    
+    lines.append("")
+    lines.append("<i>💡 Bulk deals show client-level accumulation/distribution patterns</i>")
+    lines.append("<i>💡 Block deals indicate institutional positioning</i>")
+    
     return "\n".join(lines)
 
 

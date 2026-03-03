@@ -28,7 +28,7 @@ from .delta_engine import DeltaEngine
 from .telegram_bot import (
     TelegramBot, format_fii_dii_msg, format_sector_msg,
     format_options_msg, format_commodities_msg, format_corporate_msg,
-    format_preopen_msg, format_delta_alert,
+    format_preopen_msg, format_delta_alert, format_bulk_deals_msg,
 )
 from .excel_manager import ExcelManager
 from .google_drive_uploader import GoogleDriveUploader
@@ -48,6 +48,7 @@ def run_once(
     include_preopen: bool = False,
     include_corporate: bool = False,
     include_insider: bool = False,
+    include_bulk_deals: bool = False,
     send_telegram: bool = True,
     save_excel: bool = True,
     save_json: bool = True,
@@ -69,6 +70,7 @@ def run_once(
         include_preopen=include_preopen,
         include_corporate=include_corporate,
         include_insider=include_insider,
+        include_bulk_deals=include_bulk_deals,
     )
 
     if snapshot.get("errors"):
@@ -122,6 +124,10 @@ def run_once(
         if (include_corporate or include_insider) and (snapshot.get("corporate_actions") or snapshot.get("insider_trading")):
             messages.append(("📋 Corporate", format_corporate_msg(snapshot)))
 
+        # Bulk & Block Deals
+        if include_bulk_deals and (snapshot.get("bulk_deals") or snapshot.get("block_deals")):
+            messages.append(("💼 Deals", format_bulk_deals_msg(snapshot)))
+
         for name, msg in messages:
             logger.info(f"Sending: {name}")
             bot.send(msg)
@@ -162,6 +168,10 @@ def run_once(
         parts.append(f"{len(snapshot['corporate_actions'])} corp actions")
     if snapshot.get("insider_trading"):
         parts.append(f"{len(snapshot['insider_trading'])} insider trades")
+    if snapshot.get("bulk_deals"):
+        parts.append(f"{len(snapshot['bulk_deals'])} bulk deals")
+    if snapshot.get("block_deals"):
+        parts.append(f"{len(snapshot['block_deals'])} block deals")
 
     logger.info(f"Complete: {', '.join(parts)}")
     return snapshot
@@ -241,6 +251,7 @@ Examples:
     parser.add_argument("--preopen", action="store_true", help="Include pre-open data")
     parser.add_argument("--corporate", action="store_true", help="Include corporate actions")
     parser.add_argument("--insider", action="store_true", help="Include insider trading")
+    parser.add_argument("--bulk-deals", action="store_true", help="Include bulk & block deals")
 
     # Output flags
     parser.add_argument("--no-telegram", action="store_true", help="Skip Telegram messages")
@@ -271,6 +282,7 @@ Examples:
         inc_preopen = args.preopen
         inc_corporate = args.full or args.corporate
         inc_insider = args.full or args.insider or args.corporate
+        inc_bulk_deals = args.full or args.bulk_deals
 
         run_once(
             include_sectors=inc_sectors,
@@ -278,6 +290,7 @@ Examples:
             include_preopen=inc_preopen,
             include_corporate=inc_corporate,
             include_insider=inc_insider,
+            include_bulk_deals=inc_bulk_deals,
             send_telegram=not args.no_telegram,
             save_excel=not args.no_excel,
             save_json=not args.no_json,

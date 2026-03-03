@@ -90,6 +90,8 @@ class ExcelManager:
                 self._log_corporate(wb, snapshot, date)
             if snapshot.get("insider_trading"):
                 self._log_insider(wb, snapshot, date)
+            if snapshot.get("bulk_deals") or snapshot.get("block_deals"):
+                self._log_bulk_deals(wb, snapshot, date)
 
             # Remove default sheet if empty
             if "Sheet" in wb.sheetnames:
@@ -351,3 +353,48 @@ class ExcelManager:
         for i, v in enumerate(vals, 1):
             cell = ws.cell(row=row, column=i, value=v)
             cell.border = THIN_BORDER
+
+    def _log_bulk_deals(self, wb: Workbook, snapshot: Dict, date: str):
+        name = "BulkBlock"
+        bulk = snapshot.get("bulk_deals", [])
+        block = snapshot.get("block_deals", [])
+        
+        if not bulk and not block:
+            return
+
+        if name not in wb.sheetnames:
+            ws = wb.create_sheet(name)
+            _header_row(ws, [
+                "Log Date", "Type", "Symbol", "Client",
+                "Trade Type", "Quantity", "Price", "Value (Cr)",
+            ])
+        else:
+            ws = wb[name]
+
+        # Log bulk deals
+        for d in bulk[:30]:  # Top 30
+            row = ws.max_row + 1
+            vals = [
+                date, "BULK", d["symbol"], d["client"],
+                d["trade_type"], d["qty"], d["price"], d["value_cr"],
+            ]
+            for i, v in enumerate(vals, 1):
+                cell = ws.cell(row=row, column=i, value=v)
+                cell.border = THIN_BORDER
+                # Color by trade type
+                if i == 5 and isinstance(v, str):
+                    cell.fill = GREEN_FILL if v == "BUY" else RED_FILL
+        
+        # Log block deals
+        for d in block[:30]:  # Top 30
+            row = ws.max_row + 1
+            vals = [
+                date, "BLOCK", d["symbol"], d["client"],
+                d["trade_type"], d["qty"], d["price"], d["value_cr"],
+            ]
+            for i, v in enumerate(vals, 1):
+                cell = ws.cell(row=row, column=i, value=v)
+                cell.border = THIN_BORDER
+                # Color by trade type
+                if i == 5 and isinstance(v, str):
+                    cell.fill = GREEN_FILL if v == "BUY" else RED_FILL

@@ -390,7 +390,59 @@ class MarketScraper:
             logger.error(f"Corp actions error: {e}")
             return None
 
-    # ── 8. Insider Trading (PIT) ─────────────────────────────────────────────
+    # ── 8. Bulk/Block Deals ──────────────────────────────────────────────────
+
+    def get_bulk_deals(self) -> Optional[List[Dict]]:
+        """Get today's bulk deals (off-market large volume trades)."""
+        raw = self.nse.api_get(self._url("/api/snapshot-capital-market-largedeal"))
+        if not raw or not isinstance(raw, dict):
+            return None
+        try:
+            deals = []
+            for item in raw.get("BULKDEAL", []):
+                deals.append({
+                    "symbol": item.get("symbol", ""),
+                    "client": item.get("clientName", ""),
+                    "trade_type": "BUY" if "BUY" in item.get("action", "").upper() else "SELL",
+                    "qty": self._num(item.get("quantity", "0")),
+                    "price": self._num(item.get("tradePrice", "0")),
+                    "value_cr": round(self._num(item.get("quantity", "0")) * self._num(item.get("tradePrice", "0")) / 1e7, 2),
+                    "date": item.get("date", ""),
+                })
+            # Sort by value
+            deals.sort(key=lambda x: x["value_cr"], reverse=True)
+            logger.info(f"Bulk deals: {len(deals)}")
+            return deals
+        except Exception as e:
+            logger.error(f"Bulk deals error: {e}")
+            return None
+
+    def get_block_deals(self) -> Optional[List[Dict]]:
+        """Get today's block deals (large institutional trades on exchange)."""
+        raw = self.nse.api_get(self._url("/api/block-deal"))
+        if not raw or not isinstance(raw, list):
+            return None
+        try:
+            deals = []
+            for item in raw:
+                deals.append({
+                    "symbol": item.get("symbol", ""),
+                    "client": item.get("clientName", ""),
+                    "trade_type": "BUY" if "BUY" in item.get("dealType", "").upper() else "SELL",
+                    "qty": self._num(item.get("quantity", "0")),
+                    "price": self._num(item.get("tradePrice", "0")),
+                    "value_cr": round(self._num(item.get("quantity", "0")) * self._num(item.get("tradePrice", "0")) / 1e7, 2),
+                    "date": item.get("dealDate", ""),
+                })
+            # Sort by value
+            deals.sort(key=lambda x: x["value_cr"], reverse=True)
+            logger.info(f"Block deals: {len(deals)}")
+            return deals
+        except Exception as e:
+            logger.error(f"Block deals error: {e}")
+            return None
+
+    # ── 9. Insider Trading (PIT) ─────────────────────────────────────────────
 
     def get_insider_trading(self, days_range: int = 7) -> Optional[List[Dict]]:
         today = datetime.now()
@@ -444,6 +496,12 @@ class MarketScraper:
             meta = raw.get("metadata", {})
             ind = raw.get("industryInfo", {})
             sec_info = raw.get("securityInfo", {})
+            # PE can be string or float from NSE API
+            pe_val = meta.get("pdSymbolPe") or sec_info.get("pe", 0)
+            try:
+                pe_float = float(pe_val) if pe_val else 0.0
+            except (ValueError, TypeError):
+                pe_float = 0.0
             return {
                 "symbol": symbol,
                 "last": pi.get("lastPrice", 0),
@@ -455,7 +513,7 @@ class MarketScraper:
                 "prev_close": pi.get("previousClose", 0),
                 "week52_high": wk.get("max", 0),
                 "week52_low": wk.get("min", 0),
-                "pe": meta.get("pdSymbolPe", 0) or sec_info.get("pe", 0),
+                "pe": pe_float,
                 "sector": meta.get("industry", ind.get("industry", "")),
                 "face_value": sec_info.get("faceValue", 0),
             }
@@ -554,6 +612,7 @@ class MarketScraper:
         include_preopen: bool = False,
         include_corporate: bool = False,
         include_insider: bool = False,
+        include_bulk_deals: bool = False,
         sector_list: List[str] = None,
     ) -> Dict:
         snapshot = {
@@ -562,7 +621,8 @@ class MarketScraper:
             "forex": None, "commodities": {},
             "sectors": {}, "option_chain": {},
             "preopen": None, "corporate_actions": None,
-            "insider_trading": None, "errors": [],
+            "insider_trading": None, "bulk_deals": None, "block_deals": None,
+            "errors": [],
         }
 
         # FII/DII
@@ -651,6 +711,18 @@ class MarketScraper:
                 snapshot["insider_trading"] = self.get_insider_trading()
             except Exception as e:
                 snapshot["errors"].append(f"Insider: {e}")
+
+        # Bulk & block deals (same-day trades, check once per day)
+        if include_bulk_deals:
+            try:
+                snapshot["bulk_deals"] = self.get_bulk_deals()
+            except Exception as e:
+                snapshot["errors"].append(f"Bulk deals: {e}")
+            time.sleep(1.5)
+            try:
+                snapshot["block_deals"] = self.get_block_deals()
+            except Exception as e:
+                snapshot["errors"].append(f"Block deals: {e}")
 
         logger.info(f"Snapshot complete ({len(snapshot['errors'])} errors)")
         return snapshot
