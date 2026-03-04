@@ -150,6 +150,9 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str, on_complete: Optional
             include_corporate=cfg.get("include_corporate", False),
             include_insider=cfg.get("include_insider", False),
             include_bulk_deals=cfg.get("include_bulk_deals", False),
+            send_telegram=cfg.get("send_telegram", True),
+            save_excel=cfg.get("save_excel", True),
+            save_json=cfg.get("save_json", True),
             use_cache=cfg.get("use_cache", False),
             label=label,
         )

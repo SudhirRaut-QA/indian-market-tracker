@@ -6,7 +6,7 @@ name: Morning Session (09:00–11:00 IST)
 
 on:
   schedule:
-    - cron: '07 3 * * 1-5'   # 08:37 IST = 03:07 UTC  (Mon-Fri)
+    - cron: '30 2 * * 1-5'   # 08:00 IST = 02:30 UTC  (Mon-Fri) - starts early to account for GitHub delays
   workflow_dispatch:
     inputs:
       minutes:

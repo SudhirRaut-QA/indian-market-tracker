@@ -82,7 +82,9 @@ class NSESession:
 
         for attempt in range(config.NSE_MAX_RETRIES):
             try:
-                resp = self.session.get(url, params=params, timeout=15)
+                # Add Referer header for each API call to prevent blocking
+                headers = {"Referer": config.NSE_BASE_URL + "/"}
+                resp = self.session.get(url, params=params, timeout=20, headers=headers)
                 if resp.status_code == 200:
                     body = resp.text.strip()
                     if body.startswith(("[", "{")):
@@ -104,6 +106,8 @@ class NSESession:
 
             if attempt < config.NSE_MAX_RETRIES - 1:
                 time.sleep(config.NSE_RETRY_DELAY * (attempt + 1))
+        
+        logger.error(f"All {config.NSE_MAX_RETRIES} retries failed for {url}")
         return None
 
 
@@ -121,6 +125,7 @@ class MarketScraper:
     def get_fii_dii(self) -> Optional[Dict]:
         raw = self.nse.api_get(self._url("/api/fiidiiTradeReact"))
         if not raw:
+            logger.warning("FII/DII API returned no data (NSE may be blocking or API unavailable)")
             return None
         try:
             result = {"timestamp": datetime.now().isoformat(), "date": None,
@@ -163,6 +168,7 @@ class MarketScraper:
     def get_indices(self) -> Optional[Dict]:
         raw = self.nse.api_get(self._url("/api/allIndices"))
         if not raw:
+            logger.warning("Indices API returned no data (NSE may be blocking or API unavailable)")
             return None
         try:
             result = {}
@@ -182,7 +188,7 @@ class MarketScraper:
                         "unchanged": idx.get("unchanged", 0),
                     }
             logger.info(f"Indices: {len(result)}")
-            return result
+            return result if result else None
         except Exception as e:
             logger.error(f"Indices error: {e}")
             return None
