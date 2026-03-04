@@ -415,8 +415,11 @@ class ExcelManager:
 
         for idx_name, data in indices.items():
             row = ws.max_row + 1
-            adv = data.get("advances", 0) or 0
-            dec = data.get("declines", 0) or 0
+            try:
+                adv = int(data.get("advances", 0) or 0)
+                dec = int(data.get("declines", 0) or 0)
+            except (ValueError, TypeError):
+                adv, dec = 0, 0
             breadth = round(adv / dec, 2) if dec > 0 else 0
             vals = [
                 ts, idx_name, data["last"], data["change"], data["pct"],
@@ -465,8 +468,8 @@ class ExcelManager:
                 1 for s in stocks
                 if isinstance(s.get("near_52l"), (int, float)) and 0 < s["near_52l"] <= config.NEAR_52W_LOW_PCT
             )
-            chg30 = [s.get("chg_30d", 0) for s in stocks if s.get("chg_30d")]
-            chg1y = [s.get("chg_365d", 0) for s in stocks if s.get("chg_365d")]
+            chg30 = [s.get("chg_30d", 0) for s in stocks if isinstance(s.get("chg_30d"), (int, float))]
+            chg1y = [s.get("chg_365d", 0) for s in stocks if isinstance(s.get("chg_365d"), (int, float))]
             avg_30d = round(sum(chg30) / len(chg30), 2) if chg30 else 0
             avg_1y = round(sum(chg1y) / len(chg1y), 2) if chg1y else 0
 

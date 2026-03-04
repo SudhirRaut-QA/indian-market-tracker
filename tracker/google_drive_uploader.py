@@ -61,18 +61,26 @@ class GoogleDriveUploader:
             )
         
         # Parse credentials (could be file path or JSON string)
-        if self.credentials_json.startswith('{'):
+        creds_stripped = self.credentials_json.strip()
+        if creds_stripped.startswith('{'):
             # It's a JSON string (from GitHub secret)
-            credentials_info = json.loads(self.credentials_json)
+            logger.info("Google Drive: parsing credentials from JSON string")
+            credentials_info = json.loads(creds_stripped)
             credentials = service_account.Credentials.from_service_account_info(
                 credentials_info,
                 scopes=['https://www.googleapis.com/auth/drive']
             )
-        else:
-            # It's a file path
+        elif os.path.isfile(creds_stripped):
+            # It's a file path that exists
+            logger.info(f"Google Drive: loading credentials from file {creds_stripped}")
             credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_json,
+                creds_stripped,
                 scopes=['https://www.googleapis.com/auth/drive']
+            )
+        else:
+            raise ValueError(
+                f"GOOGLE_SERVICE_ACCOUNT_JSON is neither valid JSON nor a valid file path. "
+                f"Starts with: '{creds_stripped[:10]}...', length: {len(creds_stripped)}"
             )
         
         self.service = build('drive', 'v3', credentials=credentials)

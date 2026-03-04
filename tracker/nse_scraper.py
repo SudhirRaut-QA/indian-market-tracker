@@ -28,79 +28,161 @@ from typing import Dict, Any, Optional, List
 
 import requests
 
+try:
+    from curl_cffi import requests as cffi_requests
+    HAS_CURL_CFFI = True
+except ImportError:
+    HAS_CURL_CFFI = False
+
 from . import config
 
 logger = logging.getLogger(__name__)
 
 
 class NSESession:
-    """Manages authenticated session with NSE India."""
+    """Manages authenticated session with NSE India.
+    
+    NSE uses Akamai Bot Manager which blocks datacenter IPs (GitHub Actions).
+    curl_cffi impersonates Chrome's TLS fingerprint to bypass this.
+    Falls back to plain requests for local/residential IPs.
+    """
 
-    HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "*/*",
+    # Headers for visiting the homepage (looks like real browser navigation)
+    BROWSER_HEADERS = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                  "image/avif,image/webp,image/apng,*/*;q=0.8,"
+                  "application/signed-exchange;v=b3;q=0.7",
         "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "Upgrade-Insecure-Requests": "1",
+        "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Linux"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
     }
 
+    # Headers for NSE API calls (XHR requests from the page)
+    API_HEADERS = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": config.NSE_BASE_URL + "/",
+        "X-Requested-With": "XMLHttpRequest",
+        "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Linux"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+    }
+
+    # Only set User-Agent when NOT using curl_cffi (it sets its own)
+    FALLBACK_UA = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0.0.0 Safari/537.36"
+    )
+
     def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update(self.HEADERS)
+        self.session = None
+        self._cookies_valid = False
+        self._using_cffi = False
+        self._create_session()
+
+    def _create_session(self):
+        """Create HTTP session with best available client."""
+        if HAS_CURL_CFFI:
+            self.session = cffi_requests.Session(impersonate="chrome")
+            self._using_cffi = True
+            logger.info("NSE session: curl_cffi (Chrome TLS impersonation)")
+        else:
+            self.session = requests.Session()
+            self.session.headers.update({"User-Agent": self.FALLBACK_UA})
+            self._using_cffi = False
+            logger.info("NSE session: plain requests (curl_cffi not available)")
         self._cookies_valid = False
 
     def _init_cookies(self) -> bool:
+        """Visit NSE homepage to get session cookies."""
         try:
-            self.session = requests.Session()
-            self.session.headers.update(self.HEADERS)
-            resp = self.session.get(config.NSE_BASE_URL, timeout=15)
+            self._create_session()
+            
+            # For plain requests, set browser-like headers
+            # curl_cffi handles headers via impersonation
+            if not self._using_cffi:
+                self.session.headers.update(self.BROWSER_HEADERS)
+            
+            resp = self.session.get(config.NSE_BASE_URL, timeout=20)
+            
             if resp.status_code == 200:
+                cookie_count = len(self.session.cookies)
                 self._cookies_valid = True
-                logger.info(f"NSE cookies: {len(self.session.cookies)}")
-                time.sleep(1)
+                logger.info(f"NSE cookies: {cookie_count} (status 200)")
+                if cookie_count == 0:
+                    logger.warning("Got 200 but 0 cookies — may be a challenge page")
+                time.sleep(2)
                 return True
-            return False
-        except requests.RequestException as e:
+            else:
+                logger.warning(
+                    f"NSE homepage returned {resp.status_code} "
+                    f"(body starts: '{resp.text[:80].strip()}')"
+                )
+                return False
+        except Exception as e:
             logger.error(f"Cookie init failed: {e}")
             return False
 
     def _ensure_session(self):
+        """Ensure we have valid NSE session cookies."""
         if not self._cookies_valid:
             for attempt in range(config.NSE_MAX_RETRIES):
+                logger.info(f"Session init attempt {attempt + 1}/{config.NSE_MAX_RETRIES}...")
                 if self._init_cookies():
                     return True
-                time.sleep(config.NSE_RETRY_DELAY)
+                time.sleep(config.NSE_RETRY_DELAY * (attempt + 1))
+            logger.error(
+                f"Failed to establish NSE session after {config.NSE_MAX_RETRIES} attempts. "
+                f"{'curl_cffi active' if self._using_cffi else 'INSTALL curl_cffi: pip install curl_cffi'}"
+            )
             return False
         return True
 
     def api_get(self, url: str, params: dict = None) -> Optional[Any]:
+        """Make authenticated GET request to NSE API."""
         if not self._ensure_session():
             return None
 
         for attempt in range(config.NSE_MAX_RETRIES):
             try:
-                # Add Referer header for each API call to prevent blocking
-                headers = {"Referer": config.NSE_BASE_URL + "/"}
-                resp = self.session.get(url, params=params, timeout=20, headers=headers)
+                resp = self.session.get(
+                    url, params=params, timeout=20,
+                    headers=self.API_HEADERS,
+                )
                 if resp.status_code == 200:
                     body = resp.text.strip()
                     if body.startswith(("[", "{")):
                         try:
                             return resp.json()
                         except ValueError:
+                            logger.warning(f"Invalid JSON from {url}")
                             self._cookies_valid = False
                     else:
+                        logger.warning(
+                            f"Non-JSON response from {url} "
+                            f"(len={len(body)}, starts='{body[:80]}')"
+                        )
                         self._cookies_valid = False
                         self._ensure_session()
                 elif resp.status_code in (401, 403):
+                    logger.warning(f"Auth error {resp.status_code} for {url} — refreshing session")
                     self._cookies_valid = False
                     self._ensure_session()
                 else:
                     logger.warning(f"Status {resp.status_code} for {url}")
-            except requests.RequestException as e:
+            except Exception as e:
                 logger.error(f"Request failed (attempt {attempt + 1}): {e}")
                 self._cookies_valid = False
 
