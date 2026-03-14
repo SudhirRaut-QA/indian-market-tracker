@@ -35,6 +35,10 @@ from .telegram_bot import (
 )
 from .excel_manager import ExcelManager
 from .trading_engine import generate_intraday_setups, format_trading_msg
+from .trade_tracker import (
+    save_recommendations, review_day, update_algo_params,
+    format_review_msg, format_trend_report,
+)
 from .google_drive_uploader import GoogleDriveUploader
 
 
@@ -153,11 +157,36 @@ def run_once(
 
     # 3b. Generate trading setups (used by both Telegram and Excel)
     trading_setups = None
+    trading_review = None
     if include_sectors and snapshot.get("sectors"):
         trading_setups = generate_intraday_setups(snapshot)
         logger.info(f"Trading setups: {len(trading_setups.get('index_setups', []))} index, "
                      f"{len(trading_setups.get('stock_setups', []))} stock, "
                      f"{len(trading_setups.get('etf_setups', []))} ETF")
+
+        # Save intraday recs for EOD review (skip post-market slots)
+        _intraday_slots = ("09:00", "09:08", "09:15", "09:30", "11:00")
+        if slot_time in _intraday_slots or slot_time is None:
+            today_str = datetime.now(ist).strftime("%Y-%m-%d")
+            try:
+                save_recommendations(trading_setups, slot_time or "manual", today_str)
+            except Exception as _e:
+                logger.warning(f"save_recommendations failed: {_e}")
+
+        # EOD review at 15:35 (market closed, full-day H/L available)
+        if slot_time == "15:35":
+            try:
+                trading_review = review_day(snapshot)
+                if trading_review:
+                    update_algo_params()
+                    logger.info(
+                        f"EOD review complete: "
+                        f"{trading_review['overall']['win']}W / "
+                        f"{trading_review['overall']['loss']}L / "
+                        f"{trading_review['overall']['win_rate']:.1f}% win rate"
+                    )
+            except Exception as _e:
+                logger.warning(f"review_day failed: {_e}")
 
     # 4. Send Telegram messages
     if send_telegram:
@@ -238,13 +267,20 @@ def run_once(
             if trading_msg:
                 messages.append(("📐 Trading", trading_msg))
 
+        # EOD Performance Review (15:35 slot only)
+        if trading_review:
+            rev_msg = format_review_msg(trading_review)
+            if rev_msg:
+                messages.append(("📊 EOD Review", rev_msg))
+
         for name, msg in messages:
             logger.info(f"Sending: {name}")
             bot.send(msg)
 
     # 5. Log to Excel
     if save_excel:
-        excel.log_snapshot(snapshot, delta, trading_setups=trading_setups)
+        excel.log_snapshot(snapshot, delta, trading_setups=trading_setups,
+                           trading_review=trading_review)
 
     # 6. Upload to Google Drive (best-effort, never blocks tracker)
     try:

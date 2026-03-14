@@ -15,6 +15,7 @@ data/backup/
 data/snapshots/*.json
 !data/snapshots/last_snapshot.json
 data/watchlist/
+data/trading/
 logs/
 
 # IDE

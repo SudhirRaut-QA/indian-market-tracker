@@ -17,11 +17,37 @@ Factors scored:
   - Relative strength vs sector / index
 """
 
+import json
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
+from . import config
+
 logger = logging.getLogger(__name__)
+
+_ALGO_PARAMS_FILE = config.DATA_DIR / "trading" / "algo_params.json"
+
+_DEFAULT_PARAMS = {
+    "direction_score_threshold": 15,
+    "momentum_rs_min_pct":        1.5,
+    "momentum_val_cr_min":      500.0,
+    "macro_bias_weight":          0.30,
+    "sl_buffer_pct":              0.015,
+}
+
+
+def _load_trading_params() -> dict:
+    """Load auto-tuned params from disk, falling back to defaults."""
+    try:
+        if _ALGO_PARAMS_FILE.exists():
+            with open(_ALGO_PARAMS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {**_DEFAULT_PARAMS, **data.get("params", {})}
+    except Exception as e:
+        logger.debug(f"algo_params load error: {e}")
+    return dict(_DEFAULT_PARAMS)
 
 # Sector display map (matches telegram_bot.py)
 _SECTOR_DISPLAY = {
@@ -277,6 +303,8 @@ def _generate_setup(
     sector: str,
     sector_pct: float,
     bias: Dict,
+    score_threshold: int = 15,
+    macro_weight: float = 0.30,
 ) -> Optional[Dict]:
     """Generate a complete trade setup for one instrument."""
     h = ohlc.get("high", 0) or 0
@@ -315,7 +343,7 @@ def _generate_setup(
     factors = []
 
     # Market bias contribution
-    stock_score += bias["score"] * 0.3  # 30% weight to macro
+    stock_score += bias["score"] * macro_weight
 
     # Momentum
     if isinstance(chg_30d, (int, float)):
@@ -369,9 +397,9 @@ def _generate_setup(
         cpr_note = "Wide CPR → sideways/rangebound"
 
     # Direction
-    if stock_score > 15:
+    if stock_score > score_threshold:
         direction = "LONG"
-    elif stock_score < -15:
+    elif stock_score < -score_threshold:
         direction = "SHORT"
     else:
         direction = "NEUTRAL"
@@ -476,6 +504,12 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             "generated_at": "...",
         }
     """
+    params = _load_trading_params()
+    score_threshold = int(params["direction_score_threshold"])
+    macro_weight    = float(params["macro_bias_weight"])
+    rs_min          = float(params["momentum_rs_min_pct"])
+    val_min         = float(params["momentum_val_cr_min"])
+
     bias = _market_bias(snapshot)
     indices = snapshot.get("indices", {})
     sectors = snapshot.get("sectors", {})
@@ -504,6 +538,8 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             sector="INDEX",
             sector_pct=data.get("pct", 0),
             bias=bias,
+            score_threshold=score_threshold,
+            macro_weight=macro_weight,
         )
         if setup:
             index_setups.append(setup)
@@ -534,6 +570,8 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
                 sector=sect_name.replace("NIFTY ", "") if sect_name not in _SECTOR_DISPLAY else _sector_display(sect_name),
                 sector_pct=sector_pct,
                 bias=bias,
+                score_threshold=score_threshold,
+                macro_weight=macro_weight,
             )
             if setup:
                 stock_setups.append(setup)
@@ -568,6 +606,8 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             sector="COMMODITY",
             sector_pct=0,
             bias=bias,
+            score_threshold=score_threshold,
+            macro_weight=macro_weight,
         )
         if setup:
             etf_setups.append(setup)
@@ -577,14 +617,15 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
         "index_setups": index_setups,
         "stock_setups": stock_setups[:20],  # Top 20
         "etf_setups": etf_setups,
-        "momentum_alerts": _find_momentum_stocks(snapshot, bias),
+        "momentum_alerts": _find_momentum_stocks(snapshot, bias, rs_min=rs_min, val_min=val_min),
         "generated_at": datetime.now().isoformat(),
     }
 
 
 # ─── Momentum Scanner ────────────────────────────────────────────────────────
 
-def _find_momentum_stocks(snapshot: Dict, bias: Dict) -> List[Dict]:
+def _find_momentum_stocks(snapshot: Dict, bias: Dict,
+                          rs_min: float = 1.5, val_min: float = 500) -> List[Dict]:
     """
     Scan ALL stocks for notable intraday momentum / reversal setups.
 
@@ -617,11 +658,11 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict) -> List[Dict]:
             triggers = []
 
             # 1. Outperformer in a down market
-            if nifty_pct < -0.5 and pct > 1.5:
+            if nifty_pct < -0.5 and pct > rs_min:
                 triggers.append(f"Outperformer: +{pct:.1f}% vs index {nifty_pct:.1f}%")
 
             # 2. High-volume large mover (either direction, but with clean setup)
-            if val > 500 and abs(pct) > 3:
+            if val > val_min and abs(pct) > 3:
                 triggers.append(f"High vol mover: {pct:+.1f}% on ₹{val:,.0f}Cr")
 
             # 3. 52W high breakout attempt

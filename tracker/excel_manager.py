@@ -153,7 +153,7 @@ class ExcelManager:
     """Production-grade Excel manager with deduplication and structured sheets."""
 
     SHEET_ORDER = [
-        "Dashboard", "Trading", "FII_DII", "Indices", "Sectors", "Stocks",
+        "Dashboard", "Trading", "TradingReview", "FII_DII", "Indices", "Sectors", "Stocks",
         "Commodities", "Forex", "Corporate", "Alerts_52W",
         "Insider", "Options", "PreOpen", "BulkBlock",
     ]
@@ -166,7 +166,8 @@ class ExcelManager:
     # ── Main Entry Point ─────────────────────────────────────────────────────
 
     def log_snapshot(self, snapshot: Dict, delta: Optional[Dict] = None,
-                     trading_setups: Optional[Dict] = None):
+                     trading_setups: Optional[Dict] = None,
+                     trading_review: Optional[Dict] = None):
         """Log all data from snapshot to Excel with deduplication."""
         try:
             wb = _get_wb(self.path)
@@ -198,6 +199,10 @@ class ExcelManager:
             # Trading setups sheet
             if trading_setups:
                 self._log_trading(wb, trading_setups, ts)
+
+            # EOD performance review sheet
+            if trading_review:
+                self._log_trading_review(wb, trading_review, ts)
 
             # Remove default "Sheet" if empty
             if "Sheet" in wb.sheetnames:
@@ -1001,5 +1006,51 @@ class ExcelManager:
                 cell.fill = RED_FILL
             elif s["direction"] == "NEUTRAL":
                 cell.fill = YELLOW_FILL
+
+        _auto_width(ws)
+
+    def _log_trading_review(self, wb: Workbook, review: Dict, ts: str):
+        """Log EOD trade review outcomes to the TradingReview sheet."""
+        name = "TradingReview"
+        headers = [
+            "Timestamp", "Date", "Symbol", "Category", "Sector",
+            "Direction", "LTP@Rec", "Entry", "Target", "Stop Loss", "R:R",
+            "Day High", "Day Low", "Day Close", "Outcome", "P&L %",
+            "Slot", "Bias", "Factors",
+        ]
+        ws = self._get_or_create_sheet(wb, name, headers)
+
+        # Dedup: avoid re-writing same date's review
+        date = review.get("date", "")
+        for row in range(2, ws.max_row + 1):
+            if ws.cell(row=row, column=2).value == date:
+                logger.debug("TradingReview: skipped (already logged for this date)")
+                return
+
+        _OUTCOME_FILLS = {
+            "WIN":          GREEN_FILL,
+            "LOSS":         RED_FILL,
+            "NEUTRAL":      YELLOW_FILL,
+            "NOT_TRIGGERED": PatternFill(start_color="CCCCCC", end_color="CCCCCC", fill_type="solid"),
+        }
+
+        for o in review.get("outcomes", []):
+            row = ws.max_row + 1
+            factors_str = " | ".join(str(f) for f in o.get("factors", [])[:3])
+            vals = [
+                ts, date,
+                o.get("symbol", ""), o.get("category", ""), o.get("sector", ""),
+                o.get("direction", ""), o.get("ltp", 0),
+                o.get("entry", 0), o.get("target", 0), o.get("stop_loss", 0),
+                o.get("risk_reward", 0),
+                o.get("day_high", 0), o.get("day_low", 0), o.get("day_close", 0),
+                o.get("outcome", ""), o.get("pnl_pct", 0),
+                o.get("slot", ""), o.get("day_bias", ""), factors_str,
+            ]
+            _write_row(ws, row, vals)
+            outcome = o.get("outcome", "")
+            fill = _OUTCOME_FILLS.get(outcome)
+            if fill:
+                ws.cell(row=row, column=15).fill = fill  # Outcome column
 
         _auto_width(ws)
