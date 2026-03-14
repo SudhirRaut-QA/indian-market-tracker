@@ -23,6 +23,22 @@ from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
+# Sector display map (matches telegram_bot.py)
+_SECTOR_DISPLAY = {
+    "NIFTY 50": "Nifty 50", "NIFTY BANK": "Bank", "NIFTY NEXT 50": "Next 50",
+    "NIFTY IT": "IT", "NIFTY AUTO": "Auto", "NIFTY PHARMA": "Pharma",
+    "NIFTY METAL": "Metal", "NIFTY ENERGY": "Energy", "NIFTY FMCG": "FMCG",
+    "NIFTY REALTY": "Realty", "NIFTY FINANCIAL SERVICES": "Fin Svc",
+    "NIFTY PSU BANK": "PSU Bank", "NIFTY INDIA DEFENCE": "Defence",
+    "NIFTY OIL & GAS": "Oil & Gas", "NIFTY COMMODITIES": "Commod.",
+    "NIFTY MIDCAP 50": "Midcap 50", "NIFTY SMALLCAP 50": "Smallcap 50",
+}
+
+
+def _sector_display(name: str) -> str:
+    return _SECTOR_DISPLAY.get(name, name.replace("NIFTY ", "") or name)
+
+
 # ─── Pivot Calculators ──────────────────────────────────────────────────────
 
 def _classic_pivots(h: float, l: float, c: float) -> Dict:
@@ -361,14 +377,34 @@ def _generate_setup(
         direction = "NEUTRAL"
 
     # ── Entry / Target / Stop Loss ──
-    if direction == "LONG" and best_support and best_resist:
-        entry = best_support["level"]          # buy near support
-        stop_loss = supports[1]["level"] if len(supports) > 1 else round(entry * 0.99, 2)
-        target = best_resist["level"]           # target = nearest resistance
-    elif direction == "SHORT" and best_resist and best_support:
-        entry = best_resist["level"]            # sell near resistance
-        stop_loss = resistances[1]["level"] if len(resistances) > 1 else round(entry * 1.01, 2)
-        target = best_support["level"]          # target = nearest support
+    # Rule: all entries are actionable relative to CURRENT LTP.
+    # SHORT: if already below pivot, enter now (at LTP) or on small bounce
+    # LONG:  if already above pivot, enter now (at LTP) or on small dip
+    if direction == "LONG":
+        if c >= classic["P"]:
+            # Price above pivot → trade with trend; enter at LTP
+            entry = round(c, 2)
+            s1 = best_support["level"] if best_support else classic["S1"]
+            stop_loss = round(min(s1, classic["P"] * 0.998), 2)  # SL below pivot
+            target = best_resist["level"] if best_resist else classic["R1"]
+        else:
+            # Price below pivot but LONG bias → wait for pivot reclaim
+            entry = round(classic["P"] * 1.001, 2)  # just above pivot
+            stop_loss = best_support["level"] if best_support else classic["S1"]
+            target = best_resist["level"] if best_resist else classic["R1"]
+    elif direction == "SHORT":
+        if c <= classic["P"]:
+            # Price below pivot → trade with trend; enter at LTP or small bounce
+            bounce_entry = c + (classic["P"] - c) * 0.25  # 25% bounce = entry
+            r1 = best_resist["level"] if best_resist else classic["R1"]
+            entry = round(min(bounce_entry, r1 * 0.999), 2)
+            stop_loss = round(max(r1, classic["P"] * 1.002), 2)  # SL above resistance
+            target = best_support["level"] if best_support else classic["S1"]
+        else:
+            # Price above pivot but SHORT bias → wait for pivot breakdown
+            entry = round(classic["P"] * 0.999, 2)  # just below pivot
+            stop_loss = best_resist["level"] if best_resist else classic["R1"]
+            target = best_support["level"] if best_support else classic["S1"]
     else:
         entry = classic["P"]
         stop_loss = classic["S1"] if c >= classic["P"] else classic["R1"]
@@ -495,7 +531,7 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
                 chg_365d=s.get("chg_365d", 0) or 0,
                 near_52h=s.get("near_52h", 0) or 0,
                 near_52l=s.get("near_52l", 0) or 0,
-                sector=sect_name.replace("NIFTY ", ""),
+                sector=sect_name.replace("NIFTY ", "") if sect_name not in _SECTOR_DISPLAY else _sector_display(sect_name),
                 sector_pct=sector_pct,
                 bias=bias,
             )
@@ -541,8 +577,116 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
         "index_setups": index_setups,
         "stock_setups": stock_setups[:20],  # Top 20
         "etf_setups": etf_setups,
+        "momentum_alerts": _find_momentum_stocks(snapshot, bias),
         "generated_at": datetime.now().isoformat(),
     }
+
+
+# ─── Momentum Scanner ────────────────────────────────────────────────────────
+
+def _find_momentum_stocks(snapshot: Dict, bias: Dict) -> List[Dict]:
+    """
+    Scan ALL stocks for notable intraday momentum / reversal setups.
+
+    Looks for:
+      1. Outperformers: up 2%+ today while market is down (hidden strength)
+      2. High-volume movers: value_cr > 500 Cr with >3% absolute move
+      3. Near 52W high breakouts with positive momentum
+      4. Near 52W low potential bounces (requires green day: pct > 1)
+    """
+    sectors = snapshot.get("sectors", {})
+    nifty_pct = snapshot.get("indices", {}).get("NIFTY 50", {}).get("pct", 0) or 0
+    results = []
+    seen = set()
+
+    for sect_name, sdata in sectors.items():
+        sector_pct = sdata.get("index_pct", 0) or 0
+        disp = _sector_display(sect_name)
+        for s in sdata.get("stocks", []):
+            sym = s.get("symbol", "")
+            if sym in seen or not sym:
+                continue
+            ltp = s.get("last", 0) or 0
+            pct = s.get("pct", 0) or 0
+            val = s.get("value_cr", 0) or 0
+            near_52h = s.get("near_52h", 999) or 999
+            near_52l = s.get("near_52l", 999) or 999
+            chg_30d = s.get("chg_30d", 0) or 0
+            rs = pct - sector_pct
+
+            triggers = []
+
+            # 1. Outperformer in a down market
+            if nifty_pct < -0.5 and pct > 1.5:
+                triggers.append(f"Outperformer: +{pct:.1f}% vs index {nifty_pct:.1f}%")
+
+            # 2. High-volume large mover (either direction, but with clean setup)
+            if val > 500 and abs(pct) > 3:
+                triggers.append(f"High vol mover: {pct:+.1f}% on ₹{val:,.0f}Cr")
+
+            # 3. 52W high breakout attempt
+            if isinstance(near_52h, (int, float)) and 0 < near_52h <= 1.5 and pct > 0:
+                triggers.append(f"52W high breakout zone ({near_52h:.1f}% to high)")
+
+            # 4. Reversal from 52W low (needs strong green day)
+            if isinstance(near_52l, (int, float)) and 0 < near_52l <= 2 and pct > 2:
+                triggers.append(f"Bounce from 52W low ({near_52l:.1f}% above low)")
+
+            # 5. Relative strength leader in sector (RS > 2%)
+            if rs > 2 and val > 100:
+                triggers.append(f"RS vs sector: {rs:+.1f}%")
+
+            if not triggers:
+                continue
+
+            seen.add(sym)
+
+            # Quick entry/exit using classic pivots
+            h = s.get("high", ltp * 1.02) or ltp * 1.02
+            lo = s.get("low", ltp * 0.98) or ltp * 0.98
+            pc = s.get("prev_close", ltp) or ltp
+            if h == lo:
+                continue
+
+            cl = _classic_pivots(h, lo, ltp)
+            if pct > 0:
+                direction = "LONG"
+                entry = round(ltp, 2)
+                stop_loss = round(min(cl["S1"], ltp * 0.985), 2)
+                target = round(max(cl["R1"], ltp * 1.015), 2)
+            else:
+                direction = "SHORT"
+                entry = round(ltp + (cl["P"] - ltp) * 0.2, 2)
+                stop_loss = round(max(cl["R1"], ltp * 1.015), 2)
+                target = round(min(cl["S1"], ltp * 0.985), 2)
+
+            risk = abs(entry - stop_loss)
+            reward = abs(target - entry)
+            rr = round(reward / risk, 2) if risk > 0 else 0
+
+            results.append({
+                "symbol": sym,
+                "sector": disp,
+                "ltp": ltp,
+                "pct": pct,
+                "value_cr": val,
+                "near_52h": near_52h,
+                "near_52l": near_52l,
+                "rs_vs_sector": round(rs, 2),
+                "direction": direction,
+                "entry": entry,
+                "target": target,
+                "stop_loss": stop_loss,
+                "risk_reward": rr,
+                "triggers": triggers,
+                "pivot": cl["P"],
+                "s1": cl["S1"],
+                "r1": cl["R1"],
+            })
+
+    # Sort: outperformers first (positive pct in down market), then by abs pct
+    results.sort(key=lambda x: (x["pct"] if nifty_pct < 0 else abs(x["pct"])), reverse=True)
+    return results[:15]
 
 
 # ─── Telegram Formatter ─────────────────────────────────────────────────────
@@ -622,8 +766,28 @@ def format_trading_msg(setups: Dict) -> str:
         L.append("<b>━━ Commodity ETFs ━━</b>")
         for s in etf:
             de = _dir_emoji(s["direction"])
-            L.append(f"{de} <b>{s['symbol']}</b> ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%)")
-            L.append(f"  Pivot {s['classic_pivot']:,.1f} | S1 {s['classic_s1']:,.1f} | R1 {s['classic_r1']:,.1f}")
+            L.append(f"{de} <b>{s['symbol']}</b> ₹{s['ltp']:,.2f} ({s['pct']:+.2f}%)")
+            L.append(f"  Pivot {s['classic_pivot']:,.2f} | S1 {s['classic_s1']:,.2f} | R1 {s['classic_r1']:,.2f}")
+            if s["direction"] != "NEUTRAL":
+                L.append(f"  ▶ Entry {s['entry']:,.2f} | Target {s['target']:,.2f} | SL {s['stop_loss']:,.2f}")
+        L.append("")
+
+    # ── Momentum Alerts ──
+    momentum = setups.get("momentum_alerts", [])
+    if momentum:
+        L.append("<b>━━ ⚡ Momentum Alerts ━━</b>")
+        L.append("<i>Dynamic picks based on live signals</i>")
+        L.append("")
+        for s in momentum[:8]:
+            de = _dir_emoji(s["direction"])
+            link = _nse_link(s["symbol"])
+            L.append(f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) <i>{s['sector']}</i>")
+            # First trigger (most important reason)
+            L.append(f"  📍 {s['triggers'][0]}")
+            L.append(
+                f"  Entry {s['entry']:,.1f} → Target {s['target']:,.1f} | "
+                f"SL {s['stop_loss']:,.1f} | R:R {s['risk_reward']:.1f}"
+            )
         L.append("")
 
     L.append("<i>⚠ Levels are mathematical projections, not guaranteed outcomes.</i>")

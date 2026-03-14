@@ -152,6 +152,33 @@ def _nse_link(symbol: str, text: str = None) -> str:
     return f'<a href="{NSE_QUOTE_URL}{quote(symbol)}">{text or symbol}</a>'
 
 
+# Sector display name map (full NSE name → compact readable label)
+_SECTOR_DISPLAY = {
+    "NIFTY 50":                  "Nifty 50",
+    "NIFTY BANK":                "Bank",
+    "NIFTY NEXT 50":             "Next 50",
+    "NIFTY IT":                  "IT",
+    "NIFTY AUTO":                "Auto",
+    "NIFTY PHARMA":              "Pharma",
+    "NIFTY METAL":               "Metal",
+    "NIFTY ENERGY":              "Energy",
+    "NIFTY FMCG":                "FMCG",
+    "NIFTY REALTY":              "Realty",
+    "NIFTY FINANCIAL SERVICES":  "Fin Svc",
+    "NIFTY PSU BANK":            "PSU Bank",
+    "NIFTY INDIA DEFENCE":       "Defence",
+    "NIFTY OIL & GAS":           "Oil & Gas",
+    "NIFTY COMMODITIES":         "Commod.",
+    "NIFTY MIDCAP 50":           "Midcap 50",
+    "NIFTY SMALLCAP 50":         "Smallcap 50",
+}
+
+
+def _sector_display(name: str) -> str:
+    """Human-readable sector name (never returns bare '50')."""
+    return _SECTOR_DISPLAY.get(name, name.replace("NIFTY ", "") or name)
+
+
 def _dedup_stocks(stocks: List[Dict]) -> List[Dict]:
     """Deduplicate by symbol, merge sector names, keep best volume entry."""
     seen = {}
@@ -180,16 +207,26 @@ def _dedup_stocks(stocks: List[Dict]) -> List[Dict]:
 
 
 def _cap_label(symbol: str, sectors_data: Dict) -> str:
-    """Cap category emoji: 🔵L=Large 🟡M=Mid 🟠S=Small."""
+    """Cap category emoji: 🔵L=Large (top 100) 🟡M=Mid 🟠S=Small."""
+    # Build membership sets in priority order
+    in_large, in_mid, in_small = False, False, False
     for name, data in sectors_data.items():
         syms = {s['symbol'] for s in data.get('stocks', [])}
-        if symbol in syms:
-            if name == "NIFTY 50":
-                return "🔵L"
-            if name in ("NIFTY NEXT 50", "NIFTY MIDCAP 50"):
-                return "🟡M"
-            if "SMALLCAP" in name:
-                return "🟠S"
+        if symbol not in syms:
+            continue
+        # NIFTY 50 + NIFTY NEXT 50 together = NIFTY 100 = Large Cap
+        if name in ("NIFTY 50", "NIFTY NEXT 50"):
+            in_large = True
+        elif "MIDCAP" in name:
+            in_mid = True
+        elif "SMALLCAP" in name:
+            in_small = True
+    if in_large:
+        return "🔵L"
+    if in_mid:
+        return "🟡M"
+    if in_small:
+        return "🟠S"
     return ""
 
 
@@ -216,7 +253,13 @@ def _stock_line(s: Dict, sectors_data: Dict = None, show_vol: bool = True) -> st
         parts.append(_vol(s['volume']))
     sec_str = s.get('_sectors_str', s.get('sector', ''))
     if sec_str:
-        parts.append(sec_str.replace('NIFTY ', '')[:25])
+        # Convert raw NSE names to readable display names
+        display_secs = ', '.join(
+            _sector_display(seg.strip())
+            for seg in sec_str.split(',')
+            if seg.strip()
+        )
+        parts.append(display_secs[:28])
     return " · ".join(parts)
 
 
@@ -251,20 +294,60 @@ def _market_mood(snapshot: Dict) -> str:
 
 
 def identify_watchlist(snapshot: Dict, count: int = 5) -> List[Dict]:
-    """Pick top stocks by value traded × momentum for day tracking."""
+    """
+    Pick the best intraday tracking stocks.
+
+    Strategy:
+    - Bullish market: highest momentum × volume (outperforming sectors first)
+    - Bearish market: relative strength — stocks losing LESS than their sector
+      on high volume (these hold up best and bounce hardest on reversal)
+    - Always: penalise falling-knife stocks near 52W lows, prefer high value
+    """
     sectors = snapshot.get("sectors") or {}
+    indices = snapshot.get("indices") or {}
     if not sectors:
         return []
+
+    nifty_pct = indices.get("NIFTY 50", {}).get("pct", 0) or 0
+    is_bullish = nifty_pct >= 0
+
     all_stocks = []
     for name, data in sectors.items():
+        sector_pct = data.get("index_pct", 0) or 0
         for s in data.get("stocks", []):
-            all_stocks.append({**s, "sector": name.replace("NIFTY ", "")})
+            all_stocks.append({**s, "sector": name, "sector_pct": sector_pct})
+
     deduped = _dedup_stocks(all_stocks)
+
     for s in deduped:
-        val = s.get("value_cr", 0)
-        pct_abs = abs(s.get("pct", 0))
-        s["_score"] = val * max(pct_abs, 0.1)
-    ranked = sorted(deduped, key=lambda x: x["_score"], reverse=True)
+        val = s.get("value_cr", 0) or 0
+        pct = s.get("pct", 0) or 0
+        sector_pct = s.get("sector_pct", 0) or 0
+        chg_30d = s.get("chg_30d", 0) or 0
+        near_52l = s.get("near_52l", 999) or 999
+        rs = pct - sector_pct   # relative strength vs sector
+
+        if is_bullish:
+            # Momentum play: positive move + outperforming sector + volume
+            score = val * max(pct, 0.01) * (1.0 + max(rs, 0) * 0.1)
+        else:
+            # Defensive play: least damage, still liquid
+            # rs > 0 means holding up BETTER than its sector (strong)
+            score = val * (rs + 10) * max(1.0 + chg_30d / 200, 0.1)
+
+        # Hard penalty: don't pick falling knives (at 52W low on a bad day)
+        if isinstance(near_52l, (int, float)) and 0 < near_52l <= 2:
+            score *= 0.15
+
+        # Bonus: high liquidity stocks are easier to exit
+        if val > 1000:
+            score *= 1.3
+        elif val > 500:
+            score *= 1.1
+
+        s["_score"] = score
+
+    ranked = sorted(deduped, key=lambda x: x.get("_score", 0), reverse=True)
     picks = []
     for s in ranked[:count]:
         picks.append({
@@ -276,6 +359,7 @@ def identify_watchlist(snapshot: Dict, count: int = 5) -> List[Dict]:
             "sectors": s.get("_sectors_str", s.get("sector", "")),
             "year_high": s.get("year_high", 0),
             "year_low": s.get("year_low", 0),
+            "rs_vs_sector": round((s.get("pct", 0) or 0) - (s.get("sector_pct", 0) or 0), 2),
         })
     return picks
 
@@ -293,7 +377,10 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
             if sym not in current or s.get("volume", 0) > current[sym].get("volume", 0):
                 current[sym] = s
     lines = ["<b>🎯 Watchlist Tracker</b>", ""]
-    lines.append("<i>Stocks picked for potential today — tracking live</i>")
+    indices = snapshot.get("indices") or {}
+    nifty_pct = indices.get("NIFTY 50", {}).get("pct", 0) or 0
+    context = "Bearish day" if nifty_pct < -0.5 else ("Bullish day" if nifty_pct > 0.5 else "Flat day")
+    lines.append(f"<i>Tracking live · {context} (Nifty {nifty_pct:+.2f}%)</i>")
     lines.append("")
     any_data = False
     for i, w in enumerate(watchlist, 1):
@@ -317,11 +404,15 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
         else:
             sig = "💥"
         cap = w.get("cap", "")
-        sec = w.get("sectors", "").replace("NIFTY ", "")[:20]
+        # Show sectors using display names
+        sec_raw = w.get("sectors", "")
+        sec = ", ".join(_sector_display(s.strip()) for s in sec_raw.split(",") if s.strip())[:22]
+        rs = w.get("rs_vs_sector", 0)
+        rs_str = f" · RS {rs:+.1f}%" if rs != 0 else ""
         lines.append(
             f"{i}. {sig} {_nse_link(sym)} <b>₹{cur_ltp:,.1f}</b> "
             f"(entry ₹{entry:,.1f} → <b>{chg:+.2f}%</b>) "
-            f"{cap} {sec}"
+            f"{cap} {sec}{rs_str}"
         )
         lines.append(
             f"   Vol: {_vol(cur_data.get('volume', 0))} · "
@@ -661,18 +752,18 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     for name, data in sorted_sectors:
         pct = data.get("index_pct", 0)
         e = _emoji_pct(pct)
-        short = name.replace("NIFTY ", "")
-        lines.append(f"{e} <b>{short}</b>: {_pct(pct)} ({data.get('count', 0)} stocks)")
+        disp = _sector_display(name)
+        lines.append(f"{e} <b>{disp}</b>: {_pct(pct)} ({data.get('count', 0)} stocks)")
 
     # Collect and DEDUPLICATE gainers/losers across all sectors
     all_gainers = []
     all_losers = []
     for name, data in sectors.items():
-        sector_short = name.replace("NIFTY ", "")
+        sector_disp = _sector_display(name)
         for s in data.get("gainers", [])[:3]:
-            all_gainers.append({**s, "sector": sector_short})
+            all_gainers.append({**s, "sector": sector_disp})
         for s in data.get("losers", [])[:3]:
-            all_losers.append({**s, "sector": sector_short})
+            all_losers.append({**s, "sector": sector_disp})
 
     # Deduplicate and sort
     all_gainers = _dedup_stocks(all_gainers)
@@ -698,7 +789,7 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     all_traded = []
     for name, data in sectors.items():
         for s in data.get("most_traded", [])[:3]:
-            all_traded.append({**s, "sector": name.replace("NIFTY ", "")})
+            all_traded.append({**s, "sector": _sector_display(name)})
     
     all_traded = _dedup_stocks(all_traded)
     all_traded.sort(key=lambda x: x.get("value_cr", 0), reverse=True)
@@ -719,7 +810,7 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     all_stocks_raw = []
     for name, data in sectors.items():
         for s in data.get("stocks", []):
-            all_stocks_raw.append({**s, "sector": name.replace("NIFTY ", "")})
+            all_stocks_raw.append({**s, "sector": _sector_display(name)})
     all_stocks = _dedup_stocks(all_stocks_raw)
     
     near_high = []
@@ -764,7 +855,7 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         movers_raw = []
         for name, sd in delta["sectors"].items():
             for m in sd.get("movers", [])[:3]:
-                movers_raw.append({**m, "sector": name.replace("NIFTY ", "")})
+                movers_raw.append({**m, "sector": _sector_display(name)})
         # Dedup movers by symbol
         seen_movers = {}
         for m in movers_raw:
