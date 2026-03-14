@@ -181,7 +181,7 @@ def run_once(
             # Check if watchlist exists for today
             if os.path.exists(watchlist_file):
                 try:
-                    with open(watchlist_file, "r") as wf:
+                    with open(watchlist_file, "r", encoding="utf-8") as wf:
                         watchlist = json.load(wf)
                     logger.info(f"Watchlist loaded: {len(watchlist)} stocks")
                 except Exception:
@@ -191,7 +191,7 @@ def run_once(
             if not watchlist:
                 watchlist = identify_watchlist(snapshot, count=5)
                 if watchlist:
-                    with open(watchlist_file, "w") as wf:
+                    with open(watchlist_file, "w", encoding="utf-8") as wf:
                         json.dump(watchlist, wf, ensure_ascii=False, indent=2)
                     logger.info(f"Watchlist created: {[w['symbol'] for w in watchlist]}")
 
