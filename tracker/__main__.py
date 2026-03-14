@@ -31,6 +31,7 @@ from .telegram_bot import (
     TelegramBot, format_fii_dii_msg, format_sector_msg,
     format_options_msg, format_commodities_msg, format_corporate_msg,
     format_preopen_msg, format_delta_alert, format_bulk_deals_msg,
+    identify_watchlist, format_watchlist_msg, format_expert_opinion,
 )
 from .excel_manager import ExcelManager
 from .google_drive_uploader import GoogleDriveUploader
@@ -56,6 +57,7 @@ def run_once(
     save_json: bool = True,
     label: str = "Manual Run",
     use_cache: bool = False,
+    slot_time: str = None,
 ):
     """Run a single data collection + notification cycle.
     
@@ -162,21 +164,50 @@ def run_once(
         if include_preopen and snapshot.get("preopen"):
             messages.append(("🌅 Pre-Open", format_preopen_msg(snapshot)))
 
-        # Main message: FII/DII + Indices
+        # Main message: FII/DII + Indices (slot-aware)
         if snapshot.get("fii_dii") or snapshot.get("indices"):
-            messages.append(("📊 Market Pulse", format_fii_dii_msg(snapshot, delta)))
+            messages.append(("📊 Market Pulse", format_fii_dii_msg(snapshot, delta, slot_time=slot_time)))
 
         # Sectors
         if include_sectors and snapshot.get("sectors"):
             messages.append(("🏭 Sectors", format_sector_msg(snapshot, delta)))
 
+        # Watchlist: identify in early slots, track in later ones
+        watchlist_file = os.path.join(str(config.DATA_DIR), "watchlist",
+                                      datetime.now().strftime("%Y-%m-%d") + ".json")
+        os.makedirs(os.path.dirname(watchlist_file), exist_ok=True)
+        watchlist = None
+        if include_sectors and snapshot.get("sectors"):
+            # Check if watchlist exists for today
+            if os.path.exists(watchlist_file):
+                try:
+                    with open(watchlist_file, "r") as wf:
+                        watchlist = json.load(wf)
+                    logger.info(f"Watchlist loaded: {len(watchlist)} stocks")
+                except Exception:
+                    watchlist = None
+
+            # Build watchlist if not yet created (early slots with sector data)
+            if not watchlist:
+                watchlist = identify_watchlist(snapshot, count=5)
+                if watchlist:
+                    with open(watchlist_file, "w") as wf:
+                        json.dump(watchlist, wf, ensure_ascii=False, indent=2)
+                    logger.info(f"Watchlist created: {[w['symbol'] for w in watchlist]}")
+
+            # Send watchlist tracking message
+            if watchlist:
+                wl_msg = format_watchlist_msg(snapshot, watchlist)
+                if wl_msg:
+                    messages.append(("🎯 Watchlist", wl_msg))
+
         # Options
         if include_options and snapshot.get("option_chain"):
             messages.append(("📊 Options", format_options_msg(snapshot)))
 
-        # Commodities + Forex
+        # Commodities + Forex (slot-aware)
         if snapshot.get("commodities") or snapshot.get("forex"):
-            messages.append(("🏆 Commodities", format_commodities_msg(snapshot, delta)))
+            messages.append(("🏆 Commodities", format_commodities_msg(snapshot, delta, slot_time=slot_time)))
 
         # Corporate + Insider
         if (include_corporate or include_insider) and (snapshot.get("corporate_actions") or snapshot.get("insider_trading")):
@@ -185,6 +216,12 @@ def run_once(
         # Bulk & Block Deals
         if include_bulk_deals and (snapshot.get("bulk_deals") or snapshot.get("block_deals")):
             messages.append(("💼 Deals", format_bulk_deals_msg(snapshot)))
+
+        # Expert Opinion (in slots with sector data)
+        if include_sectors and snapshot.get("sectors"):
+            expert_msg = format_expert_opinion(snapshot, delta)
+            if expert_msg:
+                messages.append(("🧠 Expert", expert_msg))
 
         for name, msg in messages:
             logger.info(f"Sending: {name}")

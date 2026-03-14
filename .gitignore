@@ -14,6 +14,7 @@ data/daily/
 data/backup/
 data/snapshots/*.json
 !data/snapshots/last_snapshot.json
+data/watchlist/
 logs/
 
 # IDE

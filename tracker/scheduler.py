@@ -47,6 +47,7 @@ def is_weekday() -> bool:
 SLOT_CONFIG = {
     "09:00": {
         "label": "Pre-Open Preview",
+        "slot_time": "09:00",
         "include_preopen": True,
         "include_sectors": False,
         "include_options": False,
@@ -55,6 +56,7 @@ SLOT_CONFIG = {
     },
     "09:08": {
         "label": "Pre-Open Final",
+        "slot_time": "09:08",
         "include_preopen": True,
         "include_sectors": False,
         "include_options": False,
@@ -63,6 +65,7 @@ SLOT_CONFIG = {
     },
     "09:15": {
         "label": "Market Open",
+        "slot_time": "09:15",
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -71,6 +74,7 @@ SLOT_CONFIG = {
     },
     "09:30": {
         "label": "Early Session",
+        "slot_time": "09:30",
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -79,6 +83,7 @@ SLOT_CONFIG = {
     },
     "11:00": {
         "label": "Mid-Morning",
+        "slot_time": "11:00",
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -87,6 +92,7 @@ SLOT_CONFIG = {
     },
     "15:35": {
         "label": "Market Close",
+        "slot_time": "15:35",
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -95,7 +101,8 @@ SLOT_CONFIG = {
     },
     "18:00": {
         "label": "Post-Market",
-        "use_cache": True,  # Use cached market close data + fresh forex
+        "slot_time": "18:00",
+        "use_cache": True,
         "include_preopen": False,
         "include_sectors": True,
         "include_options": False,
@@ -105,7 +112,8 @@ SLOT_CONFIG = {
     },
     "21:00": {
         "label": "Evening Digest",
-        "use_cache": True,  # Use cached market close data + fresh forex
+        "slot_time": "21:00",
+        "use_cache": True,
         "include_preopen": False,
         "include_sectors": True,
         "include_options": True,
@@ -155,6 +163,7 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str, on_complete: Optional
             save_json=cfg.get("save_json", True),
             use_cache=cfg.get("use_cache", False),
             label=label,
+            slot_time=cfg.get("slot_time", None),
         )
     except JobTimeout:
         logger.error(f"✖ Job {label} exceeded {job_timeout}s timeout — terminated")

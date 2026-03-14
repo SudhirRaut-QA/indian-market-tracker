@@ -136,6 +136,288 @@ def _52w_emoji(current: float, low: float, high: float) -> str:
         return "⚪"  # Mid-range
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  SLOT-AWARE & DEDUP HELPERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+NSE_QUOTE_URL = "https://www.nseindia.com/get-quotes/equity?symbol="
+_PREMARKET_SLOTS = {'09:00', '09:08'}
+_EVENING_SLOT = '21:00'
+_WATCHLIST_BUILD_SLOTS = {'09:15', '09:30', '11:00'}
+
+
+def _nse_link(symbol: str, text: str = None) -> str:
+    """Clickable NSE link for a stock symbol."""
+    from urllib.parse import quote
+    return f'<a href="{NSE_QUOTE_URL}{quote(symbol)}">{text or symbol}</a>'
+
+
+def _dedup_stocks(stocks: List[Dict]) -> List[Dict]:
+    """Deduplicate by symbol, merge sector names, keep best volume entry."""
+    seen = {}
+    for s in stocks:
+        sym = s.get('symbol', '')
+        if not sym:
+            continue
+        if sym not in seen:
+            seen[sym] = dict(s)
+            seen[sym]['_sectors'] = {s.get('sector', '')} if s.get('sector') else set()
+        else:
+            if s.get('sector'):
+                seen[sym]['_sectors'].add(s['sector'])
+            # Keep entry with highest volume
+            if s.get('volume', 0) > seen[sym].get('volume', 0):
+                bk = seen[sym]['_sectors']
+                seen[sym] = dict(s)
+                seen[sym]['_sectors'] = bk
+                if s.get('sector'):
+                    seen[sym]['_sectors'].add(s['sector'])
+    result = list(seen.values())
+    for r in result:
+        secs = sorted(x for x in r.get('_sectors', set()) if x)
+        r['_sectors_str'] = ', '.join(secs) if secs else ''
+    return result
+
+
+def _cap_label(symbol: str, sectors_data: Dict) -> str:
+    """Cap category emoji: 🔵L=Large 🟡M=Mid 🟠S=Small."""
+    for name, data in sectors_data.items():
+        syms = {s['symbol'] for s in data.get('stocks', [])}
+        if symbol in syms:
+            if name == "NIFTY 50":
+                return "🔵L"
+            if name in ("NIFTY NEXT 50", "NIFTY MIDCAP 50"):
+                return "🟡M"
+            if "SMALLCAP" in name:
+                return "🟠S"
+    return ""
+
+
+def _show_fii_forex(slot_time: Optional[str]) -> bool:
+    """Show FII/DII, Forex, Commodity Indices only at pre-market & 9 PM."""
+    if not slot_time:
+        return True
+    return slot_time in _PREMARKET_SLOTS or slot_time == _EVENING_SLOT
+
+
+def _stock_line(s: Dict, sectors_data: Dict = None, show_vol: bool = True) -> str:
+    """Single stock line with clickable link, cap label, sectors."""
+    sym = s.get('symbol', '')
+    link = _nse_link(sym)
+    ltp = f"₹{s['last']:,.1f}" if s.get('last') else "N/A"
+    p = s.get('pct', 0)
+    emoji = "🟢" if p >= 0 else "🔴"
+    parts = [f"{emoji} {link} <b>{ltp}</b> ({_pct(p)})"]
+    if sectors_data:
+        cap = _cap_label(sym, sectors_data)
+        if cap:
+            parts.append(cap)
+    if show_vol and s.get('volume', 0):
+        parts.append(_vol(s['volume']))
+    sec_str = s.get('_sectors_str', s.get('sector', ''))
+    if sec_str:
+        parts.append(sec_str.replace('NIFTY ', '')[:25])
+    return " · ".join(parts)
+
+
+def _market_mood(snapshot: Dict) -> str:
+    """Simple market mood for a kid to understand."""
+    indices = snapshot.get("indices") or {}
+    nifty = indices.get("NIFTY 50", {})
+    p = nifty.get("pct", 0)
+    try:
+        adv = int(nifty.get("advances", 0) or 0)
+        dec = int(nifty.get("declines", 0) or 0)
+    except (ValueError, TypeError):
+        adv, dec = 0, 0
+    vix_data = indices.get("INDIA VIX", {})
+    vix_pct = vix_data.get("pct", 0)
+    if p >= 1:
+        mood = "🟢🟢 Strong Rally"
+    elif p >= 0.3:
+        mood = "🟢 Mildly Bullish"
+    elif p > -0.3:
+        mood = "⚪ Sideways"
+    elif p > -1:
+        mood = "🔴 Mildly Bearish"
+    else:
+        mood = "🔴🔴 Heavy Selling"
+    fear = ""
+    if vix_pct > 5:
+        fear = " | 😨 Fear spike"
+    elif vix_pct < -3:
+        fear = " | 😌 Calm"
+    return f"{mood} ({adv}🟢 vs {dec}🔴){fear}"
+
+
+def identify_watchlist(snapshot: Dict, count: int = 5) -> List[Dict]:
+    """Pick top stocks by value traded × momentum for day tracking."""
+    sectors = snapshot.get("sectors") or {}
+    if not sectors:
+        return []
+    all_stocks = []
+    for name, data in sectors.items():
+        for s in data.get("stocks", []):
+            all_stocks.append({**s, "sector": name.replace("NIFTY ", "")})
+    deduped = _dedup_stocks(all_stocks)
+    for s in deduped:
+        val = s.get("value_cr", 0)
+        pct_abs = abs(s.get("pct", 0))
+        s["_score"] = val * max(pct_abs, 0.1)
+    ranked = sorted(deduped, key=lambda x: x["_score"], reverse=True)
+    picks = []
+    for s in ranked[:count]:
+        picks.append({
+            "symbol": s["symbol"],
+            "entry_ltp": s["last"],
+            "entry_pct": s["pct"],
+            "entry_volume": s.get("volume", 0),
+            "cap": _cap_label(s["symbol"], sectors),
+            "sectors": s.get("_sectors_str", s.get("sector", "")),
+            "year_high": s.get("year_high", 0),
+            "year_low": s.get("year_low", 0),
+        })
+    return picks
+
+
+def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]:
+    """Track watchlist stocks with current LTP vs entry price."""
+    if not watchlist:
+        return None
+    sectors = snapshot.get("sectors") or {}
+    # Build symbol→current data map
+    current = {}
+    for name, data in sectors.items():
+        for s in data.get("stocks", []):
+            sym = s["symbol"]
+            if sym not in current or s.get("volume", 0) > current[sym].get("volume", 0):
+                current[sym] = s
+    lines = ["<b>🎯 Watchlist Tracker</b>", ""]
+    lines.append("<i>Stocks picked for potential today — tracking live</i>")
+    lines.append("")
+    any_data = False
+    for i, w in enumerate(watchlist, 1):
+        sym = w["symbol"]
+        entry = w["entry_ltp"]
+        cur_data = current.get(sym)
+        if not cur_data:
+            lines.append(f"{i}. {_nse_link(sym)} — No data")
+            continue
+        any_data = True
+        cur_ltp = cur_data["last"]
+        chg = ((cur_ltp - entry) / entry * 100) if entry else 0
+        if chg >= 2:
+            sig = "🚀"
+        elif chg >= 0.5:
+            sig = "📈"
+        elif chg > -0.5:
+            sig = "➡️"
+        elif chg > -2:
+            sig = "📉"
+        else:
+            sig = "💥"
+        cap = w.get("cap", "")
+        sec = w.get("sectors", "").replace("NIFTY ", "")[:20]
+        lines.append(
+            f"{i}. {sig} {_nse_link(sym)} <b>₹{cur_ltp:,.1f}</b> "
+            f"(entry ₹{entry:,.1f} → <b>{chg:+.2f}%</b>) "
+            f"{cap} {sec}"
+        )
+        lines.append(
+            f"   Vol: {_vol(cur_data.get('volume', 0))} · "
+            f"Day: {_pct(cur_data.get('pct', 0))} · "
+            f"H/L: ₹{cur_data.get('high', 0):,.1f}/₹{cur_data.get('low', 0):,.1f}"
+        )
+    if not any_data:
+        return None
+    lines.append("")
+    # Summary
+    gains = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) > w["entry_ltp"])
+    losses = len(watchlist) - gains
+    lines.append(f"Score: {gains}🟢 winning · {losses}🔴 losing")
+    return "\n".join(lines)
+
+
+def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optional[str]:
+    """Simple market analysis any beginner can understand."""
+    indices = snapshot.get("indices") or {}
+    sectors = snapshot.get("sectors") or {}
+    if not indices:
+        return None
+    nifty = indices.get("NIFTY 50", {})
+    bank = indices.get("NIFTY BANK", {})
+    vix = indices.get("INDIA VIX", {})
+    n_pct = nifty.get("pct", 0)
+    b_pct = bank.get("pct", 0)
+    v_pct = vix.get("pct", 0)
+    v_last = vix.get("last", 0)
+    lines = ["<b>🧠 Expert Take (Simple Analysis)</b>", ""]
+    # 1. Market direction
+    if n_pct >= 1:
+        lines.append("📈 <b>Market is strongly UP today.</b> Buyers in control.")
+    elif n_pct >= 0.3:
+        lines.append("📈 <b>Market is mildly green.</b> Cautious optimism.")
+    elif n_pct > -0.3:
+        lines.append("➡️ <b>Market is flat/sideways.</b> No clear direction.")
+    elif n_pct > -1:
+        lines.append("📉 <b>Market is down.</b> Sellers have some control.")
+    else:
+        lines.append("📉📉 <b>Market is in heavy selling.</b> Be cautious!")
+    lines.append("")
+    # 2. FII/DII reading
+    fd = snapshot.get("fii_dii")
+    if fd:
+        fii_net = fd.get("fii", {}).get("net", 0)
+        dii_net = fd.get("dii", {}).get("net", 0)
+        if fii_net < -1000 and dii_net > 1000:
+            lines.append("💰 <b>Foreign investors selling, but Indian institutions buying</b> "
+                         "— DII providing support. Market has a safety net.")
+        elif fii_net > 1000 and dii_net > 0:
+            lines.append("💰 <b>Both FII & DII buying</b> — Very bullish signal!")
+        elif fii_net < -1000 and dii_net < 0:
+            lines.append("💰 <b>Both FII & DII selling</b> — Very bearish. Stay careful.")
+        elif fii_net > 0:
+            lines.append("💰 <b>Foreign investors buying</b> — Positive for market.")
+        lines.append("")
+    # 3. VIX (fear gauge)
+    if v_last:
+        if v_last > 20:
+            lines.append(f"😨 <b>VIX at {v_last:.1f}</b> — High fear. Market is volatile. Don't panic-sell.")
+        elif v_last > 15:
+            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Moderate fear. Normal caution.")
+        else:
+            lines.append(f"😌 <b>VIX at {v_last:.1f}</b> — Low fear. Market is calm.")
+        lines.append("")
+    # 4. Sector rotation
+    if sectors:
+        sorted_sec = sorted(sectors.items(), key=lambda x: x[1].get("index_pct", 0), reverse=True)
+        best_sec = sorted_sec[0] if sorted_sec else None
+        worst_sec = sorted_sec[-1] if sorted_sec else None
+        if best_sec and worst_sec:
+            b_name = best_sec[0].replace("NIFTY ", "")
+            b_val = best_sec[1].get("index_pct", 0)
+            w_name = worst_sec[0].replace("NIFTY ", "")
+            w_val = worst_sec[1].get("index_pct", 0)
+            lines.append(f"🔄 <b>Money rotating:</b> {b_name} ({_pct(b_val)}) best, "
+                         f"{w_name} ({_pct(w_val)}) worst.")
+            lines.append("")
+    # 5. Simple advice
+    lines.append("<b>📝 What should you do?</b>")
+    if n_pct < -2:
+        lines.append("• <i>Big fall day. If you own good stocks, HOLD. Don't panic.</i>")
+        lines.append("• <i>If you want to buy, wait for market to stabilize first.</i>")
+    elif n_pct < -0.5:
+        lines.append("• <i>Red day but not alarming. Watch for support levels.</i>")
+        lines.append("• <i>Good companies on dip = potential buying opportunity.</i>")
+    elif n_pct > 1:
+        lines.append("• <i>Strong green day! Don't chase — book partial profits.</i>")
+    else:
+        lines.append("• <i>Normal day. Stick to your plan, avoid impulsive trades.</i>")
+    lines.append("")
+    lines.append("<i>⚠️ This is automated analysis, not financial advice.</i>")
+    return "\n".join(lines)
+
+
 def _make_table(headers: List[str], rows: List[List[str]], align: Optional[List[str]] = None) -> str:
     """Create ASCII table with proper alignment for <pre> blocks.
     
@@ -238,10 +520,14 @@ class TelegramBot:
 #  MESSAGE FORMATTERS
 # ══════════════════════════════════════════════════════════════════════════════
 
-def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
-    """FII/DII + Key Indices + Market Status."""
+def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_time: str = None) -> str:
+    """FII/DII + Key Indices + Market Status. Slot-aware: FII/DII only at pre-market & 9 PM."""
     now = datetime.now().strftime("%d %b %Y %-I:%M %p") if os.name != "nt" else datetime.now().strftime("%d %b %Y %I:%M %p")
     lines = [f"<b>📊 Market Pulse — {now}</b>", ""]
+
+    # Market mood (one-liner)
+    lines.append(f"🌡️ {_market_mood(snapshot)}")
+    lines.append("")
 
     # Market status
     status = snapshot.get("market_status", {})
@@ -250,28 +536,26 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
             if not info or not isinstance(info, dict):
                 continue
             st = info.get("status", "")
-            # Ensure st is a string (not None)
             if not st or not isinstance(st, str):
                 continue
             if "Capital" in mkt or "Equit" in mkt:
                 emoji = "🟢" if "Open" in st or "open" in st else "🔴" if "Close" in st else "🟡"
                 lines.append(f"{emoji} {mkt}: <b>{st}</b>")
+        lines.append("")
 
-    lines.append("")
-
-    # FII/DII
+    # FII/DII — only at pre-market and 9 PM
     fd = snapshot.get("fii_dii")
-    if fd:
+    show_fii = _show_fii_forex(slot_time)
+
+    if fd and show_fii:
         sig = fd.get("signal", "")
         sig_emoji = {"Strong Bullish": "🐂🐂", "FII Bullish": "🐂", "DII Defensive": "🛡️", "Bearish": "🐻"}.get(sig, "❓")
-
         fii_date = fd.get('date', '')
         lines.append(f"<b>💰 FII/DII Activity</b> ({fii_date} — T+1 data)")
         lines.append(f"Signal: {sig_emoji} <b>{sig}</b>")
         lines.append(f"💡 {fd.get('interpretation', '')}")
         lines.append("")
-        
-        # FII/DII table format
+
         headers = ["", "Buy", "Sell", "Net"]
         rows = [
             ["🌍 FII", _cr(fd['fii']['buy']), _cr(-abs(fd['fii']['sell'])), _cr(fd['fii']['net'])],
@@ -283,37 +567,50 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         lines.append("</pre>")
         lines.append(f"📊 <b>Total Net: {_cr(fd.get('total_net', 0))}</b>")
 
-        # Delta for FII/DII
+        # Delta — smart unchanged handling
         if delta and delta.get("fii_dii"):
             dd = delta["fii_dii"]
-            prev_time_str = _format_prev_time(delta.get("prev_time", ""))
-            
-            lines.append("")
-            lines.append(f"<b>🔄 Changes vs Last Check{prev_time_str}:</b>")
-            if dd.get("fii_reversal"):
-                lines.append(f"  ⚠️ {dd['fii_reversal']}")
-            if dd.get("dii_reversal"):
-                lines.append(f"  ⚠️ {dd['dii_reversal']}")
-            lines.append(f"  FII Net: {_cr(dd['fii_net_prev'])} → {_cr(dd['fii_net_curr'])}")
-            lines.append(f"  DII Net: {_cr(dd['dii_net_prev'])} → {_cr(dd['dii_net_curr'])}")
+            fii_changed = abs(dd.get('fii_net_change', 0)) > 0.01
+            dii_changed = abs(dd.get('dii_net_change', 0)) > 0.01
+            if fii_changed or dii_changed or dd.get("fii_reversal") or dd.get("dii_reversal"):
+                prev_time_str = _format_prev_time(delta.get("prev_time", ""))
+                lines.append("")
+                lines.append(f"<b>🔄 Changes vs Last Check{prev_time_str}:</b>")
+                if dd.get("fii_reversal"):
+                    lines.append(f"  ⚠️ {dd['fii_reversal']}")
+                if dd.get("dii_reversal"):
+                    lines.append(f"  ⚠️ {dd['dii_reversal']}")
+                if fii_changed:
+                    lines.append(f"  FII Net: {_cr(dd['fii_net_prev'])} → {_cr(dd['fii_net_curr'])}")
+                if dii_changed:
+                    lines.append(f"  DII Net: {_cr(dd['dii_net_prev'])} → {_cr(dd['dii_net_curr'])}")
+        lines.append("")
+    elif fd and not show_fii:
+        # Brief FII/DII summary in non-FII slots
+        sig = fd.get("signal", "")
+        sig_emoji = {"Strong Bullish": "🐂🐂", "FII Bullish": "🐂", "DII Defensive": "🛡️", "Bearish": "🐻"}.get(sig, "❓")
+        lines.append(f"💰 FII/DII: {sig_emoji} {sig} (FII {_cr(fd['fii']['net'])} | DII {_cr(fd['dii']['net'])})")
+        lines.append("")
 
-    lines.append("")
-
-    # Key Indices
+    # Key Indices (always shown)
     indices = snapshot.get("indices") or {}
     if indices:
         lines.append("<b>📈 Key Indices</b>")
-        top5 = ["NIFTY 50", "NIFTY BANK", "NIFTY NEXT 50", "NIFTY MIDCAP 100", "NIFTY SMALLCAP 100"]
-        for name in top5:
+        top_indices = ["NIFTY 50", "NIFTY BANK", "NIFTY NEXT 50", "NIFTY MIDCAP 50", "NIFTY SMALLCAP 50"]
+        for name in top_indices:
             if name in indices:
                 idx = indices[name]
                 e = _emoji_pct(idx.get("pct", 0))
                 lines.append(f"{e} {name}: <b>{idx['last']:,.1f}</b> ({_pct(idx['pct'])})")
-                adv, dec = idx.get("advances", 0), idx.get("declines", 0)
+                try:
+                    adv = int(idx.get("advances", 0) or 0)
+                    dec = int(idx.get("declines", 0) or 0)
+                except (ValueError, TypeError):
+                    adv, dec = 0, 0
                 if adv or dec:
                     lines.append(f"   🟢{adv} 🔴{dec}")
 
-        # Trending indices
+        # Trending thematic indices
         trending = ["NIFTY PSU BANK", "NIFTY INDIA DEFENCE", "NIFTY COMMODITIES",
                      "NIFTY200 MOMENTUM 30", "NIFTY HIGH BETA 50", "NIFTY100 LOW VOLATILITY 30"]
         trend_list = []
@@ -321,30 +618,36 @@ def format_fii_dii_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
             if name in indices:
                 idx = indices[name]
                 e = _emoji_pct(idx.get("pct", 0))
-                short = name.replace("NIFTY ", "")
+                short = name.replace("NIFTY ", "").replace("100 ", "")
                 trend_list.append(f"{e} {short}: {_pct(idx['pct'])}")
         if trend_list:
             lines.append("")
-            lines.append("<b>🔥 Trending Sectors</b>")
+            lines.append("<b>🔥 Thematic Indices</b>")
             lines.extend(trend_list)
 
-        # Index delta
+        # Index delta — skip flat comparisons
         if delta and delta.get("indices"):
             id_d = delta["indices"]
             best = id_d.get("best", {})
             worst = id_d.get("worst", {})
             if best and worst:
-                prev_time_str = _format_prev_time(delta.get("prev_time", ""))
-                lines.append("")
-                lines.append(f"<b>📊 Since Last Check{prev_time_str}:</b>")
-                lines.append(f"  Best:  {best['name']} {best['signal']} ({_pct(best['pct_change'])})")
-                lines.append(f"  Worst: {worst['name']} {worst['signal']} ({_pct(worst['pct_change'])})")
+                b_pct = best.get('pct_change', 0)
+                w_pct = worst.get('pct_change', 0)
+                if abs(b_pct) >= 0.05 or abs(w_pct) >= 0.05:
+                    prev_time_str = _format_prev_time(delta.get("prev_time", ""))
+                    lines.append("")
+                    lines.append(f"<b>📊 Since Last Check{prev_time_str}:</b>")
+                    lines.append(f"  Best:  {best['name']} {best['signal']} ({_pct(b_pct)})")
+                    lines.append(f"  Worst: {worst['name']} {worst['signal']} ({_pct(w_pct)})")
+                else:
+                    lines.append("")
+                    lines.append("<i>📊 Indices unchanged since last check</i>")
 
     return "\n".join(lines)
 
 
 def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
-    """Sector heatmap + top movers per sector."""
+    """Sector heatmap + top movers (deduplicated, with clickable links)."""
     lines = ["<b>🏭 Sector Analysis</b>", ""]
 
     sectors = snapshot.get("sectors") or {}
@@ -353,113 +656,80 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         return "\n".join(lines)
 
     # Sector heatmap
-    lines.append("<b>📊 Sector Heatmap (by index %)</b>")
+    lines.append("<b>📊 Sector Heatmap</b>")
     sorted_sectors = sorted(sectors.items(), key=lambda x: x[1].get("index_pct", 0), reverse=True)
     for name, data in sorted_sectors:
         pct = data.get("index_pct", 0)
         e = _emoji_pct(pct)
         short = name.replace("NIFTY ", "")
-        lines.append(f"{e} {short}: <b>{_pct(pct)}</b> ({data.get('count', 0)} stocks)")
+        lines.append(f"{e} <b>{short}</b>: {_pct(pct)} ({data.get('count', 0)} stocks)")
 
-    # Top movers across all sectors
-    lines.append("")
-    lines.append("<b>🏆 Top Gainers (all sectors)</b>")
+    # Collect and DEDUPLICATE gainers/losers across all sectors
     all_gainers = []
     all_losers = []
     for name, data in sectors.items():
+        sector_short = name.replace("NIFTY ", "")
         for s in data.get("gainers", [])[:3]:
-            all_gainers.append({**s, "sector": name.replace("NIFTY ", "")})
+            all_gainers.append({**s, "sector": sector_short})
         for s in data.get("losers", [])[:3]:
-            all_losers.append({**s, "sector": name.replace("NIFTY ", "")})
+            all_losers.append({**s, "sector": sector_short})
 
-    all_gainers.sort(key=lambda x: x["pct"], reverse=True)
-    if all_gainers[:8]:
-        headers = ["Symbol", "LTP", "%Chg", "Volume", "Sector"]
-        rows = []
-        for s in all_gainers[:8]:
-            rows.append([
-                s['symbol'][:10],
-                f"₹{s['last']:,.0f}",
-                _pct(s['pct']),
-                _vol(s.get('volume', 0)),
-                s['sector'][:12]
-            ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'left'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
+    # Deduplicate and sort
+    all_gainers = _dedup_stocks(all_gainers)
+    all_gainers.sort(key=lambda x: x.get("pct", 0), reverse=True)
+    all_losers = _dedup_stocks(all_losers)
+    all_losers.sort(key=lambda x: x.get("pct", 0))
 
+    # Top Gainers — clickable
     lines.append("")
-    lines.append("<b>📉 Top Losers (all sectors)</b>")
-    all_losers.sort(key=lambda x: x["pct"])
-    if all_losers[:8]:
-        headers = ["Symbol", "LTP", "%Chg", "Volume", "Sector"]
-        rows = []
-        for s in all_losers[:8]:
-            rows.append([
-                s['symbol'][:10],
-                f"₹{s['last']:,.0f}",
-                _pct(s['pct']),
-                _vol(s.get('volume', 0)),
-                s['sector'][:12]
-            ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'left'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
+    lines.append("<b>🏆 Top Gainers</b>")
+    for s in all_gainers[:6]:
+        lines.append(f"  {_stock_line(s, sectors)}")
 
-    # High volume stocks
+    # Top Losers — clickable
     lines.append("")
-    lines.append("<b>📊 Highest Value Traded</b>")
+    lines.append("<b>📉 Top Losers</b>")
+    for s in all_losers[:6]:
+        lines.append(f"  {_stock_line(s, sectors)}")
+
+    # Highest Value Traded (already deduplicated)
+    lines.append("")
+    lines.append("<b>💰 Highest Value Traded</b>")
     all_traded = []
     for name, data in sectors.items():
         for s in data.get("most_traded", [])[:3]:
             all_traded.append({**s, "sector": name.replace("NIFTY ", "")})
     
-    # Deduplicate by symbol - keep highest value_cr for each stock
-    seen = {}
-    for s in all_traded:
-        sym = s["symbol"]
-        if sym not in seen or s["value_cr"] > seen[sym]["value_cr"]:
-            seen[sym] = s
+    all_traded = _dedup_stocks(all_traded)
+    all_traded.sort(key=lambda x: x.get("value_cr", 0), reverse=True)
     
-    all_traded_unique = list(seen.values())
-    all_traded_unique.sort(key=lambda x: x["value_cr"], reverse=True)
-    
-    if all_traded_unique[:5]:
-        headers = ["Symbol", "LTP", "Volume", "Value", "%Chg", "52W"]
-        rows = []
-        for s in all_traded_unique[:5]:
-            w52_pos = _52w_position(s['last'], s.get('year_low', 0), s.get('year_high', 0))
-            w52_emoji = _52w_emoji(s['last'], s.get('year_low', 0), s.get('year_high', 0))
-            rows.append([
-                s['symbol'][:10],
-                f"₹{s['last']:,.0f}",
-                _vol(s.get('volume', 0)),
-                f"₹{s['value_cr']:,.0f}Cr",
-                _pct(s['pct']),
-                f"{w52_emoji}{w52_pos}"
-            ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right', 'center'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
-        lines.append("<i>52W: 🔥=Near High | 💎=Near Low | Position in 52W range</i>")
+    for s in all_traded[:5]:
+        sym = s['symbol']
+        w52_emoji = _52w_emoji(s['last'], s.get('year_low', 0), s.get('year_high', 0))
+        w52_pos = _52w_position(s['last'], s.get('year_low', 0), s.get('year_high', 0))
+        lines.append(
+            f"  {_nse_link(sym)} <b>₹{s['last']:,.0f}</b> ({_pct(s['pct'])}) "
+            f"Vol:{_vol(s.get('volume', 0))} Val:₹{s.get('value_cr', 0):,.0f}Cr "
+            f"{w52_emoji}{w52_pos}"
+        )
 
-    # 52-Week Alerts - stocks near breakout/breakdown
+    # 52-Week Alerts — DEDUPLICATED
     lines.append("")
     lines.append("<b>🎯 52-Week Alerts</b>")
-    all_stocks = []
+    all_stocks_raw = []
     for name, data in sectors.items():
-        all_stocks.extend(data.get("stocks", []))
+        for s in data.get("stocks", []):
+            all_stocks_raw.append({**s, "sector": name.replace("NIFTY ", "")})
+    all_stocks = _dedup_stocks(all_stocks_raw)
     
-    # Find stocks near 52W high (>= 95%) or 52W low (<= 5%)
     near_high = []
     near_low = []
     for s in all_stocks:
-        if s.get('year_high', 0) == 0 or s.get('year_low', 0) == 0:
+        yh, yl = s.get('year_high', 0), s.get('year_low', 0)
+        if yh == 0 or yl == 0 or yh == yl:
             continue
-        pos_pct = ((s['last'] - s['year_low']) / (s['year_high'] - s['year_low'])) * 100
+        rng = yh - yl
+        pos_pct = ((s['last'] - yl) / rng) * 100
         if pos_pct >= 95:
             near_high.append({**s, 'pos_pct': pos_pct})
         elif pos_pct <= 5:
@@ -470,56 +740,47 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
     
     if near_high:
         lines.append("<i>🔥 Near 52-Week High (Breakout Zone):</i>")
-        headers = ["Symbol", "LTP", "52W High", "Dist", "%Chg"]
-        rows = []
         for s in near_high:
-            dist_pct = ((s['year_high'] - s['last']) / s['last']) * 100
-            rows.append([
-                s['symbol'][:10],
-                f"₹{s['last']:,.1f}",
-                f"₹{s['year_high']:,.1f}",
-                f"{dist_pct:+.1f}%",
-                _pct(s['pct'])
-            ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
+            dist = ((s['year_high'] - s['last']) / s['last']) * 100
+            lines.append(
+                f"  {_nse_link(s['symbol'])} ₹{s['last']:,.1f} → "
+                f"52W High ₹{s['year_high']:,.1f} ({dist:+.1f}% away)"
+            )
     
     if near_low:
         lines.append("<i>💎 Near 52-Week Low (Value Zone):</i>")
-        headers = ["Symbol", "LTP", "52W Low", "Dist", "%Chg"]
-        rows = []
         for s in near_low:
-            dist_pct = ((s['last'] - s['year_low']) / s['last']) * 100
-            rows.append([
-                s['symbol'][:10],
-                f"₹{s['last']:,.1f}",
-                f"₹{s['year_low']:,.1f}",
-                f"{dist_pct:+.1f}%",
-                _pct(s['pct'])
-            ])
-        table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
+            dist = ((s['last'] - s['year_low']) / s['last']) * 100
+            lines.append(
+                f"  {_nse_link(s['symbol'])} ₹{s['last']:,.1f} → "
+                f"52W Low ₹{s['year_low']:,.1f} ({dist:+.1f}% above)"
+            )
     
     if not near_high and not near_low:
         lines.append("<i>No stocks near 52-week extremes currently</i>")
 
-    # Delta: stock movers between snapshots
+    # Delta: Big Movers — DEDUPLICATED
     if delta and delta.get("sectors"):
-        movers_all = []
+        movers_raw = []
         for name, sd in delta["sectors"].items():
             for m in sd.get("movers", [])[:3]:
-                movers_all.append({**m, "sector": name.replace("NIFTY ", "")})
-        if movers_all:
-            movers_all.sort(key=lambda x: abs(x["price_chg_pct"]), reverse=True)
+                movers_raw.append({**m, "sector": name.replace("NIFTY ", "")})
+        # Dedup movers by symbol
+        seen_movers = {}
+        for m in movers_raw:
+            sym = m.get("symbol", "")
+            if sym not in seen_movers or abs(m.get("price_chg_pct", 0)) > abs(seen_movers[sym].get("price_chg_pct", 0)):
+                seen_movers[sym] = m
+        movers_unique = sorted(seen_movers.values(), key=lambda x: abs(x.get("price_chg_pct", 0)), reverse=True)
+        if movers_unique:
             prev_time_str = _format_prev_time(delta.get("prev_time", ""))
             lines.append("")
             lines.append(f"<b>🔄 Big Movers Since Last Check{prev_time_str}</b>")
-            for m in movers_all[:8]:
-                lines.append(f"  {m['signal']} {m['symbol']}: {_pct(m['price_chg_pct'])} (₹{m['price_prev']:.1f}→₹{m['price_curr']:.1f})")
+            for m in movers_unique[:6]:
+                lines.append(
+                    f"  {m['signal']} {_nse_link(m['symbol'])}: "
+                    f"{_pct(m['price_chg_pct'])} (₹{m['price_prev']:.1f}→₹{m['price_curr']:.1f})"
+                )
 
     return "\n".join(lines)
 
@@ -565,28 +826,29 @@ def format_options_msg(snapshot: Dict) -> str:
     return "\n".join(lines)
 
 
-def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
-    """Commodities + Forex."""
+def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_time: str = None) -> str:
+    """Commodities + Forex. Forex & Commodity Indices only at pre-market & 9 PM."""
     lines = ["<b>🏆 Commodities & Forex</b>", ""]
+    show_extras = _show_fii_forex(slot_time)
 
-    # Commodity ETFs
+    # Commodity ETFs — always shown
     comms = snapshot.get("commodities") or {}
     if comms:
         lines.append("<b>🥇 Commodity ETFs</b>")
         names = {
-            "TATAGOLD": "Gold Tata",
-            "TATSILV": "Silv Tata",
-            "GOLDBEES": "Gold Nip",
-            "LIQUIDBEES": "Liquid",
+            "TATAGOLD": "Gold (Tata)",
+            "TATSILV": "Silver (Tata)",
+            "GOLDBEES": "Gold (Nippon)",
+            "LIQUIDBEES": "Liquid ETF",
         }
         headers = ["Commodity", "LTP", "%Chg", "52W Low", "52W High", "Position"]
         rows = []
         for sym, data in comms.items():
             name = names.get(sym, sym)
-            w52_pos = _52w_position(data['last'], data.get('week52_low', 0), data.get('week52_high',0))
+            w52_pos = _52w_position(data['last'], data.get('week52_low', 0), data.get('week52_high', 0))
             w52_emoji = _52w_emoji(data['last'], data.get('week52_low', 0), data.get('week52_high', 0))
             rows.append([
-                name[:10],
+                name[:12],
                 f"₹{data['last']:,.0f}",
                 _pct(data['pct']),
                 f"₹{data.get('week52_low', 0):,.0f}",
@@ -599,30 +861,31 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         lines.append("</pre>")
         lines.append("")
 
-    # Commodity indices
-    indices = snapshot.get("indices") or {}
-    commodity_indices = ["NIFTY COMMODITIES", "NIFTY OIL & GAS", "NIFTY ENERGY"]
-    comm_idx_list = []
-    for name in commodity_indices:
-        if name in indices:
-            idx = indices[name]
-            comm_idx_list.append((name.replace("NIFTY ", ""), idx['last'], idx['pct']))
-    
-    if comm_idx_list:
-        lines.append("<b>📈 Commodity Indices</b>")
-        headers = ["Index", "Level", "%Change"]
-        rows = []
-        for name, last, pct in comm_idx_list:
-            rows.append([name, f"{last:,.0f}", _pct(pct)])
-        table = _make_table(headers, rows, align=['left', 'right', 'right'])
-        lines.append("<pre>")
-        lines.append(table)
-        lines.append("</pre>")
-        lines.append("")
+    # Commodity Indices — only at pre-market & 9 PM
+    if show_extras:
+        indices = snapshot.get("indices") or {}
+        commodity_indices = ["NIFTY COMMODITIES", "NIFTY OIL & GAS", "NIFTY ENERGY"]
+        comm_idx_list = []
+        for name in commodity_indices:
+            if name in indices:
+                idx = indices[name]
+                comm_idx_list.append((name.replace("NIFTY ", ""), idx['last'], idx['pct']))
+        
+        if comm_idx_list:
+            lines.append("<b>📈 Commodity Indices</b>")
+            headers = ["Index", "Level", "%Change"]
+            rows = []
+            for name, last, pct in comm_idx_list:
+                rows.append([name, f"{last:,.0f}", _pct(pct)])
+            table = _make_table(headers, rows, align=['left', 'right', 'right'])
+            lines.append("<pre>")
+            lines.append(table)
+            lines.append("</pre>")
+            lines.append("")
 
-    # Forex
+    # Forex — only at pre-market & 9 PM
     forex = snapshot.get("forex")
-    if forex:
+    if forex and show_extras:
         lines.append("<b>💱 Currency Rates</b>")
         headers = ["Pair", "Rate", "Change"]
         rows = [["USD/INR", f"₹{forex['usdinr']:.4f}", ""]]
@@ -632,7 +895,6 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         if forex.get("usdgbp"):
             rows.append(["USD/GBP", f"£{forex['usdgbp']:.4f}", ""])
 
-        # Forex delta
         if delta and delta.get("forex"):
             fd = delta["forex"]
             rows[0][2] = f"{fd['direction']} {fd['change']:+.4f}"
@@ -641,104 +903,122 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
         lines.append("<pre>")
         lines.append(table)
         lines.append("</pre>")
+    elif forex and not show_extras:
+        lines.append(f"💱 USD/INR: <b>₹{forex['usdinr']:.4f}</b> <i>(detail at 9 PM)</i>")
 
     return "\n".join(lines)
 
 
 def format_corporate_msg(snapshot: Dict) -> str:
-    """Corporate actions + insider trading."""
+    """Corporate actions + insider trading. Only shows UPCOMING events (future ex-dates)."""
     lines = ["<b>📋 Corporate Actions & Insider Trading</b>", ""]
 
-    # Corporate actions
+    today = datetime.now().date()
+
+    def _parse_date(date_str):
+        """Parse NSE date formats: '13-Mar-2026' or '06-03-2026'."""
+        if not date_str or date_str == 'N/A':
+            return None
+        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y"):
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except (ValueError, TypeError):
+                continue
+        return None
+
+    def _is_upcoming(action):
+        """Return True only if ex_date is today or in the future."""
+        ex = _parse_date(action.get('ex_date', ''))
+        return ex is not None and ex >= today
+
+    # Corporate actions — FILTER to upcoming only
     actions = snapshot.get("corporate_actions")
     if actions:
-        lines.append(f"<b>📌 Corporate Actions ({len(actions)} items)</b>")
-        lines.append("")
+        upcoming = [a for a in actions if _is_upcoming(a)]
+        if upcoming:
+            lines.append(f"<b>📌 Upcoming Corporate Actions ({len(upcoming)} events)</b>")
+            lines.append("")
 
-        dividends = [a for a in actions if "dividend" in a.get("subject", "").lower()]
-        splits = [a for a in actions if "split" in a.get("subject", "").lower()]
-        bonus = [a for a in actions if "bonus" in a.get("subject", "").lower()]
-        
-        # === DIVIDENDS (with yield calculation) ===
-        if dividends:
-            lines.append("<b>💰 Dividends:</b>")
-            for a in dividends[:8]:
-                sym = a.get('symbol', '')
-                subject = a.get('subject', '')
-                ex_date = a.get('ex_date', 'N/A')
-                rec_date = a.get('record_date', 'N/A')
-                ltp = a.get('ltp', 0)
-                pe = a.get('pe', 0)
-                
-                # Extract dividend amount from subject (e.g., "Rs 10 Per Share" → 10)
-                div_amt = _extract_dividend_amount(subject)
-                
-                # Calculate yield
-                try:
-                    ltp_val = float(ltp) if ltp else 0
-                    pe_val = float(pe) if pe else 0
-                    yield_pct = (div_amt / ltp_val * 100) if (ltp_val and div_amt) else 0
-                except (ValueError, TypeError):
-                    ltp_val, pe_val, yield_pct = 0, 0, 0
-                
-                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
-                pe_str = f"{pe_val:.1f}" if pe_val else "N/A"
-                div_str = f"₹{div_amt:.2f}" if div_amt else "N/A"
-                yield_str = f"{yield_pct:.2f}%" if yield_pct else "N/A"
-                
-                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str} | PE: {pe_str}")
-                lines.append(f"  Dividend: {div_str} | Yield: {yield_str}")
-                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
-                lines.append("")
-        
-        # === SPLITS ===
-        if splits:
-            lines.append("<b>✂️ Stock Splits:</b>")
-            for a in splits[:5]:
-                sym = a.get('symbol', '')
-                subject = a.get('subject', '')[:50]
-                ex_date = a.get('ex_date', 'N/A')
-                rec_date = a.get('record_date', 'N/A')
-                ltp = a.get('ltp', 0)
-                
-                try:
-                    ltp_val = float(ltp) if ltp else 0
-                except (ValueError, TypeError):
-                    ltp_val = 0
-                
-                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
-                
-                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str}")
-                lines.append(f"  {subject}")
-                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
-                lines.append("")
-        
-        # === BONUS ===
-        if bonus:
-            lines.append("<b>🎁 Bonus Issues:</b>")
-            for a in bonus[:5]:
-                sym = a.get('symbol', '')
-                subject = a.get('subject', '')[:50]
-                ex_date = a.get('ex_date', 'N/A')
-                rec_date = a.get('record_date', 'N/A')
-                ltp = a.get('ltp', 0)
-                
-                try:
-                    ltp_val = float(ltp) if ltp else 0
-                except (ValueError, TypeError):
-                    ltp_val = 0
-                
-                ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "N/A"
-                
-                lines.append(f"  <b>{sym}</b> | LTP: {ltp_str}")
-                lines.append(f"  {subject}")
-                lines.append(f"  Ex: {ex_date} | Record: {rec_date}")
-                lines.append("")
-        
-        if not (dividends or splits or bonus):
-            lines.append("<i>No significant corporate actions</i>")
+            dividends = [a for a in upcoming if "dividend" in a.get("subject", "").lower()]
+            splits = [a for a in upcoming if "split" in a.get("subject", "").lower()]
+            bonus = [a for a in upcoming if "bonus" in a.get("subject", "").lower()]
+            others = [a for a in upcoming if a not in dividends and a not in splits and a not in bonus]
+            
+            if dividends:
+                lines.append("<b>💰 Upcoming Dividends:</b>")
+                for a in dividends[:8]:
+                    sym = a.get('symbol', '')
+                    subject = a.get('subject', '')
+                    ex_date = a.get('ex_date', 'N/A')
+                    ltp = a.get('ltp', 0)
+                    pe = a.get('pe', 0)
+                    div_amt = _extract_dividend_amount(subject)
+                    try:
+                        ltp_val = float(ltp) if ltp else 0
+                        pe_val = float(pe) if pe else 0
+                        yield_pct = (div_amt / ltp_val * 100) if (ltp_val and div_amt) else 0
+                    except (ValueError, TypeError):
+                        ltp_val, pe_val, yield_pct = 0, 0, 0
+                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
+                    pe_str = f"{pe_val:.1f}" if pe_val else "—"
+                    div_str = f"₹{div_amt:.2f}" if div_amt else "—"
+                    yield_str = f"{yield_pct:.2f}%" if yield_pct else "—"
+                    link = _nse_link(sym)
+                    lines.append(f"  {link} | LTP: {ltp_str} | PE: {pe_str}")
+                    lines.append(f"  Dividend: {div_str} | Yield: {yield_str}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+            
+            if splits:
+                lines.append("<b>✂️ Upcoming Stock Splits:</b>")
+                for a in splits[:5]:
+                    sym = a.get('symbol', '')
+                    subject = a.get('subject', '')[:60]
+                    ex_date = a.get('ex_date', 'N/A')
+                    ltp = a.get('ltp', 0)
+                    try:
+                        ltp_val = float(ltp) if ltp else 0
+                    except (ValueError, TypeError):
+                        ltp_val = 0
+                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
+                    lines.append(f"  {_nse_link(sym)} | LTP: {ltp_str}")
+                    lines.append(f"  {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+            
+            if bonus:
+                lines.append("<b>🎁 Upcoming Bonus Issues:</b>")
+                for a in bonus[:5]:
+                    sym = a.get('symbol', '')
+                    subject = a.get('subject', '')[:60]
+                    ex_date = a.get('ex_date', 'N/A')
+                    ltp = a.get('ltp', 0)
+                    try:
+                        ltp_val = float(ltp) if ltp else 0
+                    except (ValueError, TypeError):
+                        ltp_val = 0
+                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
+                    lines.append(f"  {_nse_link(sym)} | LTP: {ltp_str}")
+                    lines.append(f"  {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+            
+            if others:
+                lines.append("<b>📋 Other Actions:</b>")
+                for a in others[:3]:
+                    sym = a.get('symbol', '')
+                    subject = a.get('subject', '')[:60]
+                    ex_date = a.get('ex_date', 'N/A')
+                    lines.append(f"  {_nse_link(sym)} — {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+
+            if not (dividends or splits or bonus or others):
+                lines.append("<i>No upcoming corporate actions</i>")
+        else:
+            lines.append("<i>No upcoming corporate actions in the next 7 days</i>")
     else:
-        lines.append("No corporate actions this week")
+        lines.append("<i>No corporate actions data available</i>")
 
     lines.append("")
     lines.append("─" * 40)
@@ -826,13 +1106,13 @@ def format_preopen_msg(snapshot: Dict) -> str:
     if gainers:
         lines.append("<b>🟢 Pre-Open Gainers:</b>")
         for s in gainers[:5]:
-            lines.append(f"  {s['symbol']}: ₹{s['iep']:,.1f} ({_pct(s['pct'])})")
+            lines.append(f"  {_nse_link(s['symbol'])} ₹{s['iep']:,.1f} ({_pct(s['pct'])})")
 
     if losers:
         lines.append("")
         lines.append("<b>🔴 Pre-Open Losers:</b>")
         for s in losers[:5]:
-            lines.append(f"  {s['symbol']}: ₹{s['iep']:,.1f} ({_pct(s['pct'])})")
+            lines.append(f"  {_nse_link(s['symbol'])} ₹{s['iep']:,.1f} ({_pct(s['pct'])})")
 
     lines.append("")
     lines.append("💡 <i>Pre-open shows where stocks will start trading today</i>")
@@ -1132,16 +1412,22 @@ def format_delta_alert(delta: Dict) -> Optional[str]:
         if fd.get("dii_reversal"):
             alerts.append(fd["dii_reversal"])
 
-    # Big index moves
+    # Big index moves (deduplicated — indices are unique by name)
     idx = delta.get("indices", {})
     if idx:
+        # Group by significance: show biggest movers first
+        big_moves = []
         for name, chg in idx.get("changes", {}).items():
-            if abs(chg.get("pct_change", 0)) >= 1.0:
-                alerts.append(f"{chg['signal']} {name}: {_pct(chg['pct_change'])} since last check")
+            pct_chg = chg.get("pct_change", 0)
+            if abs(pct_chg) >= 1.0:
+                big_moves.append((name, chg))
+        big_moves.sort(key=lambda x: abs(x[1].get("pct_change", 0)), reverse=True)
+        for name, chg in big_moves[:10]:
+            alerts.append(f"{chg['signal']} {name}: {_pct(chg['pct_change'])} since last check")
 
     if not alerts:
         return None
 
-    lines = ["<b>⚡ ALERT: Significant Changes Detected!</b>", ""]
+    lines = ["<b>⚡ ALERT: Significant Changes!</b>", ""]
     lines.extend(alerts)
     return "\n".join(lines)
