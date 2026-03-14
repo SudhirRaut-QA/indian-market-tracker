@@ -153,7 +153,7 @@ class ExcelManager:
     """Production-grade Excel manager with deduplication and structured sheets."""
 
     SHEET_ORDER = [
-        "Dashboard", "FII_DII", "Indices", "Sectors", "Stocks",
+        "Dashboard", "Trading", "FII_DII", "Indices", "Sectors", "Stocks",
         "Commodities", "Forex", "Corporate", "Alerts_52W",
         "Insider", "Options", "PreOpen", "BulkBlock",
     ]
@@ -165,7 +165,8 @@ class ExcelManager:
 
     # ── Main Entry Point ─────────────────────────────────────────────────────
 
-    def log_snapshot(self, snapshot: Dict, delta: Optional[Dict] = None):
+    def log_snapshot(self, snapshot: Dict, delta: Optional[Dict] = None,
+                     trading_setups: Optional[Dict] = None):
         """Log all data from snapshot to Excel with deduplication."""
         try:
             wb = _get_wb(self.path)
@@ -173,7 +174,7 @@ class ExcelManager:
             date = datetime.now().strftime("%Y-%m-%d")
 
             # Dashboard: OVERWRITE with latest summary
-            self._update_dashboard(wb, snapshot, ts)
+            self._update_dashboard(wb, snapshot, ts, trading_setups)
 
             # Historical sheets: APPEND with dedup
             self._log_fii_dii(wb, snapshot, ts)
@@ -193,6 +194,10 @@ class ExcelManager:
                 self._log_bulk_deals(wb, snapshot, date)
             if snapshot.get("sectors"):
                 self._log_alerts(wb, snapshot, ts)
+
+            # Trading setups sheet
+            if trading_setups:
+                self._log_trading(wb, trading_setups, ts)
 
             # Remove default "Sheet" if empty
             if "Sheet" in wb.sheetnames:
@@ -252,7 +257,8 @@ class ExcelManager:
 
     # ── Dashboard (OVERWRITE each run) ───────────────────────────────────────
 
-    def _update_dashboard(self, wb: Workbook, snapshot: Dict, ts: str):
+    def _update_dashboard(self, wb: Workbook, snapshot: Dict, ts: str,
+                          trading_setups: Optional[Dict] = None):
         """Overwrite Dashboard with latest market summary."""
         name = "Dashboard"
         if name in wb.sheetnames:
@@ -349,6 +355,60 @@ class ExcelManager:
                 cell = ws.cell(row=row, column=1)
                 cell.fill = GREEN_FILL if "HIGH" in a["type"] else RED_FILL
                 row += 1
+
+        # ── Intraday Trading Hints ──
+        if trading_setups:
+            row += 1
+            bias = trading_setups.get("bias", {})
+            ws.cell(row=row, column=1, value="Intraday Trading Analysis").font = SECTION_FONT
+            row += 1
+            bias_dir = bias.get("direction", "NEUTRAL")
+            bias_score = bias.get("score", 0)
+            ws.cell(row=row, column=1, value=f"Market Bias: {bias_dir} (score {bias_score:+d}/100)")
+            fill = GREEN_FILL if bias_dir == "BULLISH" else (RED_FILL if bias_dir == "BEARISH" else YELLOW_FILL)
+            ws.cell(row=row, column=1).fill = fill
+            row += 1
+            for r_text in bias.get("reasons", [])[:4]:
+                ws.cell(row=row, column=1, value=f"  • {r_text}")
+                row += 1
+            row += 1
+
+            # Index levels summary
+            idx_setups = trading_setups.get("index_setups", [])
+            if idx_setups:
+                _header_row(ws, ["Index", "LTP", "Pivot", "S1", "S2", "R1", "R2", "Direction", "Entry", "Target", "SL", "R:R"], row)
+                row += 1
+                for s in idx_setups:
+                    vals = [
+                        s["symbol"], s["ltp"], s["classic_pivot"],
+                        s["classic_s1"], s["classic_s2"],
+                        s["classic_r1"], s["classic_r2"],
+                        s["direction"], s["entry"], s["target"],
+                        s["stop_loss"], s["risk_reward"],
+                    ]
+                    _write_row(ws, row, vals)
+                    row += 1
+                row += 1
+
+            # Top stock setups
+            stk_setups = trading_setups.get("stock_setups", [])
+            top_stk = [s for s in stk_setups if s["direction"] != "NEUTRAL"][:10]
+            if top_stk:
+                ws.cell(row=row, column=1, value="Top Stock Setups").font = SECTION_FONT
+                row += 1
+                _header_row(ws, ["Symbol", "Sector", "LTP", "Direction", "Entry", "Target", "SL", "R:R", "Key Factor"], row)
+                row += 1
+                for s in top_stk:
+                    factor = s["factors"][0] if s.get("factors") else ""
+                    vals = [
+                        s["symbol"], s["sector"], s["ltp"],
+                        s["direction"], s["entry"], s["target"],
+                        s["stop_loss"], s["risk_reward"], factor,
+                    ]
+                    _write_row(ws, row, vals)
+                    cell = ws.cell(row=row, column=4)
+                    cell.fill = GREEN_FILL if s["direction"] == "LONG" else RED_FILL
+                    row += 1
 
         _auto_width(ws)
 
@@ -890,3 +950,56 @@ class ExcelManager:
 
         alerts.sort(key=lambda a: a["distance"])
         return alerts
+
+    # ── Trading Setups (Append with dedup) ───────────────────────────────────
+
+    def _log_trading(self, wb: Workbook, setups: Dict, ts: str):
+        """Log intraday trading setups to the Trading sheet."""
+        name = "Trading"
+        headers = [
+            "Timestamp", "Category", "Symbol", "Sector", "LTP", "% Chg",
+            "Pivot", "S1", "S2", "R1", "R2",
+            "CPR Low", "CPR High", "CPR Width%",
+            "VWAP", "Direction", "Score",
+            "Entry", "Target", "Stop Loss", "R:R",
+            "Key Factors",
+        ]
+        ws = self._get_or_create_sheet(wb, name, headers)
+
+        # Dedup: check timestamp of last row
+        if ws.max_row >= 2:
+            last_ts = ws.cell(row=ws.max_row, column=1).value
+            if last_ts == ts:
+                logger.debug("Trading: skipped (same timestamp)")
+                return
+
+        all_setups = (
+            setups.get("index_setups", [])
+            + setups.get("stock_setups", [])
+            + setups.get("etf_setups", [])
+        )
+
+        for s in all_setups:
+            row = ws.max_row + 1
+            factors_str = " | ".join(s.get("factors", [])[:3])
+            vals = [
+                ts, s["category"], s["symbol"], s.get("sector", ""),
+                s["ltp"], s.get("pct", 0),
+                s["classic_pivot"], s["classic_s1"], s["classic_s2"],
+                s["classic_r1"], s["classic_r2"],
+                s["cpr_bc"], s["cpr_tc"], s["cpr_width_pct"],
+                s["vwap"], s["direction"], s["direction_score"],
+                s["entry"], s["target"], s["stop_loss"], s["risk_reward"],
+                factors_str,
+            ]
+            _write_row(ws, row, vals, {6: "green_red", 16: "green_red"})
+            # Color the direction column
+            cell = ws.cell(row=row, column=16)
+            if s["direction"] == "LONG":
+                cell.fill = GREEN_FILL
+            elif s["direction"] == "SHORT":
+                cell.fill = RED_FILL
+            elif s["direction"] == "NEUTRAL":
+                cell.fill = YELLOW_FILL
+
+        _auto_width(ws)

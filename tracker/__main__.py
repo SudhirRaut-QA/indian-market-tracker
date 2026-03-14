@@ -34,6 +34,7 @@ from .telegram_bot import (
     identify_watchlist, format_watchlist_msg, format_expert_opinion,
 )
 from .excel_manager import ExcelManager
+from .trading_engine import generate_intraday_setups, format_trading_msg
 from .google_drive_uploader import GoogleDriveUploader
 
 
@@ -150,6 +151,14 @@ def run_once(
             json.dump(snapshot, f, ensure_ascii=False, indent=2, default=str)
         logger.info(f"JSON saved: {json_path}")
 
+    # 3b. Generate trading setups (used by both Telegram and Excel)
+    trading_setups = None
+    if include_sectors and snapshot.get("sectors"):
+        trading_setups = generate_intraday_setups(snapshot)
+        logger.info(f"Trading setups: {len(trading_setups.get('index_setups', []))} index, "
+                     f"{len(trading_setups.get('stock_setups', []))} stock, "
+                     f"{len(trading_setups.get('etf_setups', []))} ETF")
+
     # 4. Send Telegram messages
     if send_telegram:
         messages = []
@@ -223,13 +232,19 @@ def run_once(
             if expert_msg:
                 messages.append(("🧠 Expert", expert_msg))
 
+        # Intraday Trading Setups
+        if trading_setups:
+            trading_msg = format_trading_msg(trading_setups)
+            if trading_msg:
+                messages.append(("📐 Trading", trading_msg))
+
         for name, msg in messages:
             logger.info(f"Sending: {name}")
             bot.send(msg)
 
     # 5. Log to Excel
     if save_excel:
-        excel.log_snapshot(snapshot, delta)
+        excel.log_snapshot(snapshot, delta, trading_setups=trading_setups)
 
     # 6. Upload to Google Drive (best-effort, never blocks tracker)
     try:
