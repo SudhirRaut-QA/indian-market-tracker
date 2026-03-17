@@ -1,152 +1,316 @@
-# Indian Market Tracker
+﻿<div align="center">
 
-Comprehensive NSE market intelligence delivered via Telegram.
+# 🇮🇳 Indian Market Tracker
 
-Tracks FII/DII flows, 21 indices, 16 sectors, options PCR, commodities, forex, corporate actions, and insider trading — formatted as clean, easy-to-read messages.
+**NSE Market Intelligence · Automated · Delivered to Telegram**
 
----
+[![Morning Session](https://img.shields.io/github/actions/workflow/status/SudhirRaut-QA/indian-market-tracker/morning_session.yml?label=Morning%20Session&logo=github&logoColor=white)](https://github.com/SudhirRaut-QA/indian-market-tracker/actions)
+[![Afternoon Session](https://img.shields.io/github/actions/workflow/status/SudhirRaut-QA/indian-market-tracker/afternoon_session.yml?label=Afternoon%20Session&logo=github&logoColor=white)](https://github.com/SudhirRaut-QA/indian-market-tracker/actions)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)](https://python.org)
+[![Telegram](https://img.shields.io/badge/Delivers%20via-Telegram-26A5E4?logo=telegram)](https://telegram.org)
+[![NSE Data](https://img.shields.io/badge/Data%20Source-NSE%20India-orange)](https://nseindia.com)
+[![Security](https://img.shields.io/badge/Secrets-Env%20Only%20%E2%9C%85-brightgreen)](SECURITY.md)
 
-## Features
+> *Your personal stock market assistant — 8 smart Telegram updates every weekday, fully automated.*
 
-| Feature | Description |
-|---------|-------------|
-| 💰 FII/DII | Foreign & domestic institutional flows with buy/sell signals |
-| 📈 21 Indices | NIFTY 50, Bank, IT, Defence, PSU Bank, Momentum, High Beta, etc. |
-| 🏭 16 Sectors | Per-stock analysis with gainers, losers, volume leaders |
-| 📊 Options PCR | Put-Call ratio for NIFTY & BANKNIFTY with max pain |
-| 🥇 Commodities | Gold (GOLDBEES), Silver (SILVERBEES) ETF tracking |
-| 💱 Forex | USD/INR, EUR, GBP, JPY rates |
-| 📋 Corporate | Dividends, splits, rights, bonus issues |
-| 🔍 Insider Trading | PIT disclosures — who's buying/selling their own stock |
-| 🔄 Delta Engine | Snapshot comparison — flow reversals, big movers |
-| 📑 Excel Logger | Auto-logged to Excel with 7 colored sheets |
-| ☁️ Google Drive | Auto-upload Excel/JSON to Google Drive (Shared Drive) |
+</div>
 
 ---
 
-## Quick Start
+## 🗺️ Documentation Hub
+
+> **New here? Start with QUICKSTART → then read GLOSSARY for terminology.**
+
+| 📄 Document | 📝 What's Inside |
+|-------------|-----------------|
+| 🚀 **[QUICKSTART.md](QUICKSTART.md)** | Zero-to-Telegram in 15 minutes — step-by-step setup |
+| 📖 **[GLOSSARY.md](GLOSSARY.md)** | Every term explained simply (FII, VIX, PCR, Pivot, R:R...) |
+| ☁️ **[GOOGLE_DRIVE_SETUP.md](GOOGLE_DRIVE_SETUP.md)** | Auto-backup Excel & JSON to Google Drive |
+| 🔒 **[SECURITY.md](SECURITY.md)** | How secrets are managed, what's safe to commit |
+
+---
+
+## 🤔 What Does This Do? (Simple Version)
+
+Think of this as a **robot news reporter** that watches the stock market all day and texts you a summary.
+
+```
+  NSE India Website                          Your Telegram Phone
+ ┌───────────────────┐                      ┌──────────────────────────────┐
+ │  Who is buying?   │                      │  📊 Market: BULLISH ✅        │
+ │  Which sectors    │  ───► Indian  ───►   │  💰 FII Buying ₹9,977 Cr     │
+ │  are moving?      │      Market          │  📈 NIFTY +1.1% (23,450)     │
+ │  How risky is     │      Tracker         │  🔥 Hot Sector: IT +2.1%     │
+ │  the market?      │                      │  ⚡ Setup: INFY LONG R:R 2.1  │
+ │  Any big news?    │                      │  😐 VIX 21.6 — Stay cautious │
+ └───────────────────┘                      └──────────────────────────────┘
+         ↑                                              ↑
+   Checked 8× daily                         Sent automatically, no action needed
+   Mon–Fri, 9AM–9PM IST
+```
+
+**In plain English:** Every weekday, this bot
+1. Fetches live data from NSE India (the official stock exchange website)
+2. Analyses it — who is buying, who is selling, how risky the market is
+3. Sends you a clean, colour-coded Telegram message with what to watch
+
+---
+
+## ✨ Features
+
+| Feature | What You Get | Why It Matters |
+|---------|-------------|----------------|
+| 💰 **FII / DII Flows** | Foreign & domestic institution buy/sell amounts | Big money direction = market direction |
+| 📈 **21 Indices** | NIFTY 50, Bank, IT, Defence, PSU Bank, Midcap... | See which segments are strong or weak |
+| 🏭 **16 Sectors** | Top gainers, losers, volume leaders per sector | Find where money is rotating |
+| 📊 **Options PCR** | Put-Call ratio + max pain for NIFTY & BANKNIFTY | Gauge market sentiment objectively |
+| 🧭 **Trading Engine** | Pivot levels, CPR, VWAP, entry/target/stop setups | Actionable trade ideas with R:R ratio |
+| 🔥 **Momentum Scanner** | RS-ranked stocks with volume confirmation | Catch breakouts before they run |
+| 👁️ **Watchlist Tracker** | Your saved stocks P&L vs entry price | Know if you should hold, add, or exit |
+| 🧠 **Expert Opinion** | AI-style daily market verdict with reasons | Understand the full picture in 3 lines |
+| 🥇 **Commodities** | Gold & Silver ETF prices (TATAGOLD, TATSILV) | Hedge signals and inflation gauge |
+| 💱 **Forex** | USD/INR, EUR/INR, GBP/INR, JPY/INR | Impact on IT, pharma, export stocks |
+| 📋 **Corporate Actions** | Dividends, splits, rights issues, bonuses | Never miss an important date |
+| 🔍 **Insider Trading** | PIT disclosures — who's buying their own stock | Promoters buying = confidence signal |
+| 🔄 **Delta Engine** | Snapshot comparison — what changed since last check | Spot reversals and accelerations |
+| 📑 **Excel Logger** | All data auto-saved to 7 colour-coded sheets | Your own offline analytics database |
+| ☁️ **Google Drive** | Auto-upload after every run | Cloud backup, accessible anywhere |
+
+---
+
+## 🏗️ How It Works (Architecture)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     GITHUB ACTIONS (Cloud)                          │
+│  ┌────────────────────────┐    ┌───────────────────────────────┐   │
+│  │   Morning Session      │    │   Afternoon Session           │   │
+│  │   09:00–11:00 IST      │    │   15:35–21:00 IST             │   │
+│  │   (02:30 UTC cron)     │    │   (09:42 UTC cron)            │   │
+│  └──────────┬─────────────┘    └────────────┬──────────────────┘   │
+│             └──────────────┬────────────────┘                       │
+│                            ▼                                        │
+│              ┌─────────────────────────┐                           │
+│              │   python -m tracker     │                           │
+│              │   --schedule --slots    │                           │
+│              └────────────┬────────────┘                           │
+└───────────────────────────┼─────────────────────────────────────────┘
+                            │
+            ┌───────────────▼───────────────┐
+            │         tracker/              │
+            │  ┌──────────────────────┐     │
+            │  │  nse_scraper.py      │◄────┼─── NSE India API
+            │  │  (Live market data)  │     │    Forex API
+            │  └──────────┬───────────┘     │
+            │             ▼                 │
+            │  ┌──────────────────────┐     │
+            │  │  trading_engine.py   │     │
+            │  │  (Pivot, VWAP, Bias) │     │
+            │  └──────────┬───────────┘     │
+            │             ▼                 │
+            │  ┌──────────────────────┐     │
+            │  │  delta_engine.py     │     │
+            │  │  (What changed?)     │     │
+            │  └──────────┬───────────┘     │
+            │             ▼                 │
+            │  ┌──────────────────────┐     │
+            │  │  telegram_bot.py     │────►├─── 📱 Telegram
+            │  │  (Format & Send)     │     │
+            │  └──────────────────────┘     │
+            │  ┌──────────────────────┐     │
+            │  │  excel_manager.py    │────►├─── 📊 Excel File
+            │  └──────────────────────┘     │
+            │  ┌──────────────────────┐     │
+            │  │  google_drive_       │────►└─── ☁️ Google Drive
+            │  │  uploader.py         │
+            │  └──────────────────────┘
+            └───────────────────────────────┘
+```
+
+---
+
+## ⚡ Quick Start
+
+> 📋 **Full setup guide:** [QUICKSTART.md](QUICKSTART.md)
 
 ```bash
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Configure credentials
+# 2. Add your credentials
 cp .env.example .env
-# Edit .env → add Telegram bot token, chat ID
+# Edit .env — add your Telegram bot token and chat ID
 
-# 3. Verify setup
+# 3. Verify everything works
 python -m tracker --setup
 
-# 4. Run once
-python -m tracker --now
+# 4. Run once to test
+python -m tracker --now --full
 
-# 5. Start local scheduler (8 daily slots)
+# 5. Start the scheduler (runs all 8 daily slots)
 python -m tracker --schedule
 ```
 
-### CLI Options
+### CLI Reference
 
 ```
-python -m tracker --now                          # Quick fetch (FII/DII + indices)
-python -m tracker --now --full                   # Everything (sectors, options, corporate, insider)
-python -m tracker --now --preopen                # Pre-open market analysis
-python -m tracker --now --corporate              # Corporate actions + insider trading
-python -m tracker --now --no-telegram --no-excel # Data only (JSON snapshot)
-python -m tracker --schedule                     # 8-slot daily scheduler
-python -m tracker --setup                        # Verify configuration
+python -m tracker --now                            Quick fetch (FII + indices)
+python -m tracker --now --full                     Full run (all data)
+python -m tracker --now --preopen                  Pre-open market analysis
+python -m tracker --now --corporate                Corporate actions + insider
+python -m tracker --now --no-telegram --no-excel   Data only (JSON snapshot)
+python -m tracker --schedule                       8-slot daily scheduler
+python -m tracker --setup                          Verify configuration
 ```
 
 ---
 
-## Schedule (8 Daily Slots — Mon-Fri)
+## 🕐 Daily Schedule (8 Slots, Mon–Fri)
 
-| IST | UTC | Slot | Data |
-|-----|-----|------|------|
-| 09:00 | 03:30 | Pre-Open Preview | Pre-open orders |
-| 09:08 | 03:38 | Pre-Open Final | IEP settled |
-| 09:15 | 03:45 | Market Open | First trades + indices |
-| 09:30 | 04:00 | Early Session | FII/DII + sectors + options |
-| 11:00 | 05:30 | Mid-Morning | Full snapshot + delta |
-| 15:35 | 10:05 | Market Close | Closing snapshot + day delta |
-| 18:00 | 12:30 | Post-Market | FII/DII final + corporate actions |
-| 21:00 | 15:30 | Evening Digest | Full summary + insider trading |
-
----
-
-## GitHub Actions (Automated)
-
-The included workflow (`.github/workflows/market_tracker.yml`) runs **8 cron jobs** automatically on weekdays. Each slot triggers `python -m tracker --now` with the appropriate flags.
-
-### Setup GitHub Secrets
-
-Go to **Settings → Secrets and variables → Actions** and add:
-
-| Secret | Description |
-|--------|-------------|
-| `TELEGRAM_BOT_TOKEN` | From @BotFather |
-| `TELEGRAM_CHAT_ID` | Your chat/group ID |
-| `GOOGLE_DRIVE_FOLDER_ID` | *(optional)* Shared Drive folder ID |
-| `GOOGLE_SERVICE_ACCOUNT_JSON` | *(optional)* Full JSON content of service account key |
-
-> **Note**: GitHub Actions cron has ±5-20 min variance. For exact timing, use Activepieces or a VPS with crontab.
-
-### Manual Trigger
-
-You can also trigger manually from **Actions → Indian Market Tracker → Run workflow** and pick a run mode.
+```
+IST     UTC      Slot               What You Receive
+──────  ───────  ─────────────────  ─────────────────────────────────────────
+09:00   03:30    Pre-Open Preview   Early orders, IEP estimates, gap direction
+09:08   03:38    Pre-Open Final     Settled pre-open prices before bell
+09:15   03:45    Market Open        First prints, index direction, big movers
+09:30   04:00    Early Session      FII/DII flows + sector + options PCR
+11:00   05:30    Mid-Morning        Full snapshot + delta (what changed?)
+15:35   10:05    Market Close       Day's closing snapshot + full day delta
+18:00   12:30    Post-Market        Provisional FII/DII + corporate actions
+21:00   15:30    Evening Digest     Final data + insider trading + watchlist
+──────  ───────  ─────────────────  ─────────────────────────────────────────
+```
 
 ---
 
-## Google Drive Backup (Optional)
+## ☁️ GitHub Actions (Fully Automated — No Server Needed!)
 
-Auto-uploads Excel and JSON snapshots to Google Drive after each run.
+The repo includes **2 GitHub Actions workflows** that run automatically every weekday:
 
-### Setup
+```
+.github/workflows/
+├── morning_session.yml     ← 09:00–11:00 IST (5 slots)
+└── afternoon_session.yml   ← 15:35–21:00 IST (3 slots)
+```
 
-1. Create a **Shared Drive** (Team Drive) in Google Workspace
-2. Create a service account in Google Cloud Console → download JSON key
-3. Share the Shared Drive folder with the service account email
-4. Add folder ID and credentials path to `.env`
+### Setup in 3 Steps
 
-> **Important**: As of Sep 2024, Google does **not** allow service accounts to upload to personal Google Drive folders. You must use a **Shared Drive** or OAuth2 delegation.
+**Step 1 — Fork the repo** (or push to your GitHub)
 
-See [GOOGLE_DRIVE_SETUP.md](GOOGLE_DRIVE_SETUP.md) for detailed instructions.
+**Step 2 — Add secrets** (`Settings → Secrets and variables → Actions`):
+
+| Secret Name | Where to Get It | Required? |
+|-------------|----------------|-----------|
+| `TELEGRAM_BOT_TOKEN` | Message @BotFather on Telegram | ✅ Yes |
+| `TELEGRAM_CHAT_ID` | Run `python get_chat_id.py` | ✅ Yes |
+| `GOOGLE_DRIVE_FOLDER_ID` | From your Drive folder URL | ⭕ Optional |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Google Cloud Console | ⭕ Optional |
+
+**Step 3 — Enable Actions** in your fork → it runs automatically!
+
+> ⚠️ **GitHub cron has ±5–20 min variance.** For exchange-precise timing, run locally or use a VPS with crontab.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 indian-market-tracker/
-├── tracker/
-│   ├── __init__.py              # Version
-│   ├── __main__.py              # CLI entry point
-│   ├── config.py                # Configuration
-│   ├── nse_scraper.py           # NSE API + forex data
-│   ├── delta_engine.py          # Snapshot comparison
-│   ├── telegram_bot.py          # Message formatting + sending
-│   ├── excel_manager.py         # Excel logging (7 sheets)
-│   ├── google_drive_uploader.py # Google Drive upload
-│   ├── scheduler.py             # 8-slot daily scheduler
-│   └── signal_detector.py       # Signal analysis
-├── .github/workflows/
-│   └── market_tracker.yml       # 8 cron-triggered GitHub Actions
-├── credentials/                 # Service account JSON (gitignored)
-├── data/                        # Generated data (gitignored)
-├── setup.py                     # Interactive setup wizard
-├── get_chat_id.py               # Telegram chat ID helper
-├── test_tracker.py              # Local test suite
-├── test_google_drive.py         # Google Drive connection test
-├── list_drive_files.py          # List files in Drive folder
-├── .env.example
-├── .gitignore
-├── requirements.txt
-└── README.md
+│
+├── 📂 tracker/                    Core Python package
+│   ├── __main__.py                CLI entry point  (python -m tracker)
+│   ├── config.py                  All settings, thresholds, sector lists
+│   ├── nse_scraper.py             Fetches data from NSE India + Forex API
+│   ├── trading_engine.py          Pivot levels, CPR, VWAP, bias scoring, setups
+│   ├── delta_engine.py            Snapshot comparison — detects changes
+│   ├── telegram_bot.py            Formats and sends all Telegram messages
+│   ├── excel_manager.py           Writes 7-sheet Excel workbook
+│   ├── google_drive_uploader.py   Uploads Excel/JSON to Google Drive
+│   ├── scheduler.py               Runs the 8-slot daily schedule
+│   ├── signal_detector.py         52-week levels, delivery, volume signals
+│   ├── trade_tracker.py           Logs recommendations, EOD review, auto-tunes
+│   └── interactive_bot.py        Telegram command handler (/watchlist, /help)
+│
+├── 📂 .github/workflows/          Automation
+│   ├── morning_session.yml        Runs 09:00–11:00 IST slots
+│   └── afternoon_session.yml      Runs 15:35–21:00 IST slots
+│
+├── 📂 credentials/                🔒 GITIGNORED — never committed
+│   └── service-account.json       Google service account key
+│
+├── 📂 data/                       Auto-generated runtime data
+│   ├── excel/market_tracker.xlsx  Excel workbook (all history)
+│   └── snapshots/                 JSON snapshots for delta comparison
+│
+├── .env                           🔒 GITIGNORED — your secrets go here
+├── .env.example                   Template — copy to .env
+├── .gitignore                     Protects credentials and .env from git
+├── requirements.txt               Python package dependencies
+├── setup.py                       Interactive first-time setup wizard
+├── get_chat_id.py                 Helper to find your Telegram chat ID
+│
+├── 📖 README.md                   ← You are here
+├── 📖 QUICKSTART.md               Step-by-step beginner setup
+├── 📖 GLOSSARY.md                 All terms explained simply
+├── 📖 GOOGLE_DRIVE_SETUP.md       Cloud backup setup
+└── 📖 SECURITY.md                 Secret management guide
 ```
 
-## Data Sources
+---
 
-| Source | What |
-|--------|------|
-| [NSE India](https://www.nseindia.com) | FII/DII, indices, sectors, options, corporate actions, insider trading |
-| [Forex API](https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json) | USD/INR and currency rates |
-| NSE Quote API | GOLDBEES, SILVERBEES commodity ETF prices |
+## 🔒 Security Design
+
+This project is **public on GitHub** — here is exactly what is and isn't safe:
+
+| Item | In Git? | Why Safe? |
+|------|---------|-----------|
+| `tracker/*.py` | ✅ Yes | Source code only — no secrets embedded |
+| `.env.example` | ✅ Yes | Template with placeholder values only |
+| `data/snapshots/last_snapshot.json` | ✅ Yes | Public market data only |
+| `.env` | ❌ **Gitignored** | Contains your real token — never committed |
+| `credentials/*.json` | ❌ **Gitignored** | Service account keys — never committed |
+| GitHub Secrets | 🔐 Encrypted | Only available inside Actions, never in logs |
+
+**All secrets flow in via environment variables** — zero hardcoded credentials anywhere.
+
+> 📋 Full details: [SECURITY.md](SECURITY.md)
+
+---
+
+## 📊 Data Sources
+
+| Source | Data Provided |
+|--------|--------------|
+| [NSE India](https://www.nseindia.com) | FII/DII, 21 indices, 16 sectors, options chain, corporate actions, insider trading, pre-open |
+| [Fawaz Currency API](https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json) | USD/INR, EUR/INR, GBP/INR, JPY/INR |
+| NSE Quote API | TATAGOLD, TATSILV, GOLDBEES, LIQUIDBEES ETF prices |
+
+---
+
+## 🙋 FAQ
+
+**Q: Do I need to pay for anything?**
+All data sources are free. GitHub Actions free tier (2,000 min/month) is sufficient.
+
+**Q: Will it work if I am not in India?**
+Yes! GitHub Actions runs in the cloud. Your timezone does not matter.
+
+**Q: Is the data real-time?**
+NSE data is delayed ~15 minutes per NSE's public API policy. Pre-market data is real-time.
+
+**Q: Can I add my own stocks to the watchlist?**
+Yes — message `/watchlist add SYMBOL PRICE` to your Telegram bot.
+
+**Q: What happens on market holidays?**
+The scheduler runs but NSE returns no data — the bot sends a "Market Closed" notice.
+
+**Q: I see `R:R 2.1` in a message — what does that mean?**
+Risk-to-Reward ratio. See 📖 [GLOSSARY.md](GLOSSARY.md) for all terms explained simply.
+
+---
+
+<div align="center">
+
+Made with ❤️ for Indian retail investors · Data from [NSE India](https://nseindia.com)
+
+</div>
