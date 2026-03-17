@@ -198,8 +198,10 @@ def run_once(
             if alert:
                 messages.append(("⚡ Alert", alert))
 
-        # Pre-open (only during pre-market)
-        if include_preopen and snapshot.get("preopen"):
+        # Pre-open (only before 9:20 AM IST — stale after market opens)
+        ist_now = datetime.now(ist)
+        preopen_cutoff = ist_now.replace(hour=9, minute=20, second=0, microsecond=0)
+        if include_preopen and snapshot.get("preopen") and ist_now < preopen_cutoff:
             messages.append(("🌅 Pre-Open", format_preopen_msg(snapshot)))
 
         # Main message: FII/DII + Indices (slot-aware)

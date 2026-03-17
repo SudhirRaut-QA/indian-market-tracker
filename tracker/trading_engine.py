@@ -211,30 +211,35 @@ def _market_bias(snapshot: Dict) -> Dict:
     score = 0
     reasons = []
 
-    # 1. FII/DII
+    # 1. FII/DII  (T+1 data — treat as context, not dominant signal)
     fd = snapshot.get("fii_dii", {})
     fii_net = fd.get("fii", {}).get("net", 0) or 0
     dii_net = fd.get("dii", {}).get("net", 0) or 0
     if fii_net > 500:
-        score += 20
+        score += 15
         reasons.append(f"FII buying ₹{fii_net:,.0f}Cr")
     elif fii_net < -500:
-        score -= 20
+        score -= 15
         reasons.append(f"FII selling ₹{abs(fii_net):,.0f}Cr")
     if dii_net > 500:
         score += 10
         reasons.append(f"DII buying ₹{dii_net:,.0f}Cr")
 
-    # 2. VIX
+    # 2. VIX  (India VIX ranges: <13 calm, 13-18 normal, 18-24 elevated, 24+ high fear)
     indices = snapshot.get("indices", {})
     vix = indices.get("INDIA VIX", {})
     vix_val = vix.get("last", 0) or 0
     if isinstance(vix_val, (int, float)):
-        if vix_val < 14:
+        if vix_val < 13:
             score += 15
             reasons.append(f"Low VIX {vix_val:.1f} (calm)")
-        elif vix_val > 20:
-            score -= 15
+        elif vix_val < 18:
+            pass  # Normal range — no bias shift
+        elif vix_val < 24:
+            score -= 10
+            reasons.append(f"Elevated VIX {vix_val:.1f} (caution)")
+        else:
+            score -= 20
             reasons.append(f"High VIX {vix_val:.1f} (fear)")
 
     # 3. Breadth
@@ -246,20 +251,26 @@ def _market_bias(snapshot: Dict) -> Dict:
         adv, dec = 0, 0
     if adv + dec > 0:
         ratio = adv / (adv + dec)
-        if ratio > 0.6:
-            score += 15
+        if ratio >= 0.6:
+            score += 20
             reasons.append(f"Breadth {adv}:{dec} (bullish)")
-        elif ratio < 0.4:
-            score -= 15
+        elif ratio <= 0.4:
+            score -= 20
             reasons.append(f"Breadth {adv}:{dec} (bearish)")
 
-    # 4. NIFTY 50 day trend
+    # 4. NIFTY 50 day trend  (strongest real-time signal)
     n50_pct = n50.get("pct", 0) or 0
     if isinstance(n50_pct, (int, float)):
-        if n50_pct > 0.5:
+        if n50_pct > 1.0:
+            score += 20
+            reasons.append(f"NIFTY +{n50_pct:.1f}% today")
+        elif n50_pct > 0.3:
             score += 10
             reasons.append(f"NIFTY +{n50_pct:.1f}% today")
-        elif n50_pct < -0.5:
+        elif n50_pct < -1.0:
+            score -= 20
+            reasons.append(f"NIFTY {n50_pct:.1f}% today")
+        elif n50_pct < -0.3:
             score -= 10
             reasons.append(f"NIFTY {n50_pct:.1f}% today")
 
@@ -406,6 +417,7 @@ def _generate_setup(
 
     # ── Entry / Target / Stop Loss ──
     # Rule: all entries are actionable relative to CURRENT LTP.
+    # When initial R:R < 1.0, extend target to next level (R2/S2).
     # SHORT: if already below pivot, enter now (at LTP) or on small bounce
     # LONG:  if already above pivot, enter now (at LTP) or on small dip
     if direction == "LONG":
@@ -415,11 +427,18 @@ def _generate_setup(
             s1 = best_support["level"] if best_support else classic["S1"]
             stop_loss = round(min(s1, classic["P"] * 0.998), 2)  # SL below pivot
             target = best_resist["level"] if best_resist else classic["R1"]
+            # Extend to R2 if R:R would be < 1.0
+            _risk = abs(entry - stop_loss) or 1
+            if abs(target - entry) / _risk < 1.0:
+                target = classic["R2"]
         else:
             # Price below pivot but LONG bias → wait for pivot reclaim
             entry = round(classic["P"] * 1.001, 2)  # just above pivot
             stop_loss = best_support["level"] if best_support else classic["S1"]
             target = best_resist["level"] if best_resist else classic["R1"]
+            _risk = abs(entry - stop_loss) or 1
+            if abs(target - entry) / _risk < 1.0:
+                target = classic["R2"]
     elif direction == "SHORT":
         if c <= classic["P"]:
             # Price below pivot → trade with trend; enter at LTP or small bounce
@@ -428,11 +447,18 @@ def _generate_setup(
             entry = round(min(bounce_entry, r1 * 0.999), 2)
             stop_loss = round(max(r1, classic["P"] * 1.002), 2)  # SL above resistance
             target = best_support["level"] if best_support else classic["S1"]
+            # Extend to S2 if R:R would be < 1.0
+            _risk = abs(entry - stop_loss) or 1
+            if abs(target - entry) / _risk < 1.0:
+                target = classic["S2"]
         else:
             # Price above pivot but SHORT bias → wait for pivot breakdown
             entry = round(classic["P"] * 0.999, 2)  # just below pivot
             stop_loss = best_resist["level"] if best_resist else classic["R1"]
             target = best_support["level"] if best_support else classic["S1"]
+            _risk = abs(entry - stop_loss) or 1
+            if abs(target - entry) / _risk < 1.0:
+                target = classic["S2"]
     else:
         entry = classic["P"]
         stop_loss = classic["S1"] if c >= classic["P"] else classic["R1"]
@@ -783,11 +809,11 @@ def format_trading_msg(setups: Dict) -> str:
             _append_setup_block(L, s, show_link=False)
         L.append("")
 
-    # ── Top Stock Setups (show top 10) ──
+    # ── Top Stock Setups (only actionable R:R >= 1.0) ──
     stk = setups.get("stock_setups", [])
     if stk:
-        longs = [s for s in stk if s["direction"] == "LONG"][:5]
-        shorts = [s for s in stk if s["direction"] == "SHORT"][:5]
+        longs = [s for s in stk if s["direction"] == "LONG" and s["risk_reward"] >= 1.0][:5]
+        shorts = [s for s in stk if s["direction"] == "SHORT" and s["risk_reward"] >= 1.0][:5]
 
         if longs:
             L.append(f"<b>━━ 🟢 LONG Setups ({len(longs)}) ━━</b>")
@@ -819,7 +845,8 @@ def format_trading_msg(setups: Dict) -> str:
         L.append("<b>━━ ⚡ Momentum Alerts ━━</b>")
         L.append("<i>Dynamic picks based on live signals</i>")
         L.append("")
-        for s in momentum[:8]:
+        shown = [s for s in momentum if s["risk_reward"] >= 0.8][:6]
+        for s in shown:
             de = _dir_emoji(s["direction"])
             link = _nse_link(s["symbol"])
             L.append(f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) <i>{s['sector']}</i>")

@@ -290,6 +290,8 @@ def _market_mood(snapshot: Dict) -> str:
         fear = " | 😨 Fear spike"
     elif vix_pct < -3:
         fear = " | 😌 Calm"
+    elif abs(vix_pct) <= 1:
+        fear = " | 😌 Calm"
     return f"{mood} ({adv}🟢 vs {dec}🔴){fear}"
 
 
@@ -422,15 +424,23 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
     if not any_data:
         return None
     lines.append("")
-    # Summary
-    gains = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) > w["entry_ltp"])
-    losses = len(watchlist) - gains
-    lines.append(f"Score: {gains}🟢 winning · {losses}🔴 losing")
+    # Summary — track wins, losses, and flat (within ±0.1%)
+    gains = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) > w["entry_ltp"] * 1.001)
+    losses = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) < w["entry_ltp"] * 0.999)
+    flat = len(watchlist) - gains - losses
+    parts = []
+    if gains:
+        parts.append(f"{gains}🟢 winning")
+    if flat:
+        parts.append(f"{flat}⚪ flat")
+    if losses:
+        parts.append(f"{losses}🔴 losing")
+    lines.append(f"Score: {' · '.join(parts)}")
     return "\n".join(lines)
 
 
 def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optional[str]:
-    """Simple market analysis any beginner can understand."""
+    """Actionable market analysis with specific sector and breadth insights."""
     indices = snapshot.get("indices") or {}
     sectors = snapshot.get("sectors") or {}
     if not indices:
@@ -443,18 +453,37 @@ def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optio
     v_pct = vix.get("pct", 0)
     v_last = vix.get("last", 0)
     lines = ["<b>🧠 Expert Take (Simple Analysis)</b>", ""]
-    # 1. Market direction
+
+    # 1. Market direction with breadth context
+    try:
+        adv = int(nifty.get("advances", 0) or 0)
+        dec = int(nifty.get("declines", 0) or 0)
+    except (ValueError, TypeError):
+        adv, dec = 0, 0
+    breadth_pct = adv / (adv + dec) * 100 if (adv + dec) > 0 else 50
+
     if n_pct >= 1:
         lines.append("📈 <b>Market is strongly UP today.</b> Buyers in control.")
+        if breadth_pct >= 60:
+            lines.append(f"   Broad rally ({adv} of {adv+dec} stocks green) — genuine strength.")
+        else:
+            lines.append(f"   ⚠ Index up but only {adv} of {adv+dec} stocks green — narrow rally, select stocks lifting index.")
     elif n_pct >= 0.3:
         lines.append("📈 <b>Market is mildly green.</b> Cautious optimism.")
+        if breadth_pct >= 60:
+            lines.append(f"   Healthy breadth ({adv}🟢 vs {dec}🔴) — broad participation.")
     elif n_pct > -0.3:
         lines.append("➡️ <b>Market is flat/sideways.</b> No clear direction.")
+        if breadth_pct < 40:
+            lines.append(f"   ⚠ More stocks declining ({dec}🔴 vs {adv}🟢) despite flat index — hidden weakness.")
+        elif breadth_pct > 60:
+            lines.append(f"   Midcaps/smallcaps doing better ({adv}🟢 vs {dec}🔴) while large caps flat.")
     elif n_pct > -1:
         lines.append("📉 <b>Market is down.</b> Sellers have some control.")
     else:
         lines.append("📉📉 <b>Market is in heavy selling.</b> Be cautious!")
     lines.append("")
+
     # 2. FII/DII reading
     fd = snapshot.get("fii_dii")
     if fd:
@@ -470,29 +499,37 @@ def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optio
         elif fii_net > 0:
             lines.append("💰 <b>Foreign investors buying</b> — Positive for market.")
         lines.append("")
-    # 3. VIX (fear gauge)
+
+    # 3. VIX (fear gauge — India VIX: <13 calm, 13-18 normal, 18-24 elevated, 24+ high)
     if v_last:
-        if v_last > 20:
-            lines.append(f"😨 <b>VIX at {v_last:.1f}</b> — High fear. Market is volatile. Don't panic-sell.")
-        elif v_last > 15:
-            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Moderate fear. Normal caution.")
+        if v_last >= 24:
+            lines.append(f"😨 <b>VIX at {v_last:.1f}</b> — High fear! Reduce position sizes, expect wild swings.")
+        elif v_last >= 18:
+            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Elevated volatility. Use tight stop-losses.")
+        elif v_last >= 13:
+            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Normal range. Market conditions healthy.")
         else:
             lines.append(f"😌 <b>VIX at {v_last:.1f}</b> — Low fear. Market is calm.")
         lines.append("")
-    # 4. Sector rotation
+
+    # 4. Sector rotation — show top 2 and bottom 2 with context
     if sectors:
         sorted_sec = sorted(sectors.items(), key=lambda x: x[1].get("index_pct", 0), reverse=True)
-        best_sec = sorted_sec[0] if sorted_sec else None
-        worst_sec = sorted_sec[-1] if sorted_sec else None
-        if best_sec and worst_sec:
-            b_name = best_sec[0].replace("NIFTY ", "")
-            b_val = best_sec[1].get("index_pct", 0)
-            w_name = worst_sec[0].replace("NIFTY ", "")
-            w_val = worst_sec[1].get("index_pct", 0)
-            lines.append(f"🔄 <b>Money rotating:</b> {b_name} ({_pct(b_val)}) best, "
-                         f"{w_name} ({_pct(w_val)}) worst.")
+        top2 = sorted_sec[:2]
+        bot2 = sorted_sec[-2:]
+        if top2 and bot2:
+            t_names = ", ".join(f"{s[0].replace('NIFTY ', '')} ({_pct(s[1].get('index_pct', 0))})" for s in top2)
+            b_names = ", ".join(f"{s[0].replace('NIFTY ', '')} ({_pct(s[1].get('index_pct', 0))})" for s in bot2)
+            lines.append(f"🔄 <b>Money flowing into:</b> {t_names}")
+            lines.append(f"   <b>Money leaving:</b> {b_names}")
+
+            # Sector spread insight
+            spread = top2[0][1].get("index_pct", 0) - bot2[-1][1].get("index_pct", 0)
+            if spread > 3:
+                lines.append("   💡 Large sector gap — strong rotation. Focus on leading sectors.")
             lines.append("")
-    # 5. Simple advice
+
+    # 5. Actionable advice based on multiple factors
     lines.append("<b>📝 What should you do?</b>")
     if n_pct < -2:
         lines.append("• <i>Big fall day. If you own good stocks, HOLD. Don't panic.</i>")
@@ -500,10 +537,18 @@ def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optio
     elif n_pct < -0.5:
         lines.append("• <i>Red day but not alarming. Watch for support levels.</i>")
         lines.append("• <i>Good companies on dip = potential buying opportunity.</i>")
-    elif n_pct > 1:
-        lines.append("• <i>Strong green day! Don't chase — book partial profits.</i>")
+    elif n_pct > 1.5:
+        lines.append("• <i>Strong rally! Don't chase. Book partial profits on holdings up 10%+.</i>")
+    elif n_pct > 0.5:
+        if breadth_pct >= 60:
+            lines.append("• <i>Healthy green day with broad participation. Good for swing entries.</i>")
+        else:
+            lines.append("• <i>Green day but narrow rally. Be selective — buy only leaders.</i>")
     else:
-        lines.append("• <i>Normal day. Stick to your plan, avoid impulsive trades.</i>")
+        if v_last and v_last >= 18:
+            lines.append("• <i>Flat day with elevated VIX — avoid over-trading, wait for clear direction.</i>")
+        else:
+            lines.append("• <i>Normal day. Stick to your plan, avoid impulsive trades.</i>")
     lines.append("")
     lines.append("<i>⚠️ This is automated analysis, not financial advice.</i>")
     return "\n".join(lines)
@@ -939,8 +984,8 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
             w52_pos = _52w_position(data['last'], data.get('week52_low', 0), data.get('week52_high', 0))
             w52_emoji = _52w_emoji(data['last'], data.get('week52_low', 0), data.get('week52_high', 0))
             rows.append([
-                name[:12],
-                f"₹{data['last']:,.0f}",
+                name[:16],
+                f"₹{data['last']:,.2f}",
                 _pct(data['pct']),
                 f"₹{data.get('week52_low', 0):,.0f}",
                 f"₹{data.get('week52_high', 0):,.0f}",
