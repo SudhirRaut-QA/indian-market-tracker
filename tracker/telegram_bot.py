@@ -275,6 +275,7 @@ def _market_mood(snapshot: Dict) -> str:
         adv, dec = 0, 0
     vix_data = indices.get("INDIA VIX", {})
     vix_val = vix_data.get("last", 0) or 0
+    vix_pct = vix_data.get("pct", 0) or 0  # daily % change — proves live data
     if p >= 1:
         mood = "🟢🟢 Strong Rally"
     elif p >= 0.3:
@@ -285,17 +286,18 @@ def _market_mood(snapshot: Dict) -> str:
         mood = "🔴 Mildly Bearish"
     else:
         mood = "🔴🔴 Heavy Selling"
-    # VIX label based on ABSOLUTE LEVEL (not daily % change)
+    # VIX label based on ABSOLUTE LEVEL + daily change shows it's live
     # India VIX: <13 calm, 13-18 normal, 18-24 elevated, 24+ high fear
+    vix_chg_str = f" {vix_pct:+.1f}%" if vix_pct else ""
     vix_label = ""
     if vix_val >= 24:
-        vix_label = f" | 😨 VIX {vix_val:.1f} High Fear"
+        vix_label = f" | 😨 VIX {vix_val:.1f}{vix_chg_str} High Fear"
     elif vix_val >= 18:
-        vix_label = f" | ⚠️ VIX {vix_val:.1f} Elevated"
+        vix_label = f" | ⚠️ VIX {vix_val:.1f}{vix_chg_str} Elevated"
     elif vix_val >= 13:
-        vix_label = f" | 😐 VIX {vix_val:.1f} Normal"
+        vix_label = f" | 😐 VIX {vix_val:.1f}{vix_chg_str} Normal"
     elif vix_val > 0:
-        vix_label = f" | 😌 VIX {vix_val:.1f} Calm"
+        vix_label = f" | 😌 VIX {vix_val:.1f}{vix_chg_str} Calm"
     return f"{mood} ({adv}🟢 vs {dec}🔴){vix_label}"
 
 
@@ -437,13 +439,16 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
     )
     if all_zero:
         # Use today's pct change from prev_close as the honest score
+        # NOTE: parentheses around (... or 0) are critical — without them,
+        # Python parses `x or 0 >= 1.0` as `x or (0 >= 1.0)` = `x or False`
+        # which treats any non-zero pct as truthy → double-counts every stock.
         gains = sum(
             1 for w in watchlist
-            if current.get(w["symbol"], {}).get("pct", 0) or 0 >= 1.0
+            if (current.get(w["symbol"], {}).get("pct", 0) or 0) >= 1.0
         )
         losses = sum(
             1 for w in watchlist
-            if current.get(w["symbol"], {}).get("pct", 0) or 0 <= -1.0
+            if (current.get(w["symbol"], {}).get("pct", 0) or 0) <= -1.0
         )
         flat = len(watchlist) - gains - losses
         parts = []
@@ -649,14 +654,16 @@ def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optio
 
     # 3. VIX (fear gauge — India VIX: <13 calm, 13-18 normal, 18-24 elevated, 24+ high)
     if v_last:
+        # v_pct is the daily % change from NSE — shows VIX is live, not cached
+        vix_chg = f" ({'+' if v_pct >= 0 else ''}{v_pct:.1f}% today)" if v_pct else ""
         if v_last >= 24:
-            lines.append(f"😨 <b>VIX at {v_last:.1f}</b> — High fear! Reduce position sizes, expect wild swings.")
+            lines.append(f"😨 <b>VIX at {v_last:.1f}{vix_chg}</b> — High fear! Reduce position sizes, expect wild swings.")
         elif v_last >= 18:
-            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Elevated volatility. Use tight stop-losses.")
+            lines.append(f"😐 <b>VIX at {v_last:.1f}{vix_chg}</b> — Elevated volatility. Use tight stop-losses.")
         elif v_last >= 13:
-            lines.append(f"😐 <b>VIX at {v_last:.1f}</b> — Normal range. Market conditions healthy.")
+            lines.append(f"😐 <b>VIX at {v_last:.1f}{vix_chg}</b> — Normal range. Market conditions healthy.")
         else:
-            lines.append(f"😌 <b>VIX at {v_last:.1f}</b> — Low fear. Market is calm.")
+            lines.append(f"😌 <b>VIX at {v_last:.1f}{vix_chg}</b> — Low fear. Market is calm.")
         lines.append("")
 
     # 4. Sector rotation — show top 2 and bottom 2 with context

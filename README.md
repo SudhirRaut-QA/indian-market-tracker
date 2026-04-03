@@ -64,10 +64,13 @@ Think of this as a **robot news reporter** that watches the stock market all day
 | 📈 **21 Indices** | NIFTY 50, Bank, IT, Defence, PSU Bank, Midcap... | See which segments are strong or weak |
 | 🏭 **16 Sectors** | Top gainers, losers, volume leaders per sector | Find where money is rotating |
 | 📊 **Options PCR** | Put-Call ratio + max pain for NIFTY & BANKNIFTY | Gauge market sentiment objectively |
-| 🧭 **Trading Engine** | Pivot levels, CPR, VWAP, entry/target/stop setups | Actionable trade ideas with R:R ratio |
+| 🧭 **Trading Engine** | Pivot, CPR, VWAP setups with 5-dim confidence score (0–100) | Actionable setups filtered by quality, not just signal count |
+| 🎯 **Confidence Scoring** | Trend × Volume × Technical × Market Harmony × R:R | Only high-conviction setups recommended |
+| 👁️ **On Watch Section** | Near-threshold setups when market is quiet | Never see an empty setups page — always has monitor candidates |
 | 🔥 **Momentum Scanner** | RS-ranked stocks with volume confirmation | Catch breakouts before they run |
-| 👁️ **Watchlist Tracker** | Your saved stocks P&L vs entry price | Know if you should hold, add, or exit |
-| 🧠 **Expert Opinion** | AI-style daily market verdict with reasons | Understand the full picture in 3 lines |
+| 👁️ **Watchlist Tracker** | Live P&L vs entry price; honest proxy on day of entry | Know if you should hold, add, or exit |
+| 🧠 **Expert Opinion** | AI-style market verdict with VIX live change % | Understand fear level trajectory, not just a static number |
+| 🤖 **Self-Tuning Algo** | EOD review auto-adjusts confidence floor, sector blacklist | Gets smarter every trading day |
 | 🥇 **Commodities** | Gold & Silver ETF prices (TATAGOLD, TATSILV) | Hedge signals and inflation gauge |
 | 💱 **Forex** | USD/INR, EUR/INR, GBP/INR, JPY/INR | Impact on IT, pharma, export stocks |
 | 📋 **Corporate Actions** | Dividends, splits, rights issues, bonuses | Never miss an important date |
@@ -284,6 +287,30 @@ This project is **public on GitHub** — here is exactly what is and isn't safe:
 | [NSE India](https://www.nseindia.com) | FII/DII, 21 indices, 16 sectors, options chain, corporate actions, insider trading, pre-open |
 | [Fawaz Currency API](https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json) | USD/INR, EUR/INR, GBP/INR, JPY/INR |
 | NSE Quote API | TATAGOLD, TATSILV, GOLDBEES, LIQUIDBEES ETF prices |
+
+---
+
+## 🆕 Recent Enhancements (Apr 2026)
+
+### Trader-Grade Algorithm
+
+| Enhancement | Detail |
+|-------------|--------|
+| **5-Dim Confidence Score (0–100)** | Every setup scored: Trend(25) + Volume(20) + Technical(25) + Market Harmony(20) + R:R(10). Only confident setups recommended. |
+| **Smart Entry Logic** | Refuses to enter if stock already moved >3.5% from pivot (chasing filter). |
+| **Position Sizing** | Position size adjusts by VIX level, R:R ratio and confidence score. Higher fear = smaller position. |
+| **Sector Blacklist** | Sectors with <30% win rate are auto-blacklisted by the EOD review. No more bad-sector setups. |
+| **On Watch Section** | When fewer than 2 LONG or SHORT setups pass the threshold, a monitoring sub-section auto-populates using threshold−15. Users always see candidates. |
+| **Self-Tuning Confidence Floor** | EOD auto-tunes: floor drops to 45 if win rate >60%, rises to 60 if win rate <40%. |
+
+### Data Accuracy & Display
+
+| Fix | Detail |
+|-----|--------|
+| **VIX shows daily change %** | `VIX 25.5 (+5.2% today)` — proves the value is live from NSE, not cached. |
+| **52W Low × SHORT contradiction fixed** | Near 52W low is a LONG reversal zone, not a short setup. Shorts near 52W low lose −15 confidence pts. |
+| **52W Low labels** | Labeled `Potential Reversal — LONG only, not SHORT` with explicit warning in signal page. |
+| **Watchlist score on day of entry** | Entry-day score now uses stock's day pct change (proxy), not the meaningless 0.00% vs entry. Shows `3🟢 up today (entry just set)`. |
 
 ---
 
