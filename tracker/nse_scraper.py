@@ -313,9 +313,17 @@ class MarketScraper:
             idx_data = items[0]
             stocks = []
             for s in items[1:]:
+                last_p = s.get("lastPrice", 0) or 0
+                year_high = s.get("yearHigh", 0) or 0
+                year_low = s.get("yearLow", 0) or 0
+                # nearWKH/nearWKL are often absent/0 in the bulk sector API
+                # response even when the stock IS near its 52W level.
+                # Always compute from yearHigh/yearLow as authoritative source.
+                near_h = round((year_high - last_p) / last_p * 100, 2) if last_p and year_high > last_p else 0
+                near_l = round((last_p - year_low) / year_low * 100, 2) if last_p and year_low and last_p > year_low else 0
                 stocks.append({
                     "symbol": s.get("symbol", ""),
-                    "last": s.get("lastPrice", 0),
+                    "last": last_p,
                     "change": s.get("change", 0),
                     "pct": s.get("pChange", 0),
                     "open": s.get("open", 0),
@@ -324,10 +332,10 @@ class MarketScraper:
                     "prev_close": s.get("previousClose", 0),
                     "volume": s.get("totalTradedVolume", 0),
                     "value_cr": round(s.get("totalTradedValue", 0) / 1e7, 2),
-                    "year_high": s.get("yearHigh", 0),
-                    "year_low": s.get("yearLow", 0),
-                    "near_52h": s.get("nearWKH", 0),
-                    "near_52l": s.get("nearWKL", 0),
+                    "year_high": year_high,
+                    "year_low": year_low,
+                    "near_52h": near_h,
+                    "near_52l": near_l,
                     "chg_30d": s.get("perChange30d", 0),
                     "chg_365d": s.get("perChange365d", 0),
                 })

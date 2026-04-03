@@ -1211,7 +1211,8 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
 
         if delta and delta.get("forex"):
             fd = delta["forex"]
-            rows[0][2] = f"{fd['direction']} {fd['change']:+.4f}"
+            if fd["change"] != 0:  # suppress 'Unchanged +0.0000' — same API snapshot between runs
+                rows[0][2] = f"{fd['direction']} {fd['change']:+.4f}"
         
         table = _make_table(headers, rows, align=['left', 'right', 'left'])
         lines.append("<pre>")
