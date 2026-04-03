@@ -388,6 +388,13 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
     indices = snapshot.get("indices") or {}
     nifty_pct = indices.get("NIFTY 50", {}).get("pct", 0) or 0
     context = "Bearish day" if nifty_pct < -0.5 else ("Bullish day" if nifty_pct > 0.5 else "Flat day")
+    # Pre-compute all_zero BEFORE the loop so we can use day pct for arrows on entry day.
+    # all_zero = every entry was set to today's LTP (all vs-entry deltas are ~0%)
+    all_zero = bool(watchlist) and all(
+        abs((current.get(w["symbol"], {}).get("last", w["entry_ltp"]) - w["entry_ltp"])
+            / w["entry_ltp"] * 100) < 0.05
+        for w in watchlist if w.get("entry_ltp")
+    )
     lines.append(f"<i>Tracking live · {context} (Nifty {nifty_pct:+.2f}%)</i>")
     lines.append("")
     any_data = False
@@ -401,13 +408,16 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
         any_data = True
         cur_ltp = cur_data["last"]
         chg = ((cur_ltp - entry) / entry * 100) if entry else 0
-        if chg >= 2:
+        day_pct = cur_data.get("pct", 0) or 0
+        # When all entries were just set, use day's pct for the arrow (honest direction)
+        arrow_basis = day_pct if all_zero else chg
+        if arrow_basis >= 2:
             sig = "🚀"
-        elif chg >= 0.5:
+        elif arrow_basis >= 0.5:
             sig = "📈"
-        elif chg > -0.5:
+        elif arrow_basis > -0.5:
             sig = "➡️"
-        elif chg > -2:
+        elif arrow_basis > -2:
             sig = "📉"
         else:
             sig = "💥"
@@ -432,11 +442,7 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
     lines.append("")
     # Summary — track wins, losses, and flat (within ±0.1%)
     # When all entries were just set (all 0.00%), use day's pct as proxy
-    all_zero = all(
-        abs((current.get(w["symbol"], {}).get("last", w["entry_ltp"]) - w["entry_ltp"])
-            / w["entry_ltp"] * 100) < 0.05
-        for w in watchlist if w.get("entry_ltp")
-    )
+    # all_zero already computed above (before the per-stock loop)
     if all_zero:
         # Use today's pct change from prev_close as the honest score
         # NOTE: parentheses around (... or 0) are critical — without them,
@@ -1159,8 +1165,8 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
                 name[:16],
                 f"₹{data['last']:,.2f}",
                 _pct(data['pct']),
-                f"₹{data.get('week52_low', 0):,.0f}",
-                f"₹{data.get('week52_high', 0):,.0f}",
+                f"₹{data.get('week52_low', 0):,.2f}",
+                f"₹{data.get('week52_high', 0):,.2f}",
                 f"{w52_emoji}{w52_pos}"
             ])
         table = _make_table(headers, rows, align=['left', 'right', 'right', 'right', 'right', 'center'])

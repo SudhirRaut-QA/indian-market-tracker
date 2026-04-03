@@ -691,6 +691,12 @@ def _generate_setup(
     if category != "Index" and direction != "NEUTRAL" and confidence_score < confidence_floor:
         return None
 
+    # Hard block: NEVER recommend SHORT for stocks near 52W low.
+    # Near 52W low = value zone / potential reversal — fundamentally wrong direction for short.
+    # Scoring penalty alone is insufficient; this rule is non-negotiable.
+    if direction == "SHORT" and isinstance(near_52l, (int, float)) and 0 < near_52l <= 5:
+        return None
+
     # ── Position sizing ──
     pos_size = _position_sizing(vix_val, rr_ratio, confidence_score)
 
@@ -927,7 +933,7 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
                     confidence_floor=watch_floor,
                     sector_blacklist=sector_blacklist,
                 )
-                if setup and setup["direction"] != "NEUTRAL" and setup["risk_reward"] >= 1.0:
+                if setup and setup["direction"] != "NEUTRAL" and setup["risk_reward"] >= 1.5:
                     watch_seen.add(sym)
                     on_watch.append(setup)
         on_watch.sort(key=lambda s: s.get("confidence_score", 0), reverse=True)
