@@ -32,6 +32,7 @@ from .telegram_bot import (
     format_options_msg, format_commodities_msg, format_corporate_msg,
     format_preopen_msg, format_delta_alert, format_bulk_deals_msg,
     identify_watchlist, format_watchlist_msg, format_expert_opinion,
+    format_weekly_toppers,
 )
 from .excel_manager import ExcelManager
 from .trading_engine import generate_intraday_setups, format_trading_msg
@@ -192,8 +193,12 @@ def run_once(
     if send_telegram:
         messages = []
 
+        # Determine if market is closed (post-market, evening, or holiday)
+        _post_market = slot_time in ("18:00", "21:00")
+        _market_closed = use_cache  # cache mode = market closed
+
         # Delta alert (if significant changes)
-        if delta:
+        if delta and not _market_closed:
             alert = format_delta_alert(delta)
             if alert:
                 messages.append(("⚡ Alert", alert))
@@ -205,20 +210,21 @@ def run_once(
             messages.append(("🌅 Pre-Open", format_preopen_msg(snapshot)))
 
         # Main message: FII/DII + Indices (slot-aware)
+        # Post-market: send compact summary, not full repeat
         if snapshot.get("fii_dii") or snapshot.get("indices"):
             messages.append(("📊 Market Pulse", format_fii_dii_msg(snapshot, delta, slot_time=slot_time)))
 
-        # Sectors
-        if include_sectors and snapshot.get("sectors"):
+        # Sectors — SKIP in post-market (stale data, already sent at 15:35)
+        if include_sectors and snapshot.get("sectors") and not _market_closed:
             messages.append(("🏭 Sectors", format_sector_msg(snapshot, delta)))
 
-        # Watchlist: identify in early slots, track in later ones
+        # Watchlist: identify ONCE per day, track throughout
         watchlist_file = os.path.join(str(config.DATA_DIR), "watchlist",
                                       datetime.now().strftime("%Y-%m-%d") + ".json")
         os.makedirs(os.path.dirname(watchlist_file), exist_ok=True)
         watchlist = None
         if include_sectors and snapshot.get("sectors"):
-            # Check if watchlist exists for today
+            # Always load existing watchlist first (persist entry prices)
             if os.path.exists(watchlist_file):
                 try:
                     with open(watchlist_file, "r", encoding="utf-8") as wf:
@@ -227,7 +233,7 @@ def run_once(
                 except Exception:
                     watchlist = None
 
-            # Build watchlist if not yet created (early slots with sector data)
+            # Build watchlist ONLY if not yet created today (first slot)
             if not watchlist:
                 watchlist = identify_watchlist(snapshot, count=5)
                 if watchlist:
@@ -235,21 +241,21 @@ def run_once(
                         json.dump(watchlist, wf, ensure_ascii=False, indent=2)
                     logger.info(f"Watchlist created: {[w['symbol'] for w in watchlist]}")
 
-            # Send watchlist tracking message
+            # Send watchlist tracking message (always — shows P&L vs morning entry)
             if watchlist:
                 wl_msg = format_watchlist_msg(snapshot, watchlist)
                 if wl_msg:
                     messages.append(("🎯 Watchlist", wl_msg))
 
-        # Options
-        if include_options and snapshot.get("option_chain"):
+        # Options — SKIP in post-market (stale)
+        if include_options and snapshot.get("option_chain") and not _market_closed:
             messages.append(("📊 Options", format_options_msg(snapshot)))
 
-        # Commodities + Forex (slot-aware)
+        # Commodities + Forex (slot-aware — always send, forex data may be fresh)
         if snapshot.get("commodities") or snapshot.get("forex"):
             messages.append(("🏆 Commodities", format_commodities_msg(snapshot, delta, slot_time=slot_time)))
 
-        # Corporate + Insider
+        # Corporate + Insider — only in evening slots when data is fresh
         if (include_corporate or include_insider) and (snapshot.get("corporate_actions") or snapshot.get("insider_trading")):
             messages.append(("📋 Corporate", format_corporate_msg(snapshot)))
 
@@ -257,14 +263,14 @@ def run_once(
         if include_bulk_deals and (snapshot.get("bulk_deals") or snapshot.get("block_deals")):
             messages.append(("💼 Deals", format_bulk_deals_msg(snapshot)))
 
-        # Expert Opinion (in slots with sector data)
-        if include_sectors and snapshot.get("sectors"):
+        # Expert Opinion — SKIP in post-market (same stale analysis)
+        if include_sectors and snapshot.get("sectors") and not _market_closed:
             expert_msg = format_expert_opinion(snapshot, delta)
             if expert_msg:
                 messages.append(("🧠 Expert", expert_msg))
 
-        # Intraday Trading Setups
-        if trading_setups:
+        # Intraday Trading Setups — ONLY during market hours (useless after close)
+        if trading_setups and not _market_closed:
             trading_msg = format_trading_msg(trading_setups)
             if trading_msg:
                 messages.append(("📐 Trading", trading_msg))
@@ -274,6 +280,16 @@ def run_once(
             rev_msg = format_review_msg(trading_review)
             if rev_msg:
                 messages.append(("📊 EOD Review", rev_msg))
+
+        # Weekly Watchlist Toppers — Friday 21:00 slot (end of week summary)
+        if slot_time == "21:00" and ist_now.weekday() == 4:  # Friday
+            try:
+                weekly_msg = format_weekly_toppers(snapshot, str(config.DATA_DIR))
+                if weekly_msg:
+                    messages.append(("📊 Weekly Toppers", weekly_msg))
+                    logger.info("Weekly watchlist toppers generated")
+            except Exception as _e:
+                logger.warning(f"Weekly toppers failed: {_e}")
 
         for name, msg in messages:
             logger.info(f"Sending: {name}")

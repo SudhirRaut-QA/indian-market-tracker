@@ -789,7 +789,7 @@ class MarketScraper:
                 # Enrich with LTP, PE from stock quotes
                 if snapshot["corporate_actions"]:
                     snapshot["corporate_actions"] = self.enrich_corporate_actions(
-                        snapshot["corporate_actions"], max_enrich=15
+                        snapshot["corporate_actions"], max_enrich=25
                     )
             except Exception as e:
                 snapshot["errors"].append(f"Corp actions: {e}")

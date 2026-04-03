@@ -274,7 +274,7 @@ def _market_mood(snapshot: Dict) -> str:
     except (ValueError, TypeError):
         adv, dec = 0, 0
     vix_data = indices.get("INDIA VIX", {})
-    vix_pct = vix_data.get("pct", 0)
+    vix_val = vix_data.get("last", 0) or 0
     if p >= 1:
         mood = "🟢🟢 Strong Rally"
     elif p >= 0.3:
@@ -285,14 +285,18 @@ def _market_mood(snapshot: Dict) -> str:
         mood = "🔴 Mildly Bearish"
     else:
         mood = "🔴🔴 Heavy Selling"
-    fear = ""
-    if vix_pct > 5:
-        fear = " | 😨 Fear spike"
-    elif vix_pct < -3:
-        fear = " | 😌 Calm"
-    elif abs(vix_pct) <= 1:
-        fear = " | 😌 Calm"
-    return f"{mood} ({adv}🟢 vs {dec}🔴){fear}"
+    # VIX label based on ABSOLUTE LEVEL (not daily % change)
+    # India VIX: <13 calm, 13-18 normal, 18-24 elevated, 24+ high fear
+    vix_label = ""
+    if vix_val >= 24:
+        vix_label = f" | 😨 VIX {vix_val:.1f} High Fear"
+    elif vix_val >= 18:
+        vix_label = f" | ⚠️ VIX {vix_val:.1f} Elevated"
+    elif vix_val >= 13:
+        vix_label = f" | 😐 VIX {vix_val:.1f} Normal"
+    elif vix_val > 0:
+        vix_label = f" | 😌 VIX {vix_val:.1f} Calm"
+    return f"{mood} ({adv}🟢 vs {dec}🔴){vix_label}"
 
 
 def identify_watchlist(snapshot: Dict, count: int = 5) -> List[Dict]:
@@ -439,6 +443,123 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
     return "\n".join(lines)
 
 
+def format_weekly_toppers(snapshot: Dict, data_dir: str) -> Optional[str]:
+    """Weekly watchlist performance — shows best/worst suggestions this week.
+    
+    Reads all daily watchlist files (Mon-Fri) and compares each
+    stock's entry price to its closing LTP from the snapshot.
+    Returns a formatted weekly leaderboard.
+    """
+    import glob
+    from datetime import timedelta
+
+    today = datetime.now().date()
+    # Find start of this week (Monday)
+    monday = today - timedelta(days=today.weekday())
+
+    # Collect all watchlist files from this week
+    watchlist_dir = os.path.join(data_dir, "watchlist")
+    if not os.path.isdir(watchlist_dir):
+        return None
+
+    weekly_stocks = {}  # symbol → {entry, entry_date, current_ltp, pct_chg}
+    sectors = snapshot.get("sectors") or {}
+    current = {}
+    for name, data in sectors.items():
+        for s in data.get("stocks", []):
+            if s["symbol"] not in current:
+                current[s["symbol"]] = s
+
+    for day_offset in range(7):
+        dt = monday + timedelta(days=day_offset)
+        if dt > today:
+            break
+        wl_file = os.path.join(watchlist_dir, f"{dt.isoformat()}.json")
+        if not os.path.exists(wl_file):
+            continue
+        try:
+            with open(wl_file, "r", encoding="utf-8") as f:
+                day_wl = json.load(f)
+            for w in day_wl:
+                sym = w.get("symbol", "")
+                entry = w.get("entry_ltp", 0)
+                if not sym or not entry:
+                    continue
+                cur = current.get(sym, {}).get("last", 0)
+                if not cur:
+                    continue
+                pct = ((cur - entry) / entry * 100)
+                # Keep the earliest entry for this week
+                if sym not in weekly_stocks:
+                    weekly_stocks[sym] = {
+                        "symbol": sym,
+                        "entry": entry,
+                        "entry_date": dt.strftime("%a %d"),
+                        "current": cur,
+                        "pct": pct,
+                    }
+                else:
+                    # Also track if same stock was picked on multiple days
+                    weekly_stocks[sym]["picks"] = weekly_stocks[sym].get("picks", 1) + 1
+        except Exception:
+            continue
+
+    if not weekly_stocks:
+        return None
+
+    # Sort by performance
+    ranked = sorted(weekly_stocks.values(), key=lambda x: x["pct"], reverse=True)
+
+    lines = ["<b>📊 Weekly Watchlist Toppers</b>", ""]
+    lines.append(f"<i>Week of {monday.strftime('%d %b')} — {min(today, monday + timedelta(days=4)).strftime('%d %b %Y')}</i>")
+    lines.append("")
+
+    # Top winners
+    winners = [s for s in ranked if s["pct"] > 0.1]
+    losers = [s for s in ranked if s["pct"] < -0.1]
+
+    if winners:
+        lines.append("<b>🏆 Best Performers:</b>")
+        for i, s in enumerate(winners[:5], 1):
+            medal = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][i-1]
+            picks_str = f" · {s.get('picks', 1)}× picked" if s.get("picks", 1) > 1 else ""
+            lines.append(
+                f"  {medal} {_nse_link(s['symbol'])} "
+                f"<b>{s['pct']:+.2f}%</b> "
+                f"(₹{s['entry']:,.1f} → ₹{s['current']:,.1f})"
+                f"{picks_str}"
+            )
+        lines.append("")
+
+    if losers:
+        lines.append("<b>📉 Underperformers:</b>")
+        for s in losers[-3:]:
+            lines.append(
+                f"  🔻 {_nse_link(s['symbol'])} "
+                f"<b>{s['pct']:+.2f}%</b> "
+                f"(₹{s['entry']:,.1f} → ₹{s['current']:,.1f})"
+            )
+        lines.append("")
+
+    # Summary stats
+    total = len(weekly_stocks)
+    win_count = len(winners)
+    loss_count = len(losers)
+    avg_return = sum(s["pct"] for s in weekly_stocks.values()) / total if total else 0
+    win_rate = (win_count / total * 100) if total else 0
+
+    lines.append(f"<b>📈 Week Stats:</b> {total} stocks tracked")
+    lines.append(f"  Win Rate: <b>{win_rate:.0f}%</b> ({win_count}W / {loss_count}L)")
+    lines.append(f"  Avg Return: <b>{avg_return:+.2f}%</b>")
+
+    if win_rate >= 60:
+        lines.append("  💪 Strong week — our picks beat the market!")
+    elif win_rate >= 40:
+        lines.append("  📊 Mixed week — some winners, some losers.")
+    else:
+        lines.append("  ⚠️ Tough week for picks. Market conditions may need different strategy.")
+
+    return "\n".join(lines)
 def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optional[str]:
     """Actionable market analysis with specific sector and breadth insights."""
     indices = snapshot.get("indices") or {}
@@ -515,37 +636,55 @@ def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optio
     # 4. Sector rotation — show top 2 and bottom 2 with context
     if sectors:
         sorted_sec = sorted(sectors.items(), key=lambda x: x[1].get("index_pct", 0), reverse=True)
-        top2 = sorted_sec[:2]
-        bot2 = sorted_sec[-2:]
+        # Only show sectors with positive % as "flowing into"
+        positive_secs = [s for s in sorted_sec if s[1].get("index_pct", 0) > 0]
+        negative_secs = [s for s in sorted_sec if s[1].get("index_pct", 0) < 0]
+        top2 = positive_secs[:2] if positive_secs else sorted_sec[:2]
+        bot2 = negative_secs[-2:] if negative_secs else sorted_sec[-2:]
         if top2 and bot2:
             t_names = ", ".join(f"{s[0].replace('NIFTY ', '')} ({_pct(s[1].get('index_pct', 0))})" for s in top2)
             b_names = ", ".join(f"{s[0].replace('NIFTY ', '')} ({_pct(s[1].get('index_pct', 0))})" for s in bot2)
-            lines.append(f"🔄 <b>Money flowing into:</b> {t_names}")
-            lines.append(f"   <b>Money leaving:</b> {b_names}")
+            if positive_secs:
+                lines.append(f"🔄 <b>Money flowing into:</b> {t_names}")
+            else:
+                lines.append(f"🔄 <b>Least damage:</b> {t_names}")
+            if negative_secs:
+                lines.append(f"   <b>Money leaving:</b> {b_names}")
+            else:
+                lines.append(f"   <b>Lagging sectors:</b> {b_names}")
 
             # Sector spread insight
-            spread = top2[0][1].get("index_pct", 0) - bot2[-1][1].get("index_pct", 0)
+            spread = sorted_sec[0][1].get("index_pct", 0) - sorted_sec[-1][1].get("index_pct", 0)
             if spread > 3:
                 lines.append("   💡 Large sector gap — strong rotation. Focus on leading sectors.")
             lines.append("")
 
     # 5. Actionable advice based on multiple factors
     lines.append("<b>📝 What should you do?</b>")
+    high_vix = v_last and v_last >= 24
+    elevated_vix = v_last and v_last >= 18
+
     if n_pct < -2:
         lines.append("• <i>Big fall day. If you own good stocks, HOLD. Don't panic.</i>")
         lines.append("• <i>If you want to buy, wait for market to stabilize first.</i>")
     elif n_pct < -0.5:
         lines.append("• <i>Red day but not alarming. Watch for support levels.</i>")
-        lines.append("• <i>Good companies on dip = potential buying opportunity.</i>")
+        if not high_vix:
+            lines.append("• <i>Good companies on dip = potential buying opportunity.</i>")
     elif n_pct > 1.5:
-        lines.append("• <i>Strong rally! Don't chase. Book partial profits on holdings up 10%+.</i>")
+        if high_vix:
+            lines.append("• <i>Strong rally BUT VIX is high — could reverse fast. Book profits, don't add.</i>")
+        else:
+            lines.append("• <i>Strong rally! Don't chase. Book partial profits on holdings up 10%+.</i>")
     elif n_pct > 0.5:
-        if breadth_pct >= 60:
+        if high_vix:
+            lines.append("• <i>Green day but VIX signals danger ahead. Reduce position sizes, keep stop-losses tight.</i>")
+        elif breadth_pct >= 60:
             lines.append("• <i>Healthy green day with broad participation. Good for swing entries.</i>")
         else:
             lines.append("• <i>Green day but narrow rally. Be selective — buy only leaders.</i>")
     else:
-        if v_last and v_last >= 18:
+        if elevated_vix:
             lines.append("• <i>Flat day with elevated VIX — avoid over-trading, wait for clear direction.</i>")
         else:
             lines.append("• <i>Normal day. Stick to your plan, avoid impulsive trades.</i>")
@@ -1109,7 +1248,7 @@ def format_corporate_msg(snapshot: Dict) -> str:
                 lines.append("<b>✂️ Upcoming Stock Splits:</b>")
                 for a in splits[:5]:
                     sym = a.get('symbol', '')
-                    subject = a.get('subject', '')[:60]
+                    subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', 'N/A')
                     ltp = a.get('ltp', 0)
                     try:
@@ -1126,7 +1265,7 @@ def format_corporate_msg(snapshot: Dict) -> str:
                 lines.append("<b>🎁 Upcoming Bonus Issues:</b>")
                 for a in bonus[:5]:
                     sym = a.get('symbol', '')
-                    subject = a.get('subject', '')[:60]
+                    subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', 'N/A')
                     ltp = a.get('ltp', 0)
                     try:
@@ -1143,7 +1282,7 @@ def format_corporate_msg(snapshot: Dict) -> str:
                 lines.append("<b>📋 Other Actions:</b>")
                 for a in others[:3]:
                     sym = a.get('symbol', '')
-                    subject = a.get('subject', '')[:60]
+                    subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', 'N/A')
                     lines.append(f"  {_nse_link(sym)} — {subject}")
                     lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")

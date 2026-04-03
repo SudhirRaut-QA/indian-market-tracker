@@ -845,7 +845,7 @@ def format_trading_msg(setups: Dict) -> str:
         L.append("<b>━━ ⚡ Momentum Alerts ━━</b>")
         L.append("<i>Dynamic picks based on live signals</i>")
         L.append("")
-        shown = [s for s in momentum if s["risk_reward"] >= 0.8][:6]
+        shown = [s for s in momentum if s["risk_reward"] >= 1.0][:6]
         for s in shown:
             de = _dir_emoji(s["direction"])
             link = _nse_link(s["symbol"])
