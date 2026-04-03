@@ -38,7 +38,7 @@ from .excel_manager import ExcelManager
 from .trading_engine import generate_intraday_setups, format_trading_msg
 from .trade_tracker import (
     save_recommendations, review_day, update_algo_params,
-    format_review_msg, format_trend_report,
+    format_review_msg, format_trend_report, format_algo_insight_msg,
 )
 from .google_drive_uploader import GoogleDriveUploader
 
@@ -275,11 +275,18 @@ def run_once(
             if trading_msg:
                 messages.append(("📐 Trading", trading_msg))
 
-        # EOD Performance Review (15:35 slot only)
+        # EOD Performance Review + Algo Insight (15:35 slot only)
         if trading_review:
             rev_msg = format_review_msg(trading_review)
             if rev_msg:
                 messages.append(("📊 EOD Review", rev_msg))
+            # Send algo self-learning report after EOD review
+            try:
+                algo_msg = format_algo_insight_msg()
+                if algo_msg:
+                    messages.append(("🤖 Algo Insight", algo_msg))
+            except Exception as _e:
+                logger.warning(f"format_algo_insight_msg failed: {_e}")
 
         # Weekly Watchlist Toppers — Friday 21:00 slot (end of week summary)
         if slot_time == "21:00" and ist_now.weekday() == 4:  # Friday

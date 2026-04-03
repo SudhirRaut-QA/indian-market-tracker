@@ -35,6 +35,9 @@ _DEFAULT_PARAMS = {
     "momentum_val_cr_min":      500.0,
     "macro_bias_weight":          0.30,
     "sl_buffer_pct":              0.015,
+    "confidence_floor":          50,    # min 0-100 confidence to show a setup
+    "sector_blacklist":          [],    # sectors with consistently poor win rates
+    "top_trigger_types":         [],    # trigger types ranked by historical win rate
 }
 
 
@@ -143,6 +146,196 @@ def _estimate_vwap(volume: float, value_cr: float) -> float:
     if volume and value_cr and volume > 0:
         return round(value_cr * 1e7 / volume, 2)
     return 0.0
+
+
+# ─── Multi-Factor Confidence Scorer ─────────────────────────────────────────
+
+def _stock_confidence_score(
+    pct: float,
+    chg_30d: float,
+    chg_365d: float,
+    value_cr: float,
+    near_52h: float,
+    near_52l: float,
+    sector_pct: float,
+    ltp: float,
+    pivot: float,
+    vwap: float,
+    cpr_width_pct: float,
+    direction: str,   # LONG / SHORT / NEUTRAL
+    rr_ratio: float,
+    bias_score: int,  # market bias -100 to +100
+    vix_val: float,
+) -> Tuple[int, List[str]]:
+    """
+    Score a trade setup on 5 dimensions (0-100 total).
+    Returns (score, evidence_list).
+
+    Dim 1 — Trend Quality   (0-25 pts): Aligns with medium/long-term trend
+    Dim 2 — Volume Quality  (0-20 pts): Institutional-grade interest
+    Dim 3 — Technical Setup (0-25 pts): Pivot, VWAP, CPR, 52W position
+    Dim 4 — Market Harmony  (0-20 pts): Market bias and sector alignment
+    Dim 5 — Risk Quality    (0-10 pts): R:R ratio strength
+    """
+    score = 0
+    evidence = []
+
+    # ── Dim 1: Trend Quality ──────────────────────────────────────────────
+    trend_pts = 0
+    if direction == "LONG":
+        if chg_30d > 0 and chg_365d > 0:
+            trend_pts += 10
+            evidence.append("Trend ↑ (30d & 1Y aligned)")
+        elif chg_30d > 0:
+            trend_pts += 5
+            evidence.append("30d uptrend ↑")
+        if chg_30d > 10:
+            trend_pts += 5
+            evidence.append(f"Strong 30d momentum +{chg_30d:.0f}%")
+        if sector_pct > 0 and pct > 0:
+            trend_pts += 5
+            evidence.append("Sector & stock both green")
+        elif pct > 0:
+            trend_pts += 2
+            evidence.append("Stock leading sector")
+    elif direction == "SHORT":
+        if chg_30d < 0 and chg_365d < 0:
+            trend_pts += 10
+            evidence.append("Trend ↓ (30d & 1Y aligned)")
+        elif chg_30d < 0:
+            trend_pts += 5
+            evidence.append("30d downtrend ↓")
+        if chg_30d < -10:
+            trend_pts += 5
+            evidence.append(f"Strong 30d decline {chg_30d:.0f}%")
+        if sector_pct < 0 and pct < 0:
+            trend_pts += 5
+            evidence.append("Sector & stock both red")
+        elif pct < 0:
+            trend_pts += 2
+            evidence.append("Stock leading sector down")
+    score += min(trend_pts, 25)
+
+    # ── Dim 2: Volume Quality ─────────────────────────────────────────────
+    vol_pts = 0
+    if value_cr >= 1000:
+        vol_pts = 20
+        evidence.append(f"Very high volume ₹{value_cr:,.0f}Cr")
+    elif value_cr >= 500:
+        vol_pts = 15
+        evidence.append(f"High volume ₹{value_cr:,.0f}Cr")
+    elif value_cr >= 200:
+        vol_pts = 10
+        evidence.append(f"Above-avg volume ₹{value_cr:,.0f}Cr")
+    elif value_cr >= 50:
+        vol_pts = 5
+    score += min(vol_pts, 20)
+
+    # ── Dim 3: Technical Setup ────────────────────────────────────────────
+    tech_pts = 0
+    if direction == "LONG":
+        if pivot > 0 and ltp > pivot:
+            tech_pts += 5
+            evidence.append("Price above pivot ✓")
+        if vwap > 0 and ltp > vwap:
+            tech_pts += 5
+            evidence.append("Price above VWAP ✓")
+        # Near 52W high = breakout zone (strong momentum signal)
+        if isinstance(near_52h, (int, float)) and 0 < near_52h <= 2:
+            tech_pts += 10
+            evidence.append(f"Breakout zone! {near_52h:.1f}% to 52W high")
+        elif isinstance(near_52h, (int, float)) and 0 < near_52h <= 5:
+            tech_pts += 5
+            evidence.append(f"Near 52W high ({near_52h:.1f}%)")
+        # 52W low reversal (requires strong up move today)
+        if isinstance(near_52l, (int, float)) and 0 < near_52l <= 3 and pct > 1.5:
+            tech_pts += 5
+            evidence.append(f"Strong reversal from 52W low")
+        if cpr_width_pct < 0.3:
+            tech_pts += 5
+            evidence.append("Narrow CPR → trending day")
+    elif direction == "SHORT":
+        if pivot > 0 and ltp < pivot:
+            tech_pts += 5
+            evidence.append("Price below pivot ✓")
+        if vwap > 0 and ltp < vwap:
+            tech_pts += 5
+            evidence.append("Price below VWAP ✓")
+        # Near 52W low = breakdown zone
+        if isinstance(near_52l, (int, float)) and 0 < near_52l <= 2:
+            tech_pts += 10
+            evidence.append(f"Breakdown zone! {near_52l:.1f}% to 52W low")
+        elif isinstance(near_52l, (int, float)) and 0 < near_52l <= 5:
+            tech_pts += 5
+            evidence.append(f"Near 52W low ({near_52l:.1f}%)")
+        if cpr_width_pct < 0.3:
+            tech_pts += 5
+            evidence.append("Narrow CPR → trending day")
+    score += min(tech_pts, 25)
+
+    # ── Dim 4: Market Harmony ─────────────────────────────────────────────
+    mkt_pts = 0
+    if direction == "LONG" and bias_score >= 30:
+        mkt_pts += 10
+        evidence.append("Market strongly bullish")
+    elif direction == "LONG" and bias_score >= 10:
+        mkt_pts += 5
+    elif direction == "SHORT" and bias_score <= -30:
+        mkt_pts += 10
+        evidence.append("Market strongly bearish")
+    elif direction == "SHORT" and bias_score <= -10:
+        mkt_pts += 5
+
+    if direction == "LONG" and sector_pct > 0.5:
+        mkt_pts += 5
+        evidence.append(f"Sector positive ({sector_pct:+.1f}%)")
+    elif direction == "SHORT" and sector_pct < -0.5:
+        mkt_pts += 5
+        evidence.append(f"Sector negative ({sector_pct:+.1f}%)")
+
+    # VIX penalty: high fear = reduce confidence for LONG
+    if vix_val >= 24 and direction == "LONG":
+        mkt_pts -= 5
+        evidence.append(f"VIX {vix_val:.1f} (fear — caution)")
+    elif vix_val < 13 and direction == "LONG":
+        mkt_pts += 5
+        evidence.append(f"VIX {vix_val:.1f} (low fear — ideal)")
+    score += max(0, min(mkt_pts, 20))
+
+    # ── Dim 5: Risk Quality ───────────────────────────────────────────────
+    if rr_ratio >= 3.0:
+        score += 10
+        evidence.append(f"Excellent R:R {rr_ratio:.1f}")
+    elif rr_ratio >= 2.0:
+        score += 8
+        evidence.append(f"Good R:R {rr_ratio:.1f}")
+    elif rr_ratio >= 1.5:
+        score += 5
+        evidence.append(f"R:R {rr_ratio:.1f}")
+    elif rr_ratio >= 1.0:
+        score += 2
+
+    score = max(0, min(100, score))
+    label = (
+        "🌟 Premium" if score >= 70 else
+        "⚡ Good"    if score >= 50 else
+        "💡 Low"     if score >= 35 else
+        "❌ Weak"
+    )
+    return score, label, evidence[:5]   # cap evidence to 5 items
+
+
+def _position_sizing(vix_val: float, rr_ratio: float, confidence: int) -> str:
+    """Suggest position sizing based on VIX, R:R and confidence."""
+    # Base capital risk per trade
+    if confidence >= 70 and rr_ratio >= 2.0 and vix_val < 18:
+        return "Full position (2% capital risk)"
+    elif confidence >= 50 and rr_ratio >= 1.5 and vix_val < 24:
+        return "Half position (1% capital risk)"
+    elif vix_val >= 24:
+        return "Micro position only (0.5% capital risk, high VIX)"
+    else:
+        return "Quarter position (0.5% capital risk)"
 
 
 # ─── Confluence Finder ──────────────────────────────────────────────────────
@@ -314,10 +507,17 @@ def _generate_setup(
     sector: str,
     sector_pct: float,
     bias: Dict,
+    vix_val: float = 0.0,
     score_threshold: int = 15,
     macro_weight: float = 0.30,
+    confidence_floor: int = 50,
+    sector_blacklist: list = None,
 ) -> Optional[Dict]:
     """Generate a complete trade setup for one instrument."""
+    # Skip blacklisted sectors
+    if sector_blacklist and sector in sector_blacklist:
+        return None
+
     h = ohlc.get("high", 0) or 0
     l = ohlc.get("low", 0) or 0
     c = ohlc.get("last", 0) or ohlc.get("close", 0) or 0
@@ -416,48 +616,56 @@ def _generate_setup(
         direction = "NEUTRAL"
 
     # ── Entry / Target / Stop Loss ──
-    # Rule: all entries are actionable relative to CURRENT LTP.
-    # When initial R:R < 1.0, extend target to next level (R2/S2).
-    # SHORT: if already below pivot, enter now (at LTP) or on small bounce
-    # LONG:  if already above pivot, enter now (at LTP) or on small dip
+    # Trader rule: never chase a stock that has already moved >3% from pivot.
+    # LONG: prefer entering within 1.5% of support — not at the top of a spike.
+    # SHORT: prefer entering within 1.5% of resistance — not at the bottom of a dump.
+    already_moved_far = abs(pct) > 3.5  # stock already ran hard today
+
     if direction == "LONG":
         if c >= classic["P"]:
-            # Price above pivot → trade with trend; enter at LTP
-            entry = round(c, 2)
+            if already_moved_far:
+                # Enter at next pullback to pivot (don't chase the spike)
+                entry = round(classic["P"] * 1.002, 2)
+            else:
+                entry = round(c, 2)
             s1 = best_support["level"] if best_support else classic["S1"]
-            stop_loss = round(min(s1, classic["P"] * 0.998), 2)  # SL below pivot
+            stop_loss = round(min(s1, classic["P"] * 0.997), 2)
             target = best_resist["level"] if best_resist else classic["R1"]
-            # Extend to R2 if R:R would be < 1.0
             _risk = abs(entry - stop_loss) or 1
-            if abs(target - entry) / _risk < 1.0:
+            if abs(target - entry) / _risk < 1.2:
                 target = classic["R2"]
         else:
             # Price below pivot but LONG bias → wait for pivot reclaim
-            entry = round(classic["P"] * 1.001, 2)  # just above pivot
+            entry = round(classic["P"] * 1.001, 2)
             stop_loss = best_support["level"] if best_support else classic["S1"]
             target = best_resist["level"] if best_resist else classic["R1"]
             _risk = abs(entry - stop_loss) or 1
-            if abs(target - entry) / _risk < 1.0:
+            if abs(target - entry) / _risk < 1.2:
                 target = classic["R2"]
     elif direction == "SHORT":
         if c <= classic["P"]:
-            # Price below pivot → trade with trend; enter at LTP or small bounce
-            bounce_entry = c + (classic["P"] - c) * 0.25  # 25% bounce = entry
-            r1 = best_resist["level"] if best_resist else classic["R1"]
-            entry = round(min(bounce_entry, r1 * 0.999), 2)
-            stop_loss = round(max(r1, classic["P"] * 1.002), 2)  # SL above resistance
+            if already_moved_far:
+                # Don't short at the bottom — wait for bounce to resistance
+                entry = round(classic["P"] * 0.999, 2)
+            else:
+                bounce_entry = c + (classic["P"] - c) * 0.25
+                r1 = best_resist["level"] if best_resist else classic["R1"]
+                entry = round(min(bounce_entry, r1 * 0.999), 2)
+            stop_loss = round(max(
+                best_resist["level"] if best_resist else classic["R1"],
+                classic["P"] * 1.002
+            ), 2)
             target = best_support["level"] if best_support else classic["S1"]
-            # Extend to S2 if R:R would be < 1.0
             _risk = abs(entry - stop_loss) or 1
-            if abs(target - entry) / _risk < 1.0:
+            if abs(target - entry) / _risk < 1.2:
                 target = classic["S2"]
         else:
             # Price above pivot but SHORT bias → wait for pivot breakdown
-            entry = round(classic["P"] * 0.999, 2)  # just below pivot
+            entry = round(classic["P"] * 0.999, 2)
             stop_loss = best_resist["level"] if best_resist else classic["R1"]
             target = best_support["level"] if best_support else classic["S1"]
             _risk = abs(entry - stop_loss) or 1
-            if abs(target - entry) / _risk < 1.0:
+            if abs(target - entry) / _risk < 1.2:
                 target = classic["S2"]
     else:
         entry = classic["P"]
@@ -467,6 +675,23 @@ def _generate_setup(
     risk = abs(entry - stop_loss) if entry != stop_loss else 1
     reward = abs(target - entry) if target != entry else 1
     rr_ratio = round(reward / risk, 2) if risk > 0 else 0
+
+    # ── Confidence Score ──
+    confidence_score, confidence_label, confidence_evidence = _stock_confidence_score(
+        pct=pct, chg_30d=chg_30d, chg_365d=chg_365d, value_cr=value_cr,
+        near_52h=near_52h, near_52l=near_52l, sector_pct=sector_pct,
+        ltp=c, pivot=classic["P"], vwap=vwap,
+        cpr_width_pct=cpr["width_pct"], direction=direction,
+        rr_ratio=rr_ratio, bias_score=bias.get("score", 0),
+        vix_val=vix_val,
+    )
+
+    # Skip setups that don't meet the confidence floor (except for indices)
+    if category != "Index" and direction != "NEUTRAL" and confidence_score < confidence_floor:
+        return None
+
+    # ── Position sizing ──
+    pos_size = _position_sizing(vix_val, rr_ratio, confidence_score)
 
     return {
         "symbol": symbol,
@@ -498,7 +723,7 @@ def _generate_setup(
         # VWAP
         "vwap": vwap,
         # Confluence
-        "zones": zones[:8],  # top 8 nearest zones
+        "zones": zones[:8],
         "best_support": best_support,
         "best_resistance": best_resist,
         # Trade setup
@@ -509,6 +734,12 @@ def _generate_setup(
         "target": target,
         "stop_loss": stop_loss,
         "risk_reward": rr_ratio,
+        # Confidence system
+        "confidence_score": confidence_score,
+        "confidence_label": confidence_label,
+        "confidence_evidence": confidence_evidence,
+        "position_size": pos_size,
+        "already_moved_far": already_moved_far,
     }
 
 
@@ -541,6 +772,13 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
     sectors = snapshot.get("sectors", {})
     commodities = snapshot.get("commodities", {})
 
+    # Extract VIX absolute level for confidence scoring
+    vix_val = float(indices.get("INDIA VIX", {}).get("last", 0) or 0)
+
+    # Sector blacklist and confidence floor from learned params
+    sector_blacklist = params.get("sector_blacklist", [])
+    confidence_floor = int(params.get("confidence_floor", 50))
+
     index_setups = []
     stock_setups = []
     etf_setups = []
@@ -564,8 +802,11 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             sector="INDEX",
             sector_pct=data.get("pct", 0),
             bias=bias,
+            vix_val=vix_val,
             score_threshold=score_threshold,
             macro_weight=macro_weight,
+            confidence_floor=0,   # always show index levels
+            sector_blacklist=[],
         )
         if setup:
             index_setups.append(setup)
@@ -575,6 +816,7 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
     for sect_name, sdata in sectors.items():
         stocks = sdata.get("stocks", [])
         sector_pct = sdata.get("index_pct", 0) or 0
+        disp_sector = _sector_display(sect_name)
         # Already sorted by value_cr desc in most cases; ensure sort
         ranked = sorted(stocks, key=lambda s: s.get("value_cr", 0) or 0, reverse=True)
         for s in ranked[:3]:
@@ -593,17 +835,23 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
                 chg_365d=s.get("chg_365d", 0) or 0,
                 near_52h=s.get("near_52h", 0) or 0,
                 near_52l=s.get("near_52l", 0) or 0,
-                sector=sect_name.replace("NIFTY ", "") if sect_name not in _SECTOR_DISPLAY else _sector_display(sect_name),
+                sector=disp_sector,
                 sector_pct=sector_pct,
                 bias=bias,
+                vix_val=vix_val,
                 score_threshold=score_threshold,
                 macro_weight=macro_weight,
+                confidence_floor=confidence_floor,
+                sector_blacklist=sector_blacklist,
             )
             if setup:
                 stock_setups.append(setup)
 
-    # Sort stock setups: strongest directional score first
-    stock_setups.sort(key=lambda s: abs(s["direction_score"]), reverse=True)
+    # Sort stock setups: highest confidence first, then strongest directional score
+    stock_setups.sort(
+        key=lambda s: (s.get("confidence_score", 0), abs(s["direction_score"])),
+        reverse=True
+    )
 
     # ── ETF setups ──
     for etf_sym, edata in commodities.items():
@@ -632,8 +880,11 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             sector="COMMODITY",
             sector_pct=0,
             bias=bias,
+            vix_val=vix_val,
             score_threshold=score_threshold,
             macro_weight=macro_weight,
+            confidence_floor=0,   # always show ETFs
+            sector_blacklist=[],
         )
         if setup:
             etf_setups.append(setup)
@@ -641,9 +892,15 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
     return {
         "bias": bias,
         "index_setups": index_setups,
-        "stock_setups": stock_setups[:20],  # Top 20
+        "stock_setups": stock_setups[:20],  # Top 20 by confidence
         "etf_setups": etf_setups,
-        "momentum_alerts": _find_momentum_stocks(snapshot, bias, rs_min=rs_min, val_min=val_min),
+        "momentum_alerts": _find_momentum_stocks(
+            snapshot, bias,
+            rs_min=rs_min, val_min=val_min,
+            vix_val=vix_val,
+            confidence_floor=confidence_floor,
+            sector_blacklist=sector_blacklist,
+        ),
         "generated_at": datetime.now().isoformat(),
     }
 
@@ -651,7 +908,10 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
 # ─── Momentum Scanner ────────────────────────────────────────────────────────
 
 def _find_momentum_stocks(snapshot: Dict, bias: Dict,
-                          rs_min: float = 1.5, val_min: float = 500) -> List[Dict]:
+                          rs_min: float = 1.5, val_min: float = 500,
+                          vix_val: float = 0.0,
+                          confidence_floor: int = 50,
+                          sector_blacklist: list = None) -> List[Dict]:
     """
     Scan ALL stocks for notable intraday momentum / reversal setups.
 
@@ -660,7 +920,9 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict,
       2. High-volume movers: value_cr > 500 Cr with >3% absolute move
       3. Near 52W high breakouts with positive momentum
       4. Near 52W low potential bounces (requires green day: pct > 1)
+      5. Relative strength leaders with substantial volume
     """
+    sector_blacklist = sector_blacklist or []
     sectors = snapshot.get("sectors", {})
     nifty_pct = snapshot.get("indices", {}).get("NIFTY 50", {}).get("pct", 0) or 0
     results = []
@@ -669,6 +931,11 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict,
     for sect_name, sdata in sectors.items():
         sector_pct = sdata.get("index_pct", 0) or 0
         disp = _sector_display(sect_name)
+
+        # Skip blacklisted sectors
+        if disp in sector_blacklist:
+            continue
+
         for s in sdata.get("stocks", []):
             sym = s.get("symbol", "")
             if sym in seen or not sym:
@@ -679,11 +946,12 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict,
             near_52h = s.get("near_52h", 999) or 999
             near_52l = s.get("near_52l", 999) or 999
             chg_30d = s.get("chg_30d", 0) or 0
+            chg_365d = s.get("chg_365d", 0) or 0
             rs = pct - sector_pct
 
             triggers = []
 
-            # 1. Outperformer in a down market
+            # 1. Outperformer in a down market (hidden strength — most reliable)
             if nifty_pct < -0.5 and pct > rs_min:
                 triggers.append(f"Outperformer: +{pct:.1f}% vs index {nifty_pct:.1f}%")
 
@@ -711,25 +979,52 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict,
             # Quick entry/exit using classic pivots
             h = s.get("high", ltp * 1.02) or ltp * 1.02
             lo = s.get("low", ltp * 0.98) or ltp * 0.98
-            pc = s.get("prev_close", ltp) or ltp
             if h == lo:
                 continue
 
             cl = _classic_pivots(h, lo, ltp)
+            already_moved_far = abs(pct) > 3.5
             if pct > 0:
                 direction = "LONG"
-                entry = round(ltp, 2)
+                if already_moved_far:
+                    entry = round(cl["P"] * 1.001, 2)  # wait for pullback
+                else:
+                    entry = round(ltp, 2)
                 stop_loss = round(min(cl["S1"], ltp * 0.985), 2)
                 target = round(max(cl["R1"], ltp * 1.015), 2)
+                # extend target if R:R < 1.2
+                _risk = abs(entry - stop_loss) or 1
+                if abs(target - entry) / _risk < 1.2:
+                    target = round(max(cl["R2"], ltp * 1.025), 2)
             else:
                 direction = "SHORT"
-                entry = round(ltp + (cl["P"] - ltp) * 0.2, 2)
+                if already_moved_far:
+                    entry = round(cl["P"] * 0.999, 2)  # wait for bounce
+                else:
+                    entry = round(ltp + (cl["P"] - ltp) * 0.2, 2)
                 stop_loss = round(max(cl["R1"], ltp * 1.015), 2)
                 target = round(min(cl["S1"], ltp * 0.985), 2)
+                _risk = abs(entry - stop_loss) or 1
+                if abs(target - entry) / _risk < 1.2:
+                    target = round(min(cl["S2"], ltp * 0.975), 2)
 
             risk = abs(entry - stop_loss)
             reward = abs(target - entry)
             rr = round(reward / risk, 2) if risk > 0 else 0
+
+            # Confidence scoring for momentum picks
+            conf_score, conf_label, conf_ev = _stock_confidence_score(
+                pct=pct, chg_30d=chg_30d, chg_365d=chg_365d, value_cr=val,
+                near_52h=near_52h, near_52l=near_52l, sector_pct=sector_pct,
+                ltp=ltp, pivot=cl["P"], vwap=0,
+                cpr_width_pct=1.0,  # unknown for momentum picks
+                direction=direction, rr_ratio=rr,
+                bias_score=bias.get("score", 0), vix_val=vix_val,
+            )
+
+            # Skip low-confidence momentum picks
+            if conf_score < confidence_floor:
+                continue
 
             results.append({
                 "symbol": sym,
@@ -746,13 +1041,19 @@ def _find_momentum_stocks(snapshot: Dict, bias: Dict,
                 "stop_loss": stop_loss,
                 "risk_reward": rr,
                 "triggers": triggers,
+                "trigger_type": triggers[0].split(":")[0] if triggers else "Unknown",
+                "confidence_score": conf_score,
+                "confidence_label": conf_label,
+                "confidence_evidence": conf_ev,
+                "position_size": _position_sizing(vix_val, rr, conf_score),
                 "pivot": cl["P"],
                 "s1": cl["S1"],
                 "r1": cl["R1"],
+                "already_moved_far": already_moved_far,
             })
 
-    # Sort: outperformers first (positive pct in down market), then by abs pct
-    results.sort(key=lambda x: (x["pct"] if nifty_pct < 0 else abs(x["pct"])), reverse=True)
+    # Sort: by confidence score first, then momentum strength
+    results.sort(key=lambda x: (x["confidence_score"], abs(x["pct"])), reverse=True)
     return results[:15]
 
 
@@ -809,7 +1110,7 @@ def format_trading_msg(setups: Dict) -> str:
             _append_setup_block(L, s, show_link=False)
         L.append("")
 
-    # ── Top Stock Setups (only actionable R:R >= 1.0) ──
+    # ── Top Stock Setups (only actionable R:R >= 1.0 AND confidence >= floor) ──
     stk = setups.get("stock_setups", [])
     if stk:
         longs = [s for s in stk if s["direction"] == "LONG" and s["risk_reward"] >= 1.0][:5]
@@ -843,19 +1144,22 @@ def format_trading_msg(setups: Dict) -> str:
     momentum = setups.get("momentum_alerts", [])
     if momentum:
         L.append("<b>━━ ⚡ Momentum Alerts ━━</b>")
-        L.append("<i>Dynamic picks based on live signals</i>")
+        L.append("<i>Dynamic picks filtered by confidence score</i>")
         L.append("")
         shown = [s for s in momentum if s["risk_reward"] >= 1.0][:6]
         for s in shown:
             de = _dir_emoji(s["direction"])
             link = _nse_link(s["symbol"])
-            L.append(f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) <i>{s['sector']}</i>")
-            # First trigger (most important reason)
-            L.append(f"  📍 {s['triggers'][0]}")
+            conf = s.get("confidence_label", "")
+            warn = " ⚠️ wait for pullback" if s.get("already_moved_far") else ""
+            L.append(f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) <i>{s['sector']}</i>  {conf}")
+            L.append(f"  📍 {s['triggers'][0]}{warn}")
             L.append(
                 f"  Entry {s['entry']:,.1f} → Target {s['target']:,.1f} | "
                 f"SL {s['stop_loss']:,.1f} | R:R {s['risk_reward']:.1f}"
             )
+            if s.get("position_size"):
+                L.append(f"  📊 {s['position_size']}")
         L.append("")
 
     L.append("<i>⚠ Levels are mathematical projections, not guaranteed outcomes.</i>")
@@ -895,18 +1199,26 @@ def _append_setup_block(L: list, s: Dict, show_link: bool = True):
 
 
 def _append_compact_line(L: list, s: Dict):
-    """Compact one-liner for a stock setup."""
+    """Compact setup block for a stock."""
     de = _dir_emoji(s["direction"])
     link = _nse_link(s["symbol"])
     rr = s["risk_reward"]
+    conf = s.get("confidence_label", "")
+    warn = " ⚠️ <i>already moved far — wait for pullback</i>" if s.get("already_moved_far") else ""
     L.append(
         f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) "
-        f"<i>{s['sector']}</i>"
+        f"<i>{s['sector']}</i>  {conf}"
     )
     L.append(
         f"  Entry {s['entry']:,.1f} → Target {s['target']:,.1f} | "
         f"SL {s['stop_loss']:,.1f} | R:R {rr:.1f}"
     )
-    # Key factor
-    if s.get("factors"):
+    if s.get("position_size"):
+        L.append(f"  📊 {s['position_size']}{warn}")
+    elif warn:
+        L.append(f"  {warn.strip()}")
+    # Key factors (top 2)
+    if s.get("confidence_evidence"):
+        L.append(f"  <i>{'  ·  '.join(s['confidence_evidence'][:2])}</i>")
+    elif s.get("factors"):
         L.append(f"  <i>{' · '.join(s['factors'][:3])}</i>")

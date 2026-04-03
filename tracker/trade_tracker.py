@@ -97,18 +97,20 @@ def save_recommendations(setups: Dict, slot_time: str, today: str = None) -> Non
             if s.get("direction", "NEUTRAL") == "NEUTRAL":
                 continue
             slot_recs.append({
-                "slot":            slot_time,
-                "symbol":          s["symbol"],
-                "category":        cat_name,
-                "sector":          s.get("sector", ""),
-                "direction":       s["direction"],
-                "ltp":             s["ltp"],
-                "entry":           s["entry"],
-                "target":          s["target"],
-                "stop_loss":       s["stop_loss"],
-                "risk_reward":     s["risk_reward"],
-                "direction_score": s.get("direction_score", 0),
-                "factors":         s.get("factors", [])[:3],
+                "slot":             slot_time,
+                "symbol":           s["symbol"],
+                "category":         cat_name,
+                "sector":           s.get("sector", ""),
+                "direction":        s["direction"],
+                "ltp":              s["ltp"],
+                "entry":            s["entry"],
+                "target":           s["target"],
+                "stop_loss":        s["stop_loss"],
+                "risk_reward":      s["risk_reward"],
+                "direction_score":  s.get("direction_score", 0),
+                "confidence_score": s.get("confidence_score", 0),
+                "trigger_type":     "Standard",
+                "factors":          s.get("factors", [])[:3],
             })
 
     # Momentum alerts
@@ -127,6 +129,8 @@ def save_recommendations(setups: Dict, slot_time: str, today: str = None) -> Non
             "stop_loss":       m["stop_loss"],
             "risk_reward":     m["risk_reward"],
             "direction_score": 0,
+            "confidence_score": m.get("confidence_score", 0),
+            "trigger_type":    m.get("trigger_type", "Unknown"),
             "factors":         m.get("triggers", [])[:2],
         })
 
@@ -470,7 +474,6 @@ def update_algo_params(history: List[Dict] = None) -> Dict:
     if len(mom_all) >= 5:
         def _wr(sub):
             return sum(1 for o in sub if o["outcome"] == "WIN") / len(sub) if sub else 0
-        # Use pnl_pct as a proxy for RS magnitude (bigger moves = higher RS)
         high_pnl = [o for o in mom_all if abs(o.get("pnl_pct", 0)) > 1.0]
         low_pnl  = [o for o in mom_all if abs(o.get("pnl_pct", 0)) <= 1.0]
         if _wr(high_pnl) > _wr(low_pnl) + 0.10:
@@ -495,43 +498,122 @@ def update_algo_params(history: List[Dict] = None) -> Dict:
             new["macro_bias_weight"] = 0.30
             notes.append(f"Bias weight kept at 0.30 (accuracy {bias_acc:.0%})")
 
-    # ── 4. Compute rolling win rate summary ──
-    decided = [o for o in all_out if o["outcome"] in ("WIN", "LOSS")]
-    overall_wr = sum(1 for o in decided if o["outcome"] == "WIN") / len(decided) if decided else 0
+    # ── 4. Confidence floor auto-tuning ──
+    # If overall win rate is poor, raise the bar so only the best setups show
+    decided_all = [o for o in all_out if o["outcome"] in ("WIN", "LOSS")]
+    overall_wr = sum(1 for o in decided_all if o["outcome"] == "WIN") / len(decided_all) if decided_all else 0
+    if overall_wr < 0.40 and len(decided_all) >= 10:
+        new["confidence_floor"] = 60
+        notes.append(f"Confidence floor→60 (win rate {overall_wr:.0%} — tightening filter)")
+    elif overall_wr >= 0.60 and len(decided_all) >= 10:
+        new["confidence_floor"] = 45
+        notes.append(f"Confidence floor→45 (win rate {overall_wr:.0%} — algo performing well)")
+    else:
+        new["confidence_floor"] = 50
+        notes.append(f"Confidence floor kept at 50 (win rate {overall_wr:.0%})")
 
+    # ── 5. Sector blacklist — block consistently losing sectors ──
+    sector_agg: Dict[str, List] = {}
+    for o in decided_all:
+        sector_agg.setdefault(o.get("sector", "?"), []).append(o)
+
+    sector_blacklist: List[str] = []
+    sector_performance: Dict[str, float] = {}
+    for sec, lst in sector_agg.items():
+        if len(lst) >= 5:   # minimum sample size
+            wr = sum(1 for o in lst if o["outcome"] == "WIN") / len(lst)
+            sector_performance[sec] = round(wr * 100, 1)
+            if wr < 0.30:   # < 30% win rate → blacklist
+                sector_blacklist.append(sec)
+                notes.append(f"Blacklisted sector: {sec} ({wr:.0%} win, {len(lst)} calls)")
+
+    new["sector_blacklist"] = sector_blacklist
+    if not sector_blacklist:
+        notes.append("No sectors blacklisted (all have acceptable win rates)")
+
+    # ── 6. Trigger type win rates (for ranking momentum alerts) ──
+    trigger_agg: Dict[str, List] = {}
+    for o in decided_all:
+        ttype = o.get("trigger_type", "Unknown")
+        trigger_agg.setdefault(ttype, []).append(o)
+
+    trigger_win_rates: Dict[str, float] = {}
+    for ttype, lst in trigger_agg.items():
+        if len(lst) >= 3:
+            wr = sum(1 for o in lst if o["outcome"] == "WIN") / len(lst)
+            trigger_win_rates[ttype] = round(wr * 100, 1)
+
+    # Sort triggers best to worst
+    top_trigger_types = sorted(trigger_win_rates, key=lambda t: trigger_win_rates[t], reverse=True)
+    new["top_trigger_types"] = top_trigger_types
+    if trigger_win_rates:
+        best_t = top_trigger_types[0] if top_trigger_types else "N/A"
+        notes.append(f"Best trigger: '{best_t}' ({trigger_win_rates.get(best_t, 0):.1f}% win)")
+
+    # ── 7. Time-slot analysis ──
+    slot_wins: Dict[str, List] = {}
+    for rev in history:
+        date = rev.get("date", "")
+        rec_file = _RECS_DIR / f"{date}.json"
+        if not rec_file.exists():
+            continue
+        try:
+            with open(rec_file, "r", encoding="utf-8") as f:
+                all_slots = json.load(f)
+        except Exception:
+            continue
+        # Match each slot_rec to outcome
+        outcome_map = {
+            f"{o['symbol']}_{o['category']}": o["outcome"]
+            for o in rev.get("outcomes", [])
+        }
+        for slot_data in all_slots:
+            slot = slot_data.get("slot", "")
+            for rec in slot_data.get("recs", []):
+                key = f"{rec['symbol']}_{rec['category']}"
+                outcome = outcome_map.get(key, "")
+                if outcome in ("WIN", "LOSS"):
+                    slot_wins.setdefault(slot, []).append(outcome == "WIN")
+
+    slot_rates: Dict[str, float] = {}
+    for slot, wins in slot_wins.items():
+        if len(wins) >= 3:
+            slot_rates[slot] = round(sum(wins) / len(wins) * 100, 1)
+    if slot_rates:
+        best_slot = max(slot_rates, key=slot_rates.get)
+        notes.append(f"Best time slot: {best_slot} ({slot_rates[best_slot]:.1f}% win)")
+
+    # ── 8. Compute rolling win rate summary ──
     cat_rates: Dict[str, float] = {}
     for cat in ["Index", "Stock", "ETF", "Momentum"]:
-        sub = [o for o in decided if o["category"] == cat]
+        sub = [o for o in decided_all if o["category"] == cat]
         if sub:
             cat_rates[cat] = round(sum(1 for o in sub if o["outcome"] == "WIN") / len(sub) * 100, 1)
 
     dir_rates: Dict[str, float] = {}
     for d in ["LONG", "SHORT"]:
-        sub = [o for o in decided if o["direction"] == d]
+        sub = [o for o in decided_all if o["direction"] == d]
         if sub:
             dir_rates[d] = round(sum(1 for o in sub if o["outcome"] == "WIN") / len(sub) * 100, 1)
 
-    # Best sectors over history
-    sector_agg: Dict[str, List] = {}
-    for o in decided:
-        sector_agg.setdefault(o.get("sector", "?"), []).append(o)
-    top_sectors = sorted(
-        [(s, sum(1 for o in lst if o["outcome"] == "WIN") / len(lst))
-         for s, lst in sector_agg.items() if len(lst) >= 3],
-        key=lambda x: x[1], reverse=True
+    top_sectors_list = sorted(
+        sector_performance.items(), key=lambda x: x[1], reverse=True
     )[:5]
 
     params_data = {
-        "version":       3,
+        "version":       4,
         "last_updated":  datetime.now().strftime("%Y-%m-%d"),
         "days_analyzed": len(history),
         "params":        new,
         "performance": {
-            "overall_win_rate_pct": round(overall_wr * 100, 1),
-            "by_category":          cat_rates,
-            "by_direction":         dir_rates,
-            "top_sectors":          {s: round(wr * 100, 1) for s, wr in top_sectors},
-            "total_evaluated":      len(decided),
+            "overall_win_rate_pct":  round(overall_wr * 100, 1),
+            "by_category":           cat_rates,
+            "by_direction":          dir_rates,
+            "top_sectors":           dict(top_sectors_list),
+            "sector_blacklist":      sector_blacklist,
+            "trigger_win_rates":     trigger_win_rates,
+            "slot_win_rates":        slot_rates,
+            "total_evaluated":       len(decided_all),
         },
         "tuning_notes": notes,
     }
@@ -540,8 +622,9 @@ def update_algo_params(history: List[Dict] = None) -> Dict:
         json.dump(params_data, f, ensure_ascii=False, indent=2)
 
     logger.info(
-        f"Algo params updated (win_rate={overall_wr:.1%}, "
-        f"{len(decided)} samples, {len(history)} days)"
+        f"Algo params v4 updated (win_rate={overall_wr:.1%}, "
+        f"{len(decided_all)} samples, {len(history)} days, "
+        f"{len(sector_blacklist)} blacklisted sectors)"
     )
     return new
 
@@ -647,8 +730,98 @@ def format_review_msg(review: Dict) -> str:
     else:
         L.append("  ❌ Low accuracy today — parameters recalibrated for tomorrow")
     L.append("")
-    L.append("<i>⚙️ Algo params auto-updated for next session</i>")
+    L.append("<i>⚙️ Algo v4 params auto-updated for next session</i>")
 
+    return "\n".join(L)
+
+
+def format_algo_insight_msg() -> str:
+    """
+    Format a dedicated algo self-learning summary Telegram message.
+    Shows what the algorithm learned and how it changed parameters.
+    Triggered once per day after EOD tuning (15:35 slot).
+    """
+    if not _ALGO_PARAMS.exists():
+        return ""
+    try:
+        with open(_ALGO_PARAMS, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return ""
+
+    perf = data.get("performance", {})
+    params = data.get("params", {})
+    notes = data.get("tuning_notes", [])
+
+    overall_wr = perf.get("overall_win_rate_pct", 0)
+    total_eval = perf.get("total_evaluated", 0)
+    days_analyzed = data.get("days_analyzed", 0)
+    last_updated = data.get("last_updated", "N/A")
+
+    wr_em = "🟢" if overall_wr >= 60 else ("🟡" if overall_wr >= 40 else "🔴")
+
+    L = ["<b>🤖 Algo Self-Learning Report</b>", ""]
+    L.append(f"{wr_em} <b>14-Day Win Rate: {overall_wr:.1f}%</b>  ({total_eval} setups, {days_analyzed} days)")
+    L.append(f"Last updated: {last_updated}")
+    L.append("")
+
+    # Current parameters
+    L.append("<b>⚙️ Active Parameters:</b>")
+    L.append(f"  • Confidence floor: {params.get('confidence_floor', 50)}/100")
+    L.append(f"  • Score threshold: {params.get('direction_score_threshold', 15)}")
+    L.append(f"  • Macro weight: {params.get('macro_bias_weight', 0.30):.0%}")
+    L.append(f"  • Momentum RS min: {params.get('momentum_rs_min_pct', 1.5):.1f}%")
+    L.append("")
+
+    # Category performance
+    cat_rates = perf.get("by_category", {})
+    if cat_rates:
+        L.append("<b>📊 Win Rate by Category:</b>")
+        for cat, wr in sorted(cat_rates.items(), key=lambda x: x[1], reverse=True):
+            em = "✅" if wr >= 60 else ("⚠️" if wr >= 40 else "❌")
+            L.append(f"  {em} {cat}: {wr:.1f}%")
+        L.append("")
+
+    # Trigger type performance
+    trigger_rates = perf.get("trigger_win_rates", {})
+    if trigger_rates:
+        L.append("<b>🎯 Trigger Win Rates:</b>")
+        for ttype, wr in sorted(trigger_rates.items(), key=lambda x: x[1], reverse=True)[:5]:
+            em = "🔥" if wr >= 65 else ("⚡" if wr >= 50 else "💡")
+            L.append(f"  {em} {ttype}: {wr:.1f}%")
+        L.append("")
+
+    # Best time slot
+    slot_rates = perf.get("slot_win_rates", {})
+    if slot_rates:
+        best_slot = max(slot_rates, key=slot_rates.get)
+        L.append(f"<b>⏰ Best Trading Window:</b> {best_slot} ({slot_rates[best_slot]:.1f}% win)")
+        L.append("")
+
+    # Blacklisted sectors
+    bl = params.get("sector_blacklist", [])
+    if bl:
+        L.append(f"<b>🚫 Blacklisted Sectors:</b> {', '.join(bl)}")
+        L.append("<i>These sectors are skipped until win rate improves</i>")
+        L.append("")
+
+    # Top performing sectors
+    top_secs = perf.get("top_sectors", {})
+    if top_secs:
+        L.append("<b>🏆 Best Sectors (14d):</b>")
+        for sec, wr in list(top_secs.items())[:3]:
+            L.append(f"  🟢 {sec}: {wr:.1f}%")
+        L.append("")
+
+    # Tuning notes
+    if notes:
+        L.append("<b>📝 Changes This Session:</b>")
+        for note in notes[:5]:
+            L.append(f"  • {note}")
+        L.append("")
+
+    L.append("<i>🔄 Parameters automatically adjust each market day.</i>")
+    L.append("<i>The more data collected, the more accurate it becomes.</i>")
     return "\n".join(L)
 
 
