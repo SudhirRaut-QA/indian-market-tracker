@@ -429,17 +429,43 @@ def format_watchlist_msg(snapshot: Dict, watchlist: List[Dict]) -> Optional[str]
         return None
     lines.append("")
     # Summary — track wins, losses, and flat (within ±0.1%)
-    gains = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) > w["entry_ltp"] * 1.001)
-    losses = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) < w["entry_ltp"] * 0.999)
-    flat = len(watchlist) - gains - losses
-    parts = []
-    if gains:
-        parts.append(f"{gains}🟢 winning")
-    if flat:
-        parts.append(f"{flat}⚪ flat")
-    if losses:
-        parts.append(f"{losses}🔴 losing")
-    lines.append(f"Score: {' · '.join(parts)}")
+    # When all entries were just set (all 0.00%), use day's pct as proxy
+    all_zero = all(
+        abs((current.get(w["symbol"], {}).get("last", w["entry_ltp"]) - w["entry_ltp"])
+            / w["entry_ltp"] * 100) < 0.05
+        for w in watchlist if w.get("entry_ltp")
+    )
+    if all_zero:
+        # Use today's pct change from prev_close as the honest score
+        gains = sum(
+            1 for w in watchlist
+            if current.get(w["symbol"], {}).get("pct", 0) or 0 >= 1.0
+        )
+        losses = sum(
+            1 for w in watchlist
+            if current.get(w["symbol"], {}).get("pct", 0) or 0 <= -1.0
+        )
+        flat = len(watchlist) - gains - losses
+        parts = []
+        if gains:
+            parts.append(f"{gains}🟢 up today")
+        if flat:
+            parts.append(f"{flat}⚪ flat today")
+        if losses:
+            parts.append(f"{losses}🔴 down today")
+        lines.append(f"Score: {' · '.join(parts)} <i>(entry just set)</i>")
+    else:
+        gains = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) > w["entry_ltp"] * 1.001)
+        losses = sum(1 for w in watchlist if current.get(w["symbol"], {}).get("last", 0) < w["entry_ltp"] * 0.999)
+        flat = len(watchlist) - gains - losses
+        parts = []
+        if gains:
+            parts.append(f"{gains}🟢 winning")
+        if flat:
+            parts.append(f"{flat}⚪ flat")
+        if losses:
+            parts.append(f"{losses}🔴 losing")
+        lines.append(f"Score: {' · '.join(parts)}")
     return "\n".join(lines)
 
 
@@ -1023,7 +1049,7 @@ def format_sector_msg(snapshot: Dict, delta: Optional[Dict] = None) -> str:
             )
     
     if near_low:
-        lines.append("<i>💎 Near 52-Week Low (Value Zone):</i>")
+        lines.append("<i>💎 Near 52-Week Low (Potential Reversal — LONG only, not SHORT):</i>")
         for s in near_low:
             dist = ((s['last'] - s['year_low']) / s['last']) * 100
             lines.append(
@@ -1440,7 +1466,8 @@ def format_52w_alerts_msg(snapshot: Dict) -> Optional[str]:
 
     if near_low:
         near_low.sort(key=lambda x: x["pos_pct"])
-        lines.append("<b>💎 Near 52-Week Low (Value Zone):</b>")
+        lines.append("<b>💎 Near 52-Week Low (Potential Reversal — LONG bias only):</b>")
+        lines.append("<i>⚠ These are value zones for reversal. Do NOT short near 52W lows.</i>")
         headers = ["Symbol", "LTP", "52W Low", "Dist", "Sector"]
         rows = []
         for s in near_low[:10]:

@@ -261,17 +261,18 @@ def _stock_confidence_score(
         if vwap > 0 and ltp < vwap:
             tech_pts += 5
             evidence.append("Price below VWAP ✓")
-        # Near 52W low = breakdown zone
-        if isinstance(near_52l, (int, float)) and 0 < near_52l <= 2:
-            tech_pts += 10
-            evidence.append(f"Breakdown zone! {near_52l:.1f}% to 52W low")
-        elif isinstance(near_52l, (int, float)) and 0 < near_52l <= 5:
-            tech_pts += 5
-            evidence.append(f"Near 52W low ({near_52l:.1f}%)")
+        # Near 52W HIGH = better breakdown location
+        if isinstance(near_52h, (int, float)) and 0 < near_52h <= 3:
+            tech_pts += 8
+            evidence.append(f"Near 52W high — short at resistance")
+        # Near 52W LOW = value zone, NOT a short setup — penalise heavily
+        if isinstance(near_52l, (int, float)) and 0 < near_52l <= 5:
+            tech_pts -= 15   # strong penalty: don't short what's already near bottom
+            evidence.append(f"⚠ Near 52W low — risky short ({near_52l:.1f}% above low)")
         if cpr_width_pct < 0.3:
             tech_pts += 5
             evidence.append("Narrow CPR → trending day")
-    score += min(tech_pts, 25)
+    score += max(0, min(tech_pts, 25))
 
     # ── Dim 4: Market Harmony ─────────────────────────────────────────────
     mkt_pts = 0
@@ -751,6 +752,7 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
       - Key indices (NIFTY 50, BANK NIFTY)
       - Top 3 stocks per sector (by traded value)
       - Commodity ETFs
+      - On-Watch: near-threshold setups when main setups are sparse
 
     Returns:
         {
@@ -758,6 +760,7 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
             "index_setups": [...],
             "stock_setups": [...],
             "etf_setups": [...],
+            "on_watch": [...],   # near-threshold setups to monitor
             "generated_at": "...",
         }
     """
@@ -889,11 +892,53 @@ def generate_intraday_setups(snapshot: Dict) -> Dict:
         if setup:
             etf_setups.append(setup)
 
+    # ── On-Watch setups: collect near-threshold if main setups are sparse ──
+    # Run again at lower confidence floor (confidence_floor - 15) to populate
+    # an "On Watch" section when main actionable setups are very few
+    on_watch = []
+    main_longs = [s for s in stock_setups if s["direction"] == "LONG"]
+    main_shorts = [s for s in stock_setups if s["direction"] == "SHORT"]
+    if len(main_longs) < 2 or len(main_shorts) < 2:
+        watch_floor = max(30, confidence_floor - 15)
+        watch_seen = {s["symbol"] for s in stock_setups}
+        for sect_name, sdata in sectors.items():
+            sect_pct = sdata.get("index_pct", 0) or 0
+            disp_sector = _sector_display(sect_name)
+            if disp_sector in sector_blacklist:
+                continue
+            ranked = sorted(sdata.get("stocks", []), key=lambda s: s.get("value_cr", 0) or 0, reverse=True)
+            for s in ranked[:5]:  # look at top 5 per sector for watch
+                sym = s.get("symbol", "")
+                if sym in watch_seen or not sym:
+                    continue
+                setup = _generate_setup(
+                    symbol=sym, category="Stock", ohlc=s,
+                    volume=s.get("volume", 0) or 0,
+                    value_cr=s.get("value_cr", 0) or 0,
+                    pct=s.get("pct", 0) or 0,
+                    chg_30d=s.get("chg_30d", 0) or 0,
+                    chg_365d=s.get("chg_365d", 0) or 0,
+                    near_52h=s.get("near_52h", 0) or 0,
+                    near_52l=s.get("near_52l", 0) or 0,
+                    sector=disp_sector, sector_pct=sect_pct,
+                    bias=bias, vix_val=vix_val,
+                    score_threshold=score_threshold,
+                    macro_weight=macro_weight,
+                    confidence_floor=watch_floor,
+                    sector_blacklist=sector_blacklist,
+                )
+                if setup and setup["direction"] != "NEUTRAL" and setup["risk_reward"] >= 1.0:
+                    watch_seen.add(sym)
+                    on_watch.append(setup)
+        on_watch.sort(key=lambda s: s.get("confidence_score", 0), reverse=True)
+        on_watch = on_watch[:4]  # max 4 on-watch picks
+
     return {
         "bias": bias,
         "index_setups": index_setups,
         "stock_setups": stock_setups[:20],  # Top 20 by confidence
         "etf_setups": etf_setups,
+        "on_watch": on_watch,
         "momentum_alerts": _find_momentum_stocks(
             snapshot, bias,
             rs_min=rs_min, val_min=val_min,
@@ -1140,6 +1185,22 @@ def format_trading_msg(setups: Dict) -> str:
                 L.append(f"  ▶ Entry {s['entry']:,.2f} | Target {s['target']:,.2f} | SL {s['stop_loss']:,.2f}")
         L.append("")
 
+    # ── On Watch (near-threshold setups to monitor) ──
+    on_watch = setups.get("on_watch", [])
+    if on_watch:
+        L.append("<b>━━ 👁 On Watch (Near Threshold) ━━</b>")
+        L.append("<i>Below confidence floor — monitor for entry trigger</i>")
+        L.append("")
+        for s in on_watch:
+            de = _dir_emoji(s["direction"])
+            link = _nse_link(s["symbol"])
+            conf = s.get("confidence_label", "")
+            L.append(f"{de} {link} ₹{s['ltp']:,.1f} ({s['pct']:+.1f}%) <i>{s['sector']}</i>  {conf}")
+            L.append(f"  Watch entry: {s['entry']:,.1f} | Target: {s['target']:,.1f} | SL: {s['stop_loss']:,.1f} | R:R {s['risk_reward']:.1f}")
+            if s.get("confidence_evidence"):
+                L.append(f"  <i>{' · '.join(s['confidence_evidence'][:2])}</i>")
+        L.append("")
+
     # ── Momentum Alerts ──
     momentum = setups.get("momentum_alerts", [])
     if momentum:
@@ -1160,6 +1221,12 @@ def format_trading_msg(setups: Dict) -> str:
             )
             if s.get("position_size"):
                 L.append(f"  📊 {s['position_size']}")
+        L.append("")
+
+    if not any([idx_setups,
+                [s for s in stk if s["risk_reward"] >= 1.0] if stk else [],
+                on_watch, momentum, etf]):
+        L.append("<i>No high-confidence setups today — market too uncertain. Check On Watch section.</i>")
         L.append("")
 
     L.append("<i>⚠ Levels are mathematical projections, not guaranteed outcomes.</i>")
