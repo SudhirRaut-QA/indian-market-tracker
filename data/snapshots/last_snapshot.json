@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-04-14T11:00:06.449962",
+  "timestamp": "2026-04-14 21:00:05 IST",
   "fii_dii": {
-    "timestamp": "2026-04-14T11:00:09.177965",
+    "timestamp": "2026-04-14T16:18:45.601466",
     "date": "13-Apr-2026",
     "fii": {
       "buy": 15382.09,
@@ -314,11 +314,11 @@
     }
   },
   "forex": {
-    "usdinr": 93.3173,
-    "usdeur": 0.8556,
-    "usdgbp": 0.7461,
-    "usdjpy": 159.7294,
-    "date": "2026-04-13"
+    "usdinr": 93.3075,
+    "usdeur": 0.8502,
+    "usdgbp": 0.7403,
+    "usdjpy": 159.143,
+    "date": "2026-04-14"
   },
   "commodities": {
     "TATAGOLD": {
@@ -13348,7 +13348,120 @@
   },
   "option_chain": {},
   "preopen": null,
-  "corporate_actions": null,
+  "corporate_actions": [
+    {
+      "symbol": "727GS2026",
+      "company": "GOVERNMENT OF INDIA",
+      "subject": "Interest Payment",
+      "ex_date": "07-Apr-2026",
+      "record_date": "07-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 0,
+      "pct": 0,
+      "pe": 0.0,
+      "week52_high": 108.3,
+      "week52_low": 97.9
+    },
+    {
+      "symbol": "VBL",
+      "company": "Varun Beverages Limited",
+      "subject": "Dividend - Re 0.50 Per Share",
+      "ex_date": "08-Apr-2026",
+      "record_date": "08-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 430,
+      "pct": -0.3707136237256772,
+      "pe": 47.47,
+      "week52_high": 568.5,
+      "week52_low": 381
+    },
+    {
+      "symbol": "706GS2046",
+      "company": "GOVERNMENT OF INDIA",
+      "subject": "Interest Payment",
+      "ex_date": "09-Apr-2026",
+      "record_date": "09-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 99,
+      "pct": 0,
+      "pe": 0.0,
+      "week52_high": 106.25,
+      "week52_low": 97.81
+    },
+    {
+      "symbol": "RMDRIP",
+      "company": "R M Drip and Sprinklers Systems Limited",
+      "subject": "Bonus 5:7",
+      "ex_date": "10-Apr-2026",
+      "record_date": "10-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 25.84,
+      "pct": -3.5100821508588544,
+      "pe": 24.23,
+      "week52_high": 72.22,
+      "week52_low": 20.88
+    },
+    {
+      "symbol": "JASH",
+      "company": "Jash Engineering Limited",
+      "subject": "Interim Dividend - Re 0.60 Per Share",
+      "ex_date": "10-Apr-2026",
+      "record_date": "10-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 386,
+      "pct": -4.135104929839805,
+      "pe": 44.49,
+      "week52_high": 698.95,
+      "week52_low": 327.1
+    },
+    {
+      "symbol": "MUTHOOTFIN",
+      "company": "Muthoot Finance Limited",
+      "subject": "Interim Dividend - Rs 30 Per Share",
+      "ex_date": "17-Apr-2026",
+      "record_date": "17-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 3560,
+      "pct": -0.38893085984498976,
+      "pe": 16.53,
+      "week52_high": 4149.5,
+      "week52_low": 2005.5
+    },
+    {
+      "symbol": "PASHUPATI",
+      "company": "Pashupati Cotspin Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per Share",
+      "ex_date": "17-Apr-2026",
+      "record_date": "17-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 995,
+      "pct": -0.4303012108475888,
+      "pe": 96.95,
+      "week52_high": 1036.4,
+      "week52_low": 595.95
+    },
+    {
+      "symbol": "AUROPHARMA",
+      "company": "Aurobindo Pharma Limited",
+      "subject": "Buy Back",
+      "ex_date": "17-Apr-2026",
+      "record_date": "17-Apr-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "ltp": 1340,
+      "pct": -0.6966058989180444,
+      "pe": 22.15,
+      "week52_high": 1363,
+      "week52_low": 1016.1
+    }
+  ],
   "insider_trading": null,
   "bulk_deals": null,
   "block_deals": null,
