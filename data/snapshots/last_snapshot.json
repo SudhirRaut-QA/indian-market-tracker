@@ -1,101 +1,101 @@
 {
-  "timestamp": "2026-06-09T12:21:33.680729",
+  "timestamp": "2026-06-09 21:00:07 IST",
   "fii_dii": {
-    "timestamp": "2026-06-09T12:21:37.186575",
-    "date": "08-Jun-2026",
+    "timestamp": "2026-06-09T17:54:57.034645",
+    "date": "09-Jun-2026",
     "fii": {
-      "buy": 8842.08,
-      "sell": 14397.75,
-      "net": -5555.67
+      "buy": 14735.47,
+      "sell": 19301.5,
+      "net": -4566.03
     },
     "dii": {
-      "buy": 16683.18,
-      "sell": 11517.94,
-      "net": 5165.24
+      "buy": 17664.98,
+      "sell": 11505.5,
+      "net": 6159.48
     },
-    "total_net": -390.4300000000003,
+    "total_net": 1593.4499999999998,
     "signal": "DII Defensive",
     "interpretation": "FII selling, DII buying — DII supporting"
   },
   "indices": {
     "NIFTY 50": {
-      "last": 23195.9,
-      "change": 72.9,
-      "pct": 0.32,
+      "last": 23242.1,
+      "change": 119.1,
+      "pct": 0.52,
       "open": 23259.05,
-      "high": 23259.45,
+      "high": 23279.4,
       "low": 23104.45,
       "prev_close": 23123,
-      "advances": "28",
-      "declines": "20",
-      "unchanged": "2"
+      "advances": "31",
+      "declines": "19",
+      "unchanged": "0"
     },
     "NIFTY NEXT 50": {
-      "last": 69803.05,
-      "change": 827.65,
-      "pct": 1.2,
+      "last": 69945.85,
+      "change": 970.45,
+      "pct": 1.41,
       "open": 69351.1,
-      "high": 69831.25,
+      "high": 70052,
       "low": 69311.9,
       "prev_close": 68975.4,
-      "advances": "44",
-      "declines": "6",
+      "advances": "42",
+      "declines": "8",
       "unchanged": "4"
     },
     "NIFTY BANK": {
-      "last": 54880.9,
-      "change": 817.15,
-      "pct": 1.51,
+      "last": 55194.5,
+      "change": 1130.75,
+      "pct": 2.09,
       "open": 54265,
-      "high": 54901.95,
+      "high": 55318.35,
       "low": 54242.3,
       "prev_close": 54063.75,
-      "advances": "13",
-      "declines": "1",
+      "advances": "14",
+      "declines": "0",
       "unchanged": "0"
     },
     "NIFTY FINANCIAL SERVICES": {
-      "last": 25034.6,
-      "change": 229.6,
-      "pct": 0.93,
+      "last": 25152.45,
+      "change": 347.45,
+      "pct": 1.4,
       "open": 24934.5,
-      "high": 25117.75,
+      "high": 25199.6,
       "low": 24897.35,
       "prev_close": 24805,
-      "advances": "18",
-      "declines": "2",
+      "advances": "19",
+      "declines": "1",
       "unchanged": "0"
     },
     "NIFTY MIDCAP 50": {
-      "last": 17238.4,
-      "change": 199.25,
-      "pct": 1.17,
+      "last": 17248.1,
+      "change": 208.95,
+      "pct": 1.23,
       "open": 17139.5,
-      "high": 17254.5,
+      "high": 17274.8,
       "low": 17123.25,
       "prev_close": 17039.15,
-      "advances": "41",
-      "declines": "9",
+      "advances": "40",
+      "declines": "10",
       "unchanged": "0"
     },
     "INDIA VIX": {
-      "last": 16.16,
-      "change": -0.87,
-      "pct": -5.09,
+      "last": 15.58,
+      "change": -1.45,
+      "pct": -8.53,
       "open": 17.03,
       "high": 17.03,
-      "low": 15.8,
+      "low": 15.52,
       "prev_close": 17.03,
       "advances": 0,
       "declines": 0,
       "unchanged": 0
     },
     "NIFTY SMALLCAP 50": {
-      "last": 8857.7,
-      "change": 91.4,
-      "pct": 1.04,
+      "last": 8905.5,
+      "change": 139.2,
+      "pct": 1.59,
       "open": 8805.05,
-      "high": 8876.55,
+      "high": 8917.6,
       "low": 8804.95,
       "prev_close": 8766.3,
       "advances": "39",
@@ -103,71 +103,71 @@
       "unchanged": "0"
     },
     "NIFTY AUTO": {
-      "last": 26060.5,
-      "change": 378.7,
-      "pct": 1.47,
+      "last": 26025.65,
+      "change": 343.85,
+      "pct": 1.34,
       "open": 25937.2,
-      "high": 26066,
+      "high": 26115.45,
       "low": 25807.95,
       "prev_close": 25681.8,
-      "advances": "14",
-      "declines": "0",
-      "unchanged": "1"
-    },
-    "NIFTY FMCG": {
-      "last": 48259.25,
-      "change": 160.6,
-      "pct": 0.33,
-      "open": 48316.8,
-      "high": 48383.05,
-      "low": 48056.1,
-      "prev_close": 48098.65,
       "advances": "13",
       "declines": "2",
       "unchanged": "0"
     },
+    "NIFTY FMCG": {
+      "last": 48447.4,
+      "change": 348.75,
+      "pct": 0.73,
+      "open": 48316.8,
+      "high": 48506.6,
+      "low": 48056.1,
+      "prev_close": 48098.65,
+      "advances": "14",
+      "declines": "1",
+      "unchanged": "0"
+    },
     "NIFTY IT": {
-      "last": 28494.95,
-      "change": -158.6,
-      "pct": -0.55,
+      "last": 28516.25,
+      "change": -137.3,
+      "pct": -0.48,
       "open": 28895.3,
       "high": 28895.3,
-      "low": 28373.95,
+      "low": 28294.6,
       "prev_close": 28653.55,
       "advances": "4",
       "declines": "6",
       "unchanged": "0"
     },
     "NIFTY METAL": {
-      "last": 12972.65,
-      "change": 59,
-      "pct": 0.46,
+      "last": 12987.1,
+      "change": 73.45,
+      "pct": 0.57,
       "open": 12968.45,
-      "high": 13006.5,
+      "high": 13011.2,
       "low": 12877.5,
       "prev_close": 12913.65,
-      "advances": "13",
-      "declines": "2",
+      "advances": "12",
+      "declines": "3",
       "unchanged": "4"
     },
     "NIFTY PHARMA": {
-      "last": 24352.65,
-      "change": 205,
-      "pct": 0.85,
+      "last": 24290.3,
+      "change": 142.65,
+      "pct": 0.59,
       "open": 24208.15,
       "high": 24416.95,
       "low": 24171.55,
       "prev_close": 24147.65,
-      "advances": "16",
-      "declines": "3",
-      "unchanged": "1"
+      "advances": "13",
+      "declines": "7",
+      "unchanged": "0"
     },
     "NIFTY PSU BANK": {
-      "last": 8433.75,
-      "change": 234.2,
-      "pct": 2.86,
+      "last": 8496.6,
+      "change": 297.05,
+      "pct": 3.62,
       "open": 8221.55,
-      "high": 8446.2,
+      "high": 8509,
       "low": 8217.3,
       "prev_close": 8199.55,
       "advances": "12",
@@ -175,47 +175,47 @@
       "unchanged": "0"
     },
     "NIFTY REALTY": {
-      "last": 757.15,
-      "change": 7.95,
-      "pct": 1.06,
+      "last": 761.4,
+      "change": 12.2,
+      "pct": 1.63,
       "open": 750.95,
-      "high": 763.05,
+      "high": 763.5,
       "low": 750.85,
       "prev_close": 749.2,
-      "advances": "8",
-      "declines": "2",
+      "advances": "10",
+      "declines": "0",
       "unchanged": "0"
     },
     "NIFTY OIL & GAS": {
-      "last": 10959.3,
-      "change": 27.6,
-      "pct": 0.25,
+      "last": 10965.3,
+      "change": 33.6,
+      "pct": 0.31,
       "open": 10983.45,
       "high": 11011.15,
-      "low": 10924.15,
+      "low": 10901.75,
       "prev_close": 10931.7,
       "advances": "9",
       "declines": "6",
       "unchanged": "0"
     },
     "NIFTY100 LOW VOLATILITY 30": {
-      "last": 19201.9,
-      "change": 88.75,
-      "pct": 0.46,
+      "last": 19223.3,
+      "change": 110.15,
+      "pct": 0.58,
       "open": 19196.75,
-      "high": 19218.75,
+      "high": 19251.9,
       "low": 19152.4,
       "prev_close": 19113.15,
-      "advances": "19",
-      "declines": "10",
-      "unchanged": "1"
+      "advances": "21",
+      "declines": "9",
+      "unchanged": "0"
     },
     "NIFTY200 MOMENTUM 30": {
-      "last": 29964.95,
-      "change": 388.45,
-      "pct": 1.31,
+      "last": 30103.65,
+      "change": 527.15,
+      "pct": 1.78,
       "open": 29778.75,
-      "high": 29970,
+      "high": 30148.5,
       "low": 29725.4,
       "prev_close": 29576.5,
       "advances": "28",
@@ -223,47 +223,47 @@
       "unchanged": "0"
     },
     "NIFTY HIGH BETA 50": {
-      "last": 4175.4,
-      "change": 48.95,
-      "pct": 1.19,
+      "last": 4191.45,
+      "change": 65,
+      "pct": 1.58,
       "open": 4158.45,
-      "high": 4185.95,
+      "high": 4196.6,
       "low": 4150.05,
       "prev_close": 4126.45,
-      "advances": "41",
-      "declines": "9",
+      "advances": "42",
+      "declines": "8",
       "unchanged": "4"
     },
     "NIFTY COMMODITIES": {
-      "last": 9972.45,
-      "change": 30.3,
-      "pct": 0.3,
+      "last": 9973.3,
+      "change": 31.15,
+      "pct": 0.31,
       "open": 9990.85,
       "high": 9992.7,
       "low": 9929.1,
       "prev_close": 9942.15,
-      "advances": "22",
-      "declines": "8",
+      "advances": "19",
+      "declines": "11",
       "unchanged": "4"
     },
     "NIFTY ENERGY": {
-      "last": 39786.1,
-      "change": 100.65,
-      "pct": 0.25,
+      "last": 39752.95,
+      "change": 67.5,
+      "pct": 0.17,
       "open": 39877.4,
       "high": 39909,
-      "low": 39596.6,
+      "low": 39573.6,
       "prev_close": 39685.45,
       "advances": "24",
       "declines": "16",
       "unchanged": "0"
     },
     "NIFTY INDIA DEFENCE": {
-      "last": 9109,
-      "change": 131.7,
-      "pct": 1.47,
+      "last": 9130.45,
+      "change": 153.15,
+      "pct": 1.71,
       "open": 9035.55,
-      "high": 9126.55,
+      "high": 9146.65,
       "low": 9005.15,
       "prev_close": 8977.3,
       "advances": "16",
@@ -273,15 +273,15 @@
   },
   "market_status": {
     "Capital Market": {
-      "status": "Open",
-      "trade_date": "09-Jun-2026 12:21",
+      "status": "Closed",
+      "trade_date": "09-Jun-2026 15:30",
       "index": "NIFTY 50",
-      "last": 23195.05,
-      "variation": 72.04999999999927,
-      "pct": 0.31
+      "last": 23242.1,
+      "variation": 119.09999999999854,
+      "pct": 0.52
     },
     "Currency": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "09-Jun-2026",
       "index": "",
       "last": "",
@@ -297,7 +297,7 @@
       "pct": ""
     },
     "Debt": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "09-Jun-2026",
       "index": "",
       "last": "",
@@ -305,26 +305,612 @@
       "pct": ""
     },
     "currencyfuture": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "09-Jun-2026",
       "index": "",
-      "last": "95.6800",
+      "last": "95.3725",
       "variation": "",
       "pct": ""
     }
   },
   "forex": {
-    "usdinr": 95.3345,
-    "usdeur": 0.8671,
-    "usdgbp": 0.7495,
-    "usdjpy": 160.332,
-    "date": "2026-06-08"
+    "usdinr": 95.6379,
+    "usdeur": 0.8667,
+    "usdgbp": 0.7491,
+    "usdjpy": 160.2572,
+    "date": "2026-06-09"
   },
   "commodities": {},
   "sectors": {},
   "option_chain": {},
   "preopen": null,
-  "corporate_actions": null,
+  "corporate_actions": [
+    {
+      "symbol": "NDRINVIT",
+      "company": "NDR INVIT Trust",
+      "subject": "Distribution - Rs 1.92 Per Unit Consist Of Re 0.949 Per Unit As Interest / Re 0.971 Per Unit As Return Of Capital",
+      "ex_date": "02-Jun-2026",
+      "record_date": "02-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "NXT-INFRA",
+      "company": "Nxt-Infra Trust",
+      "subject": "Distribution - Rs 4.3475 Per Unit Consist Of Rs 2.8887 Per Unit As Interest/ Rs 1.4588 Per Unit As Return Of Capital",
+      "ex_date": "02-Jun-2026",
+      "record_date": "02-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "SETCO",
+      "company": "Setco Automotive Limited",
+      "subject": "Interim Dividend - Rs 13 Per Share",
+      "ex_date": "02-Jun-2026",
+      "record_date": "02-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "OSEINTRUST",
+      "company": "Oriental InfraTrust",
+      "subject": "Distribution - Rs 3.9155 Per Unit Consists Of Rs 1.2084 Per Unit As Interest/ Re 0.9735 Per Unit As Dividend/ Rs 1.7336 Per Unit As Return Of Capital",
+      "ex_date": "02-Jun-2026",
+      "record_date": "02-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "FOSECOIND",
+      "company": "Foseco India Limited",
+      "subject": "Dividend - Rs 25 Per Share",
+      "ex_date": "03-Jun-2026",
+      "record_date": "03-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "REMSONSIND",
+      "company": "Remsons Industries Limited",
+      "subject": "Interim Dividend - Re 0.20 Per Share",
+      "ex_date": "03-Jun-2026",
+      "record_date": "03-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "NAVNETEDUL",
+      "company": "Navneet Education Limited",
+      "subject": "Interim Dividend - Rs 1.50 Per Share",
+      "ex_date": "03-Jun-2026",
+      "record_date": "03-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ASHOKLEY",
+      "company": "Ashok Leyland Limited",
+      "subject": "Interim Dividend - Rs 2.50 Per Share",
+      "ex_date": "03-Jun-2026",
+      "record_date": "03-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "company": "Anand Rathi Wealth Limited",
+      "subject": "Bonus 1:1",
+      "ex_date": "03-Jun-2026",
+      "record_date": "03-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TRENT",
+      "company": "Trent Limited",
+      "subject": "Bonus 1:2",
+      "ex_date": "04-Jun-2026",
+      "record_date": "04-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TIIL",
+      "company": "Technocraft Industries (India) Limited",
+      "subject": "Interim Dividend - Rs 20 Per Share",
+      "ex_date": "04-Jun-2026",
+      "record_date": "04-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "RALLIS",
+      "company": "Rallis India Limited",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "04-Jun-2026",
+      "record_date": "04-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "RELIANCE",
+      "company": "Reliance Industries Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "BANKBARODA",
+      "company": "Bank of Baroda",
+      "subject": "Dividend - Rs 8.50 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "BEML",
+      "company": "BEML Limited",
+      "subject": "Interim Dividend - Rs 2.30 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "CIPLA",
+      "company": "Cipla Limited",
+      "subject": "Dividend - Rs 13 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "E2E",
+      "company": "E2E Networks Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "SPCENET",
+      "company": "Spacenet Enterprises India Limited",
+      "subject": "Interim Dividend - Rs. 0.01 Per Sh",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "HDFCAMC",
+      "company": "HDFC Asset Management Company Limited",
+      "subject": "Dividend - Rs 54 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ICICIPRULI",
+      "company": "ICICI Prudential Life Insurance Company Limited",
+      "subject": "Dividend - Rs 1.65 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "VERTOZ",
+      "company": "Vertoz Limited",
+      "subject": "Interim Dividend - Rs 0.10 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "WIPRO",
+      "company": "Wipro Limited",
+      "subject": "Buy Back",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "JAGRAN",
+      "company": "Jagran Prakashan Limited",
+      "subject": "Interim Dividend - Rs 7 Per Share & Special Dividend Rs 3 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "JSWENERGY",
+      "company": "JSW Energy Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "MAHABANK",
+      "company": "Bank of Maharashtra",
+      "subject": "Dividend - Rs 1.20 Per Sh",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ACI",
+      "company": "Archean Chemical Industries Limited",
+      "subject": "Dividend - Rs 2.50 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "PONNIERODE",
+      "company": "Ponni Sugars (Erode) Limited",
+      "subject": "Dividend - Rs 5 Per Share",
+      "ex_date": "05-Jun-2026",
+      "record_date": "05-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "RELTD",
+      "company": "Ravindra Energy Limited",
+      "subject": "Rights 1:9 @ Premium 91",
+      "ex_date": "08-Jun-2026",
+      "record_date": "08-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "NELCO",
+      "company": "NELCO Limited",
+      "subject": "Dividend - Rs 1 Per Share",
+      "ex_date": "09-Jun-2026",
+      "record_date": "09-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "INOXINDIA",
+      "company": "INOX India Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "09-Jun-2026",
+      "record_date": "09-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TATAELXSI",
+      "company": "Tata Elxsi Limited",
+      "subject": "Dividend - Rs 75 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TATACHEM",
+      "company": "Tata Chemicals Limited",
+      "subject": "Dividend - Rs 11 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "SESHAPAPER",
+      "company": "Seshasayee Paper and Boards Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TATAINVEST",
+      "company": "Tata Investment Corporation Limited",
+      "subject": "Dividend - Rs 3.40 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "INFY",
+      "company": "Infosys Limited",
+      "subject": "Dividend - Rs 25 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "INDIANB",
+      "company": "Indian Bank",
+      "subject": "Dividend - Rs 18.25 Per Share",
+      "ex_date": "10-Jun-2026",
+      "record_date": "10-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ICICIAMC",
+      "company": "ICICI Prudential Asset Management Company Limited",
+      "subject": "Dividend - Rs 12.40 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TMCV",
+      "company": "Tata Motors Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TRENT",
+      "company": "Trent Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "VOLTAS",
+      "company": "Voltas Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "JMFINANCIL",
+      "company": "JM Financial Limited",
+      "subject": "Dividend - Rs 1.75 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "LLOYDSME",
+      "company": "Lloyds Metals And Energy Limited",
+      "subject": "Dividend - Rs 1 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "MMFL",
+      "company": "MM Forgings Limited",
+      "subject": "Interim Dividend - Rs 4 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ACC",
+      "company": "ACC Limited",
+      "subject": "Dividend - Rs 7.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ADANIENT",
+      "company": "Adani Enterprises Limited",
+      "subject": "Dividend - Rs 1.30 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "NAVINFLUOR",
+      "company": "Navin Fluorine International Limited",
+      "subject": "Dividend - Rs 8.60 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TMB",
+      "company": "Tamilnad Mercantile Bank Limited",
+      "subject": "Dividend - Rs 12.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "TATASTEEL",
+      "company": "Tata Steel Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ELECON",
+      "company": "Elecon Engineering Company Limited",
+      "subject": "Dividend - Rs 1.5 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "EIMCOELECO",
+      "company": "Eimco Elecon (India) Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "DCBBANK",
+      "company": "DCB Bank Limited",
+      "subject": "Dividend - Rs 1.45 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "CUB",
+      "company": "City Union Bank Limited",
+      "subject": "Bonus 1:3",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "CEMPRO",
+      "company": "Cemindia Projects Limited",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "CANBK",
+      "company": "Canara Bank",
+      "subject": "Dividend - Rs 4.20 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "PNB",
+      "company": "Punjab National Bank",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "13-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "RIIL",
+      "company": "Reliance Industrial Infrastructure Limited",
+      "subject": "Dividend - Rs 3.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "company": "Adani Ports and Special Economic Zone Limited",
+      "subject": "Dividend - Rs 7.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "AMBUJACEM",
+      "company": "Ambuja Cements Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "APCOTEXIND",
+      "company": "Apcotex Industries Limited",
+      "subject": "Dividend - Rs 5.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ORIENTCEM",
+      "company": "Orient Cement Limited",
+      "subject": "Dividend - Rs 0.50 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "PETRONET",
+      "company": "Petronet LNG Limited",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "ATGL",
+      "company": "Adani Total Gas Limited",
+      "subject": "Dividend - Rs 0.25 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "AVANTEL",
+      "company": "Avantel Limited",
+      "subject": "Dividend - Rs 0.20 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "PIRAMALFIN",
+      "company": "Piramal Finance Limited",
+      "subject": "Dividend - Rs 11 Per Share",
+      "ex_date": "12-Jun-2026",
+      "record_date": "12-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    },
+    {
+      "symbol": "RRKABEL",
+      "company": "R R Kabel Limited",
+      "subject": "Dividend - Rs 5.50 Per Share",
+      "ex_date": "16-Jun-2026",
+      "record_date": "16-Jun-2026",
+      "bc_start": "-",
+      "bc_end": "-"
+    }
+  ],
   "insider_trading": null,
   "bulk_deals": null,
   "block_deals": null,
