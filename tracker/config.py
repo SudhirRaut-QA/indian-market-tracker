@@ -98,6 +98,24 @@ NSE_RETRY_DELAY = 5
 # =============================================================================
 FOREX_API_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
 
+# Phase 3: Global sentiment & indices
+YAHOO_SPARK_URL = "https://query1.finance.yahoo.com/v8/finance/spark"
+CNN_FEAR_GREED_URL = "https://production.dataviz.cnn.io/index/fearandgreed/current"
+
+GLOBAL_INDEX_SYMBOLS = {
+    "S&P 500": "^GSPC",
+    "NASDAQ": "^IXIC",
+    "DOW": "^DJI",
+    "NIKKEI": "^N225",
+    "HANG SENG": "^HSI",
+    "FTSE": "^FTSE",
+}
+
+GLOBAL_MACRO_SYMBOLS = {
+    "DXY": "DX-Y.NYB",
+    "BRENT": "BZ=F",
+}
+
 # =============================================================================
 # DATA STORAGE
 # =============================================================================

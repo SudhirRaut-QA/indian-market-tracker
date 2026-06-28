@@ -381,6 +381,16 @@ class MarketScraper:
                 last_p = s.get("lastPrice", 0) or 0
                 year_high = s.get("yearHigh", 0) or 0
                 year_low = s.get("yearLow", 0) or 0
+                pe_raw = s.get("pdSymbolPe") or s.get("pe") or s.get("PE")
+                deliv_raw = (
+                    s.get("deliveryToTradedQuantity")
+                    or s.get("deliveryToTradedQty")
+                    or s.get("deliveryQtyToTradedQty")
+                )
+                pe_val = self._num(pe_raw)
+                delivery_pct = self._num(deliv_raw)
+                if not (0 < delivery_pct <= 100):
+                    delivery_pct = 0.0
                 # nearWKH/nearWKL are often absent/0 in the bulk sector API
                 # response even when the stock IS near its 52W level.
                 # Always compute from yearHigh/yearLow as authoritative source.
@@ -403,6 +413,8 @@ class MarketScraper:
                     "near_52l": near_l,
                     "chg_30d": s.get("perChange30d", 0),
                     "chg_365d": s.get("perChange365d", 0),
+                    "pe": round(pe_val, 2) if pe_val > 0 else 0,
+                    "delivery_pct": round(delivery_pct, 2) if delivery_pct > 0 else 0,
                 })
             by_chg = sorted(stocks, key=lambda x: x["pct"], reverse=True)
             by_val = sorted(stocks, key=lambda x: x["value_cr"], reverse=True)
@@ -993,6 +1005,27 @@ class MarketScraper:
 
     # ── 9. Commodity ETF Quotes ──────────────────────────────────────────────
 
+    @staticmethod
+    def _extract_delivery_pct_from_quote_raw(raw: Dict) -> float:
+        """Extract delivery% from quote-equity payload when available."""
+        candidates = [
+            ((raw.get("securityWiseDP") or {}).get("deliveryToTradedQuantity")),
+            ((raw.get("securityWiseDP") or {}).get("deliveryToTradedQty")),
+            (((raw.get("marketDeptOrderBook") or {}).get("tradeInfo") or {}).get("deliveryToTradedQuantity")),
+            (((raw.get("marketDeptOrderBook") or {}).get("tradeInfo") or {}).get("deliveryToTradedQty")),
+            ((raw.get("metadata") or {}).get("deliveryToTradedQuantity")),
+        ]
+        for c in candidates:
+            if c is None:
+                continue
+            try:
+                v = float(str(c).replace(",", "").strip())
+            except (TypeError, ValueError):
+                continue
+            if 0 < v <= 100:
+                return round(v, 2)
+        return 0.0
+
     def get_stock_quote(self, symbol: str) -> Optional[Dict]:
         """Fetch a single stock's quote (LTP, PE, 52W, volume, etc.)."""
         raw = self.nse.api_get(self._url(f"/api/quote-equity?symbol={symbol}"))
@@ -1007,6 +1040,7 @@ class MarketScraper:
             sec_info = raw.get("securityInfo", {})
             # PE can be string or float from NSE API
             pe_val = meta.get("pdSymbolPe") or sec_info.get("pe", 0)
+            delivery_pct = self._extract_delivery_pct_from_quote_raw(raw)
             try:
                 pe_float = float(pe_val) if pe_val else 0.0
             except (ValueError, TypeError):
@@ -1023,6 +1057,7 @@ class MarketScraper:
                 "week52_high": wk.get("max", 0),
                 "week52_low": wk.get("min", 0),
                 "pe": pe_float,
+                "delivery_pct": delivery_pct,
                 "sector": meta.get("industry", ind.get("industry", "")),
                 "face_value": sec_info.get("faceValue", 0),
             }
@@ -1040,7 +1075,8 @@ class MarketScraper:
                     lookup[sym] = {
                         "last": stock.get("last", 0),
                         "pct":  stock.get("pct", 0),
-                        "pe":   0,  # PE not in sector API — fetched via quote if needed
+                        "pe":   stock.get("pe", 0) or 0,
+                        "delivery_pct": stock.get("delivery_pct", 0) or 0,
                         "week52_high": stock.get("year_high", 0),
                         "week52_low":  stock.get("year_low", 0),
                     }
@@ -1071,6 +1107,7 @@ class MarketScraper:
             meta = raw.get("metadata", {})
             sec  = raw.get("securityInfo", {})
             pe_raw = meta.get("pdSymbolPe") or sec.get("pe", 0)
+            delivery_pct = self._extract_delivery_pct_from_quote_raw(raw)
             try:
                 pe_float = float(str(pe_raw).replace(",", "")) if pe_raw else 0.0
             except (ValueError, TypeError):
@@ -1079,11 +1116,60 @@ class MarketScraper:
                 "last":        pi.get("lastPrice", 0),
                 "pct":         pi.get("pChange", 0),
                 "pe":          pe_float,
+                "delivery_pct": delivery_pct,
                 "week52_high": wk.get("max", 0),
                 "week52_low":  wk.get("min", 0),
             }
         except Exception:
             return None
+
+    def _build_quality_lookup_from_quotes(self, sectors: Dict, max_symbols: int = 24) -> Dict[str, Dict]:
+        """Build symbol→{pe, delivery_pct} lookup for top liquid names.
+
+        Keeps API calls bounded and only enriches where quality fields are missing.
+        """
+        if not sectors or max_symbols <= 0:
+            return {}
+
+        best_by_symbol: Dict[str, Dict] = {}
+        for sector_data in sectors.values():
+            for s in sector_data.get("stocks", []):
+                sym = s.get("symbol", "")
+                if not sym:
+                    continue
+                cur = best_by_symbol.get(sym)
+                if not cur or (s.get("value_cr", 0) or 0) > (cur.get("value_cr", 0) or 0):
+                    best_by_symbol[sym] = {
+                        "value_cr": float(s.get("value_cr", 0) or 0),
+                        "volume": float(s.get("volume", 0) or 0),
+                    }
+
+        ranked = sorted(
+            best_by_symbol.items(),
+            key=lambda kv: (kv[1].get("value_cr", 0), kv[1].get("volume", 0)),
+            reverse=True,
+        )
+        if not ranked:
+            return {}
+
+        out: Dict[str, Dict] = {}
+        for sym, _ in ranked[:max_symbols]:
+            q = self._get_stock_quote_fast(sym)
+            if not q:
+                continue
+            pe = float(q.get("pe", 0) or 0)
+            delivery_pct = float(q.get("delivery_pct", 0) or 0)
+            if pe <= 0 and delivery_pct <= 0:
+                continue
+            out[sym] = {
+                "pe": round(pe, 2) if pe > 0 else 0.0,
+                "delivery_pct": round(delivery_pct, 2) if delivery_pct > 0 else 0.0,
+            }
+            time.sleep(0.2)
+
+        if out:
+            logger.info(f"Quality lookup via quote API: {len(out)}/{min(len(ranked), max_symbols)} symbols")
+        return out
 
     def enrich_corporate_actions(
         self,
@@ -1424,6 +1510,136 @@ class MarketScraper:
             logger.warning(f"MCX proxy quotes error: {e}")
         return out
 
+    def _get_yahoo_spark_quotes(self, symbols: List[str], range_: str = "5d", interval: str = "1d") -> Dict[str, Dict]:
+        """Fetch Yahoo spark quotes for symbols and return normalized map.
+
+        Returns: {symbol: {last, prev, pct}}
+        """
+        if not symbols:
+            return {}
+
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            ),
+            "Accept": "application/json",
+        }
+
+        try:
+            resp = requests.get(
+                config.YAHOO_SPARK_URL,
+                params={
+                    "symbols": ",".join(symbols),
+                    "range": range_,
+                    "interval": interval,
+                    "includePrePost": "false",
+                },
+                headers=headers,
+                timeout=12,
+                verify=False,
+            )
+            if resp.status_code != 200:
+                logger.warning(f"Yahoo spark quote fetch returned {resp.status_code}")
+                return {}
+
+            raw = resp.json() if isinstance(resp.json(), dict) else {}
+            out: Dict[str, Dict] = {}
+            for sym, item in raw.items():
+                if not isinstance(item, dict):
+                    continue
+                closes = [c for c in (item.get("close") or []) if c is not None]
+                if not closes:
+                    continue
+                last = float(closes[-1])
+                prev_raw = item.get("chartPreviousClose")
+                prev = float(prev_raw) if prev_raw else (float(closes[-2]) if len(closes) >= 2 else 0.0)
+                pct = round((last - prev) / prev * 100, 2) if prev > 0 else 0.0
+                out[sym] = {
+                    "last": round(last, 4),
+                    "prev": round(prev, 4) if prev > 0 else 0.0,
+                    "pct": pct,
+                }
+            return out
+        except Exception as e:
+            logger.warning(f"Yahoo spark quotes error: {e}")
+            return {}
+
+    def get_global_indices(self) -> Dict[str, Dict]:
+        """Fetch key global equity indices via Yahoo spark."""
+        symbol_map = config.GLOBAL_INDEX_SYMBOLS
+        raw = self._get_yahoo_spark_quotes(list(symbol_map.values()), range_="5d", interval="1d")
+        out: Dict[str, Dict] = {}
+        for name, sym in symbol_map.items():
+            q = raw.get(sym)
+            if not q:
+                continue
+            out[name] = {
+                "symbol": sym,
+                "last": q.get("last", 0.0),
+                "pct": q.get("pct", 0.0),
+            }
+        logger.info(f"Global indices: {len(out)}/{len(symbol_map)}")
+        return out
+
+    def get_global_sentiment(self) -> Dict[str, Any]:
+        """Fetch Fear & Greed + macro drivers (DXY, Brent)."""
+        out: Dict[str, Any] = {
+            "fear_greed": None,
+            "macro": {},
+        }
+
+        # CNN Fear & Greed (free endpoint)
+        fg_headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            ),
+            "Accept": "application/json, text/plain, */*",
+            "Referer": "https://www.cnn.com/markets/fear-and-greed",
+            "Origin": "https://www.cnn.com",
+        }
+        try:
+            fg_resp = requests.get(
+                config.CNN_FEAR_GREED_URL,
+                headers=fg_headers,
+                timeout=10,
+                verify=False,
+            )
+            if fg_resp.status_code == 200:
+                fg = fg_resp.json() if isinstance(fg_resp.json(), dict) else {}
+                score = fg.get("score")
+                rating = fg.get("rating", "")
+                prev_close = fg.get("previous_close")
+                if isinstance(score, (int, float)):
+                    out["fear_greed"] = {
+                        "score": round(float(score), 2),
+                        "rating": str(rating or "").strip(),
+                        "previous_close": float(prev_close) if isinstance(prev_close, (int, float)) else None,
+                        "timestamp": fg.get("timestamp", ""),
+                    }
+            else:
+                logger.warning(f"Fear & Greed endpoint returned {fg_resp.status_code}")
+        except Exception as e:
+            logger.warning(f"Fear & Greed fetch failed: {e}")
+
+        # DXY + Brent from Yahoo
+        macro_map = config.GLOBAL_MACRO_SYMBOLS
+        macro_raw = self._get_yahoo_spark_quotes(list(macro_map.values()), range_="5d", interval="1d")
+        for name, sym in macro_map.items():
+            q = macro_raw.get(sym)
+            if not q:
+                continue
+            out["macro"][name] = {
+                "symbol": sym,
+                "last": q.get("last", 0.0),
+                "pct": q.get("pct", 0.0),
+            }
+
+        return out
+
     # ── 10. USD/INR Forex ────────────────────────────────────────────────────
 
     def get_usdinr(self) -> Optional[Dict]:
@@ -1488,6 +1704,9 @@ class MarketScraper:
             "fii_dii": None, "indices": None, "market_status": None,
             "forex": None, "commodities": {},
             "mcx_drivers": {},
+            "global_indices": {},
+            "global_sentiment": {},
+            "quality_lookup": {},
             "sectors": {}, "option_chain": {},
             "preopen": None, "corporate_actions": None,
             "corporate_sources": {},
@@ -1526,6 +1745,17 @@ class MarketScraper:
                 snapshot["forex"] = self.get_usdinr()
             except Exception as e:
                 snapshot["errors"].append(f"Forex: {e}")
+
+            # Global phase-3 cues (US/Asia/Europe + fear/greed + DXY/Brent)
+            try:
+                snapshot["global_indices"] = self.get_global_indices()
+            except Exception as e:
+                snapshot["errors"].append(f"Global indices: {e}")
+
+            try:
+                snapshot["global_sentiment"] = self.get_global_sentiment()
+            except Exception as e:
+                snapshot["errors"].append(f"Global sentiment: {e}")
 
             # Commodity ETFs
             try:
@@ -1567,6 +1797,15 @@ class MarketScraper:
                 except Exception as e:
                     snapshot["errors"].append(f"Sector {name}: {e}")
                 time.sleep(1.5)
+
+            # Enrich PE/Delivery% for top liquid symbols (bounded API calls)
+            try:
+                snapshot["quality_lookup"] = self._build_quality_lookup_from_quotes(
+                    snapshot.get("sectors", {}),
+                    max_symbols=24,
+                )
+            except Exception as e:
+                snapshot["errors"].append(f"Quality lookup: {e}")
 
         # Options
         if include_options:

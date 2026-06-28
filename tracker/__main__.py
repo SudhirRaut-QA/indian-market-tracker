@@ -33,7 +33,9 @@ from .telegram_bot import (
     format_preopen_msg, format_delta_alert, format_bulk_deals_msg,
     identify_watchlist, format_watchlist_msg, format_expert_opinion,
     format_weekly_toppers, format_categorized_signals_msg,
-    format_corporate_dividends_table_msg,
+    format_corporate_dividends_table_msg, format_phase2_predictive_msg,
+    format_phase3_global_msg, format_phase4_ml_msg,
+    format_weekend_global_msg,
 )
 from .signal_detector import SignalDetector
 from .excel_manager import ExcelManager
@@ -112,17 +114,27 @@ def run_once(
                 include_core=include_core,
             )
             
-            # Merge fresh data into cached snapshot
-            if fresh.get("forex"):
-                snapshot["forex"] = fresh["forex"]
-            if fresh.get("corporate_actions"):
-                snapshot["corporate_actions"] = fresh["corporate_actions"]
-            if fresh.get("insider_trading"):
-                snapshot["insider_trading"] = fresh["insider_trading"]
-            if fresh.get("bulk_deals"):
-                snapshot["bulk_deals"] = fresh["bulk_deals"]
-            if fresh.get("block_deals"):
-                snapshot["block_deals"] = fresh["block_deals"]
+            # Merge fresh data into cached snapshot.
+            # Core market fields are refreshed when include_core=True so that
+            # 18:00/21:00 slots show:
+            #   • Updated FII/DII (NSE publishes final numbers ~16:00)
+            #   • Live global indices (US market open by 21:00 IST)
+            #   • Fresh global sentiment / Fear & Greed
+            #   • Current India indices / VIX (post-close adjustments)
+            _ALWAYS_REFRESH = (
+                "fii_dii", "indices", "market_status",
+                "global_indices", "global_sentiment",
+                "mcx_drivers", "commodities",
+            )
+            for key in _ALWAYS_REFRESH:
+                if fresh.get(key):
+                    snapshot[key] = fresh[key]
+
+            # Corporate / deal data (only present when explicitly requested)
+            _CONDITIONAL = ("forex", "corporate_actions", "insider_trading", "bulk_deals", "block_deals")
+            for key in _CONDITIONAL:
+                if fresh.get(key):
+                    snapshot[key] = fresh[key]
             
             # Update timestamp
             snapshot["timestamp"] = start_ist
@@ -197,6 +209,8 @@ def run_once(
     # 4. Send Telegram messages
     if send_telegram:
         messages = []
+        phase2_flow = None
+        detector = SignalDetector()
 
         # Determine if market is closed (post-market, evening, or holiday)
         _post_market = slot_time in ("18:00", "21:00")
@@ -299,7 +313,6 @@ def run_once(
         # Phase 1 Intelligence Report — EOD (15:35) and evening (18:00, 21:00)
         if slot_time in ("15:35", "18:00", "21:00") and snapshot.get("sectors"):
             try:
-                detector = SignalDetector()
                 cat_signals = detector.analyze_with_categories(
                     snapshot,
                     delta=delta,
@@ -308,8 +321,67 @@ def run_once(
                 sig_msg = format_categorized_signals_msg(cat_signals)
                 if sig_msg:
                     messages.append(("📊 Signals", sig_msg))
+
+                # Phase 2 Predictive Intelligence (historical snapshot analytics)
+                phase2 = detector.analyze_predictive(
+                    snapshot,
+                    data_dir=str(config.DATA_DIR),
+                )
+                p2_msg = format_phase2_predictive_msg(phase2)
+                if p2_msg:
+                    messages.append(("🔮 Phase2", p2_msg))
+                phase2_flow = (phase2 or {}).get("fii_dii_trend") or None
             except Exception as _e:
-                logger.warning(f"Categorized signals failed: {_e}")
+                logger.warning(f"Signals/Phase2 generation failed: {_e}")
+
+        # Phase 3 Global Sentiment & Indices
+        if slot_time in (None, "09:00", "09:08", "15:35", "18:00", "21:00"):
+            try:
+                if not phase2_flow:
+                    if snapshot.get("sectors"):
+                        # Reuse predictive engine to expose 5-day FII/DII rolling bias in Phase 3.
+                        _p2 = detector.analyze_predictive(snapshot, data_dir=str(config.DATA_DIR))
+                        phase2_flow = (_p2 or {}).get("fii_dii_trend") or None
+                    else:
+                        # Pre-open slots run without sectors; still compute rolling FII/DII from history.
+                        phase2_flow = detector.analyze_fii_dii_trend(data_dir=str(config.DATA_DIR))
+                p3_msg = format_phase3_global_msg(snapshot, phase2_flow)
+                if p3_msg:
+                    messages.append(("🌍 Phase3", p3_msg))
+            except Exception as _e:
+                logger.warning(f"Phase3 generation failed: {_e}")
+
+        # Phase 4 ML Prediction — EOD/evening next-session outlook
+        if slot_time in ("15:35", "18:00", "21:00") and snapshot.get("sectors"):
+            try:
+                phase4 = detector.analyze_ml_prediction(snapshot, data_dir=str(config.DATA_DIR))
+
+                # Accuracy: compare yesterday's picks against today's prices
+                try:
+                    accuracy = SignalDetector.compute_phase4_accuracy(
+                        snapshot, data_dir=str(config.DATA_DIR)
+                    )
+                    if accuracy:
+                        phase4["accuracy"] = accuracy
+                except Exception as _ae:
+                    logger.warning(f"Phase4 accuracy compute failed: {_ae}")
+
+                p4_msg = format_phase4_ml_msg(phase4)
+                if p4_msg:
+                    messages.append(("🤖 Phase4", p4_msg))
+
+                # Log today's picks for next session's accuracy scoring
+                if slot_time == "15:35":
+                    try:
+                        SignalDetector.log_phase4_picks(
+                            phase4.get("top_stocks") or [],
+                            data_dir=str(config.DATA_DIR),
+                        )
+                    except Exception as _le:
+                        logger.warning(f"Phase4 picks log failed: {_le}")
+
+            except Exception as _e:
+                logger.warning(f"Phase4 generation failed: {_e}")
 
         # Weekly Watchlist Toppers — Friday 21:00 slot (end of week summary)
         if slot_time == "21:00" and ist_now.weekday() == 4:  # Friday
@@ -358,6 +430,8 @@ def run_once(
         parts.append("Commodities")
     if snapshot.get("forex"):
         parts.append("Forex")
+    if snapshot.get("global_indices"):
+        parts.append("Global")
     if snapshot.get("corporate_actions"):
         parts.append(f"{len(snapshot['corporate_actions'])} corp actions")
     if snapshot.get("insider_trading"):
@@ -387,6 +461,50 @@ def run_once(
     logger.info("=" * 70)
     
     return snapshot
+
+
+def run_weekend_global_report(send_telegram: bool = True) -> None:
+    """Fetch global indices + sentiment only (no NSE) and send a Monday preview.
+
+    Designed for the Sunday 21:00 IST slot when Indian markets are closed.
+    Makes zero NSE API calls — uses Yahoo Finance and CNN Fear & Greed only.
+    """
+    ist = ZoneInfo("Asia/Kolkata")
+    ist_now = datetime.now(ist)
+    logger.info(f"Weekend global report — {ist_now.strftime('%Y-%m-%d %H:%M IST')}")
+
+    scraper = MarketScraper()
+    bot     = TelegramBot()
+
+    snapshot: dict = {
+        "timestamp":        ist_now.isoformat(),
+        "global_indices":   {},
+        "global_sentiment": {},
+    }
+
+    try:
+        snapshot["global_indices"]   = scraper.get_global_indices()
+    except Exception as e:
+        logger.warning(f"Weekend report — global indices failed: {e}")
+
+    try:
+        snapshot["global_sentiment"] = scraper.get_global_sentiment()
+    except Exception as e:
+        logger.warning(f"Weekend report — global sentiment failed: {e}")
+
+    gidx = snapshot.get("global_indices") or {}
+    gs   = snapshot.get("global_sentiment") or {}
+    logger.info(
+        f"Weekend report: {len(gidx)} global indices, "
+        f"F&G={( (gs.get('fear_greed') or {}).get('score') )}"
+    )
+
+    msg = format_weekend_global_msg(snapshot)
+    if msg and send_telegram:
+        bot.send(msg)
+        logger.info("Weekend global report sent")
+    elif not msg:
+        logger.warning("Weekend global report: no data to format")
 
 
 def verify_setup():
@@ -484,6 +602,7 @@ Examples:
             run_immediately=args.catch_up,
             run_fn=run_once,
             slots=slots,
+            weekend_fn=run_weekend_global_report,
         )
         return
 

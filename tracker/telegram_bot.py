@@ -148,14 +148,14 @@ def _yield_indicator(yield_pct: float) -> str:
 
 
 def _build_annual_dividend_totals(data_dir: str) -> dict:
-    """Scan ALL stored snapshots to sum dividends per symbol, grouped by ex_date year.
+    """Scan ALL stored snapshots to sum dividends from the PREVIOUS complete year.
 
-    Priority:
-      1. Previous calendar year (e.g. 2025) — complete, reliable for annual yield.
-      2. Current year YTD fallback when no prior-year data exists yet.
+    Ann.Yield must use prior-year data (FY2025) to be meaningfully different from
+    Yield (which uses the upcoming dividend). Never mixes in current-year data.
 
-    Returns {symbol: {"total": float, "label": str}} — zero extra API calls.
-    Deduplication is by (symbol, ex_date) so each payout is counted once.
+    Returns {symbol: {"total": float, "label": str}} for FY{prev_year} only.
+    Returns {} if prior year has no data (shows no Ann.Yield in that case).
+    Deduplication by (symbol, ex_date) — each payout counted once.
     """
     import json as _json
     from pathlib import Path as _Path
@@ -173,14 +173,12 @@ def _build_annual_dividend_totals(data_dir: str) -> dict:
 
     today     = datetime.now()
     prev_year = today.year - 1
-    curr_year = today.year
     snap_dir  = _Path(data_dir) / "snapshots"
     if not snap_dir.exists():
         return {}
 
     seen: set = set()
-    # year_buckets[year][symbol] = cumulative_div
-    year_buckets: dict = {prev_year: {}, curr_year: {}}
+    prev_data: dict = {}  # Only collect {symbol: total_divs} for prev_year
 
     for sf in snap_dir.glob("snapshot_*.json"):
         try:
@@ -195,28 +193,105 @@ def _build_annual_dividend_totals(data_dir: str) -> dict:
                 key = (sym, ex_date)
                 if key in seen:
                     continue
-                seen.add(key)
                 ex_year = _parse_ex_year(ex_date)
-                if ex_year not in year_buckets:
+                if ex_year != prev_year:  # Only collect previous year
                     continue
+                seen.add(key)
                 div = _extract_dividend_amount(a.get("subject", ""))
                 if div > 0:
-                    bucket = year_buckets[ex_year]
-                    bucket[sym] = bucket.get(sym, 0.0) + div
+                    prev_data[sym] = prev_data.get(sym, 0.0) + div
         except Exception:
             continue
 
-    prev_data = year_buckets[prev_year]
-    curr_data = year_buckets[curr_year]
+    # Return FY{prev_year} data only; empty if no prior-year dividends exist
+    return {sym: {"total": total, "label": f"FY{prev_year}"}
+            for sym, total in prev_data.items()}
 
-    if prev_data:
-        # Previous year is complete — preferred for annual yield
-        return {sym: {"total": total, "label": f"FY{prev_year}"}
-                for sym, total in prev_data.items()}
-    else:
-        # No previous year data yet — show current year YTD
-        return {sym: {"total": total, "label": f"{curr_year} YTD"}
-                for sym, total in curr_data.items()}
+
+def _fetch_prior_year_dividend_total_online(symbol: str, year: int) -> float:
+    """Fetch prior-year dividend total from Yahoo chart events as fallback.
+
+    Tries NSE ticker first (<symbol>.NS), then BSE ticker (<symbol>.BO).
+    Returns 0.0 when unavailable so local data remains the primary source.
+    """
+    if not symbol or year < 2000:
+        return 0.0
+
+    period1 = int(datetime(year, 1, 1).timestamp())
+    period2 = int(datetime(year + 1, 1, 1).timestamp())
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/131.0.0.0 Safari/537.36"
+        )
+    }
+
+    for suffix in (".NS", ".BO"):
+        ticker = f"{symbol}{suffix}"
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+        try:
+            resp = requests.get(
+                url,
+                params={
+                    "period1": period1,
+                    "period2": period2,
+                    "interval": "1d",
+                    "events": "div",
+                    "includePrePost": "false",
+                },
+                headers=headers,
+                timeout=2,
+            )
+            if resp.status_code != 200:
+                continue
+
+            payload = resp.json() or {}
+            result = ((payload.get("chart") or {}).get("result") or [None])[0] or {}
+            events = (result.get("events") or {}).get("dividends") or {}
+            total = 0.0
+            for evt in events.values():
+                try:
+                    amt = float((evt or {}).get("amount") or 0)
+                    if amt > 0:
+                        total += amt
+                except (TypeError, ValueError):
+                    continue
+            if total > 0:
+                return round(total, 4)
+        except Exception:
+            continue
+
+    return 0.0
+
+
+def _fill_missing_annual_totals_online(symbols: List[str], annual_totals: dict) -> dict:
+    """Fill missing symbols in annual totals using online fallback (Yahoo)."""
+    out = dict(annual_totals or {})
+    prev_year = datetime.now().year - 1
+    started_at = datetime.now()
+
+    # Keep fallback lightweight to avoid delaying message delivery.
+    unique_symbols: List[str] = []
+    seen: set = set()
+    for s in symbols:
+        if not s or s in seen:
+            continue
+        seen.add(s)
+        unique_symbols.append(s)
+
+    for sym in unique_symbols[:6]:
+        if (datetime.now() - started_at).total_seconds() > 10:
+            break
+        if not sym or sym in out:
+            continue
+        try:
+            total = _fetch_prior_year_dividend_total_online(sym, prev_year)
+            if total > 0:
+                out[sym] = {"total": total, "label": f"FY{prev_year}"}
+        except Exception:
+            continue
+    return out
 
 
 def _emoji_pct(val: float) -> str:
@@ -803,6 +878,8 @@ def format_categorized_signals_msg(signals: Dict) -> str:
             trend    = s.get("trend", "")
             reasons  = s.get("reasons", [])
             vol_r    = s.get("vol_ratio", 0)
+            pe_v     = s.get("pe", 0)
+            deliv_v  = s.get("delivery_pct", 0)
 
             # Skip if no real data
             if not sym or ltp <= 0:
@@ -815,9 +892,16 @@ def format_categorized_signals_msg(signals: Dict) -> str:
             L.append(
                 f"  <b>{sym}</b>  ₹{ltp:,.2f}  {pct_str}  {trend_icon}"
             )
+            quality_bits = []
+            if pe_v and pe_v > 0:
+                quality_bits.append(f"PE {pe_v:.1f}")
+            if deliv_v and deliv_v > 0:
+                quality_bits.append(f"Del {deliv_v:.0f}%")
+
             L.append(
                 f"  Score: <b>{score}/100</b> | {sector}"
                 + (f" | {vol_str}" if vol_str else "")
+                + (f" | {' | '.join(quality_bits)}" if quality_bits else "")
             )
             # Top 2 reasons — skip empty/zero ones
             clean_reasons = [r for r in reasons if r][:2]
@@ -877,11 +961,382 @@ def format_categorized_signals_msg(signals: Dict) -> str:
     L.append("─" * 36)
     L.append(
         "<i>Score 0-100 based on: momentum, 52W position, "
-        "volume, FII sentiment, historical trend. "
+        "volume vs 5-day avg, PE, delivery%, FII sentiment, 7-day trend. "
         "Not financial advice — do your own research.</i>"
     )
 
     return "\n".join(L)
+
+
+def format_phase2_predictive_msg(phase2: Dict) -> Optional[str]:
+    """Format Phase 2 predictive analytics into a compact Telegram message."""
+    if not phase2:
+        return None
+
+    levels = (phase2.get("momentum_levels") or {})
+    leaders = levels.get("leaders") or []
+    laggards = levels.get("laggards") or []
+
+    rotation = (phase2.get("sector_rotation") or {})
+    gaining = rotation.get("gaining") or []
+    losing = rotation.get("losing") or []
+
+    breakouts = phase2.get("breakout_tracker") or []
+    flow = phase2.get("fii_dii_trend") or {}
+
+    if not any([leaders, laggards, gaining, losing, breakouts, flow.get("prediction")]):
+        return None
+
+    now_str = datetime.now().strftime("%d %b %Y  %I:%M %p")
+    L = [
+        f"<b>🧠 Phase 2 Predictive View — {now_str}</b>",
+        "<i>Historical momentum, sector rotation, breakout persistence, and flow trend</i>",
+        "",
+    ]
+
+    if leaders:
+        L.append("<b>📈 Momentum + Levels (Leaders)</b>")
+        for x in leaders[:5]:
+            sym = x.get("symbol", "")
+            if not sym:
+                continue
+            L.append(
+                f"  <b>{sym}</b>  5d:{x.get('mom_5d', 0):+.1f}% | "
+                f"S:{x.get('support', 0):,.0f} R:{x.get('resistance', 0):,.0f} | "
+                f"Room→R: {x.get('dist_to_res', 0):.1f}%"
+            )
+        L.append("")
+
+    if laggards:
+        L.append("<b>📉 Momentum Laggards (Mean-Reversion Watch)</b>")
+        for x in laggards[:3]:
+            sym = x.get("symbol", "")
+            if not sym:
+                continue
+            L.append(f"  {sym}: 5d {x.get('mom_5d', 0):+.1f}% | S:{x.get('support', 0):,.0f}")
+        L.append("")
+
+    if gaining or losing:
+        L.append("<b>🔄 Sector Rotation (5-day consistency)</b>")
+        if gaining:
+            top = gaining[0]
+            L.append(
+                f"  🟢 Into: <b>{top.get('sector','')}</b> "
+                f"({top.get('avg_5d', 0):+.2f}% avg, {top.get('up_days', 0)}/{top.get('up_days', 0) + top.get('down_days', 0)} up days)"
+            )
+        if losing:
+            top = losing[0]
+            L.append(
+                f"  🔴 Out of: <b>{top.get('sector','')}</b> "
+                f"({top.get('avg_5d', 0):+.2f}% avg, {top.get('down_days', 0)}/{top.get('up_days', 0) + top.get('down_days', 0)} down days)"
+            )
+        L.append("")
+
+    if breakouts:
+        L.append("<b>🚨 52W Breakout Persistence (3+ days near high)</b>")
+        for b in breakouts[:5]:
+            sym = b.get("symbol", "")
+            if not sym:
+                continue
+            L.append(
+                f"  {sym}: {b.get('days', 0)}d near 52W high | "
+                f"{b.get('near_52h', 0):.2f}% away | {b.get('pct', 0):+.1f}%"
+            )
+        L.append("")
+
+    if flow:
+        pred = flow.get("prediction", "UNKNOWN")
+        note = flow.get("note", "")
+        L.append("<b>💸 FII/DII 5-day Rolling Trend</b>")
+        L.append(
+            f"  Signal: <b>{pred}</b> | FII avg: ₹{flow.get('avg_fii_5d', 0):,.0f}Cr | "
+            f"DII avg: ₹{flow.get('avg_dii_5d', 0):,.0f}Cr"
+        )
+        if note:
+            L.append(f"  <i>{note}</i>")
+
+    return "\n".join(L)
+
+
+def format_phase3_global_msg(snapshot: Dict, fii_flow: Optional[Dict] = None) -> Optional[str]:
+    """Format Phase 3 global sentiment and index cues."""
+    gidx = snapshot.get("global_indices") or {}
+    gs = snapshot.get("global_sentiment") or {}
+    fg = gs.get("fear_greed") or {}
+    macro = gs.get("macro") or {}
+    forex = snapshot.get("forex") or {}
+
+    if not (gidx or fg or macro):
+        return None
+
+    now_str = datetime.now().strftime("%d %b %Y  %I:%M %p")
+    lines = [
+        f"<b>🌍 Phase 3 Global Sentiment — {now_str}</b>",
+        "<i>Global indices, risk sentiment, and macro drivers</i>",
+        "",
+    ]
+
+    if gidx:
+        lines.append("<b>🌐 Global Equity Cues</b>")
+        ordered = ["S&P 500", "NASDAQ", "DOW", "NIKKEI", "HANG SENG", "FTSE"]
+        headers = ["Index", "Last", "%Chg"]
+        rows = []
+        for name in ordered:
+            d = gidx.get(name)
+            if not d:
+                continue
+            rows.append([
+                name,
+                f"{float(d.get('last', 0) or 0):,.2f}",
+                _pct(float(d.get("pct", 0) or 0)),
+            ])
+        if rows:
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=['left', 'right', 'right']))
+            lines.append("</pre>")
+            lines.append("")
+
+    if fg:
+        try:
+            score = float(fg.get("score", 0) or 0)
+        except (TypeError, ValueError):
+            score = 0.0
+        rating = str(fg.get("rating", "") or "").strip().title()
+        if score >= 75:
+            fg_emoji = "🟢"
+        elif score >= 55:
+            fg_emoji = "🟡"
+        elif score >= 45:
+            fg_emoji = "⚪"
+        elif score >= 25:
+            fg_emoji = "🟠"
+        else:
+            fg_emoji = "🔴"
+        lines.append("<b>😶‍🌫️ Fear & Greed</b>")
+        lines.append(f"  {fg_emoji} Score: <b>{score:.1f}</b>/100 | {rating}")
+        lines.append("")
+
+    macro_parts = []
+    dxy = (macro.get("DXY") or {})
+    brent = (macro.get("BRENT") or {})
+    if dxy:
+        macro_parts.append(f"DXY {dxy.get('last', 0):,.2f} ({_pct(float(dxy.get('pct', 0) or 0))})")
+    if brent:
+        macro_parts.append(f"Brent ${brent.get('last', 0):,.2f} ({_pct(float(brent.get('pct', 0) or 0))})")
+    if forex.get("usdinr"):
+        macro_parts.append(f"USD/INR ₹{float(forex.get('usdinr', 0) or 0):.2f}")
+    if macro_parts:
+        lines.append("<b>🧭 Macro Drivers</b>")
+        lines.append("  " + " | ".join(macro_parts))
+        lines.append("")
+
+    if fii_flow:
+        pred = str(fii_flow.get("prediction", "UNKNOWN") or "UNKNOWN")
+        avg_fii = float(fii_flow.get("avg_fii_5d", 0) or 0)
+        avg_dii = float(fii_flow.get("avg_dii_5d", 0) or 0)
+        note = str(fii_flow.get("note", "") or "")
+        lines.append("<b>💸 FII/DII Rolling Bias (5d)</b>")
+        lines.append(f"  Signal: <b>{pred}</b> | FII ₹{avg_fii:,.0f}Cr | DII ₹{avg_dii:,.0f}Cr")
+        if note:
+            lines.append(f"  <i>{note}</i>")
+
+    return "\n".join(lines)
+
+
+def format_phase4_ml_msg(phase4: Dict) -> Optional[str]:
+    """Format Phase 4 ML-style prediction output for Telegram."""
+    if not phase4:
+        return None
+
+    picks = phase4.get("top_stocks") or []
+    sector_pred = phase4.get("sector_prediction") or {}
+    if not picks and not sector_pred:
+        return None
+
+    now_str = datetime.now().strftime("%d %b %Y  %I:%M %p")
+    lines = [
+        f"<b>🤖 Phase 4 ML Prediction — {now_str}</b>",
+        "<i>Next-session score model and sector outlook</i>",
+        "",
+    ]
+
+    if picks:
+        lines.append("<b>📌 Tomorrow Positive Signals (Top 5)</b>")
+        headers = ["Sym", "Score", "5d%", "Volx", "52W Pos"]
+        rows = []
+        for p in picks[:5]:
+            sym = str(p.get("symbol", "") or "")
+            if not sym:
+                continue
+            near_h = p.get("near_52h")
+            near_l = p.get("near_52l")
+            pos_str = "Mid"
+            if isinstance(near_h, (int, float)):
+                pos_str = f"NearH {near_h:.1f}%"
+            elif isinstance(near_l, (int, float)):
+                pos_str = f"NearL {near_l:.1f}%"
+
+            rows.append([
+                sym,
+                f"{float(p.get('score', 0) or 0):.1f}",
+                _pct(float(p.get("five_day_return", 0) or 0)),
+                f"{float(p.get('volume_ratio', 0) or 0):.2f}",
+                pos_str,
+            ])
+
+        if rows:
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=["left", "right", "right", "right", "left"]))
+            lines.append("</pre>")
+            lines.append("  <i>Model: 0.3*5d_return + 0.2*volume_ratio + 0.3*52W_position + 0.2*FII_net</i>")
+            lines.append("")
+
+    if sector_pred:
+        outlook = str(sector_pred.get("outlook", "NEUTRAL") or "NEUTRAL")
+        score = float(sector_pred.get("score", 0) or 0)
+        gavg = float(sector_pred.get("global_avg_pct", 0) or 0)
+        fg_score = float(sector_pred.get("fear_greed_score", 50) or 50)
+        fii_net = float(sector_pred.get("fii_net", 0) or 0)
+
+        lines.append("<b>🏭 Sector Prediction</b>")
+        lines.append(f"  Outlook: <b>{outlook}</b> | Composite: {score:+.2f}")
+        lines.append(f"  Drivers: Global avg {_pct(gavg)} | Fear&Greed {fg_score:.1f} | FII ₹{fii_net:,.0f}Cr")
+
+        leaders = sector_pred.get("likely_leaders") or []
+        if leaders:
+            lead_txt = ", ".join(
+                f"{x.get('sector','')} ({x.get('model_score', 0):+.1f})"
+                for x in leaders[:3]
+                if x.get("sector")
+            )
+            if lead_txt:
+                lines.append(f"  🟢 Likely leaders: {lead_txt}")
+
+        laggards = sector_pred.get("likely_laggards") or []
+        if laggards:
+            lag_txt = ", ".join(
+                f"{x.get('sector','')} ({x.get('model_score', 0):+.1f})"
+                for x in laggards[:3]
+                if x.get("sector")
+            )
+            if lag_txt:
+                lines.append(f"  🔴 Likely laggards: {lag_txt}")
+
+        data_note = sector_pred.get("data_note", "")
+        if data_note:
+            lines.append(f"  <i>⚠️ {data_note}</i>")
+
+    # ── Accuracy & Portfolio P&L (rolling 5-session) ────────────────────
+    accuracy = phase4.get("accuracy") or {}
+    hit_rate = accuracy.get("rolling_hit_rate")
+    sessions = accuracy.get("sessions_tracked", 0)
+    if hit_rate is not None and sessions > 0:
+        hits   = accuracy.get("hits", 0)
+        misses = accuracy.get("misses", 0)
+        filled = round(hit_rate / 10)
+        bar = "🟩" * filled + "⬜" * (10 - filled)
+        lines.append("")
+        lines.append(f"<b>📈 Model Accuracy — {sessions}d rolling</b>")
+        lines.append(f"  Hit rate: <b>{hit_rate:.1f}%</b>  [{bar}]")
+        lines.append(f"  ✅ {hits} correct  ❌ {misses} wrong  (neutral ±0.5% excluded)")
+
+        # Mini P&L table: last 8 actionable picks
+        results = accuracy.get("session_results") or []
+        actionable = [r for r in results if r.get("hit") is not None][-8:]
+        if actionable:
+            lines.append("  <i>Recent picks P&L:</i>")
+            for r in actionable:
+                sym   = r.get("symbol", "")
+                pct   = r.get("pct_chg", 0)
+                icon  = "✅" if r.get("hit") else "❌"
+                ep    = r.get("entry_price", 0)
+                cp    = r.get("current_price", 0)
+                lines.append(
+                    f"  {icon} {sym}  ₹{ep:,.1f}→₹{cp:,.1f}  <b>{pct:+.2f}%</b>"
+                )
+
+    return "\n".join(lines)
+
+
+def format_weekend_global_msg(snapshot: Dict) -> Optional[str]:
+    """Format global cues for Sunday evening → Monday open preview.
+
+    Only uses data already present in the snapshot (global_indices +
+    global_sentiment).  No NSE market data needed — markets are closed.
+    """
+    gidx = snapshot.get("global_indices") or {}
+    gs   = snapshot.get("global_sentiment") or {}
+    fg   = gs.get("fear_greed") or {}
+    macro = gs.get("macro") or {}
+
+    if not gidx and not fg:
+        return None
+
+    now_str = datetime.now().strftime("%d %b %Y  %I:%M %p")
+    lines = [
+        f"<b>🌍 Weekend Global Cues — {now_str}</b>",
+        "<i>Monday morning market preview (NSE opens 09:15 IST)</i>",
+        "",
+    ]
+
+    # Global equity table
+    if gidx:
+        lines.append("<b>📊 Global Equity (Friday close)</b>")
+        for name, data in gidx.items():
+            pct  = float(data.get("pct", 0) or 0)
+            last = float(data.get("last", 0) or 0)
+            icon = "🟢" if pct >= 0 else "🔴"
+            lines.append(f"  {icon} {name:<14} {last:>10,.2f}  ({pct:+.2f}%)")
+        lines.append("")
+
+    # Fear & Greed
+    fg_score = None
+    if fg.get("score") is not None:
+        fg_score = float(fg["score"])
+        rating   = fg.get("rating", "")
+        filled   = round(fg_score / 10)
+        bar      = "🟩" * filled + "⬜" * (10 - filled)
+        lines.append(f"<b>😨 Fear & Greed:</b>  {fg_score:.0f}/100 — <b>{rating}</b>")
+        lines.append(f"  [{bar}]")
+        lines.append("")
+
+    # Macro drivers
+    dxy   = macro.get("DXY") or {}
+    brent = macro.get("BRENT") or {}
+    if dxy or brent:
+        lines.append("<b>🔍 Macro Drivers</b>")
+        if dxy:
+            d_pct = float(dxy.get("pct", 0) or 0)
+            icon  = "🔺" if d_pct > 0 else "🔻"
+            lines.append(f"  {icon} DXY (US Dollar Index):  {dxy.get('last', 0):.3f}  ({d_pct:+.2f}%)")
+        if brent:
+            b_pct = float(brent.get("pct", 0) or 0)
+            icon  = "🔺" if b_pct > 0 else "🔻"
+            lines.append(f"  {icon} Brent Crude:           ${brent.get('last', 0):.2f}  ({b_pct:+.2f}%)")
+        lines.append("")
+
+    # Composite outlook
+    g_pcts     = [float(d.get("pct", 0) or 0) for d in gidx.values()]
+    global_avg = sum(g_pcts) / len(g_pcts) if g_pcts else 0.0
+    dxy_pct    = float(dxy.get("pct", 0) or 0) if dxy else 0.0
+
+    if global_avg >= 0.4 and (fg_score or 50) >= 40 and dxy_pct <= 0.3:
+        outlook = "🟢 Positive open expected"
+        note    = "Global rally + neutral-to-greedy sentiment; watch FII flows at 09:00"
+    elif global_avg <= -0.5 or (fg_score is not None and fg_score < 25):
+        outlook = "🔴 Cautious open expected"
+        note    = "Global weakness or extreme fear; avoid aggressive longs until 09:30"
+    elif dxy_pct >= 0.5:
+        outlook = "⚠️ Mixed — strong Dollar headwind"
+        note    = "Rising DXY pressures EM inflows; FII selling likely; wait for direction"
+    else:
+        outlook = "⚪ Range-bound open likely"
+        note    = "No strong cues; wait for FII data and Nifty futures gap direction"
+
+    lines.append(f"<b>📋 Monday Outlook:</b>  {outlook}")
+    lines.append(f"  <i>{note}</i>")
+
+    return "\n".join(lines)
 
 
 def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optional[str]:
@@ -1503,6 +1958,33 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
         lines.append("<i>These are global futures proxies used as MCX sentiment drivers</i>")
         lines.append("")
 
+    # Phase 3 macro expansion: DXY + Brent alongside USD/INR
+    gs = snapshot.get("global_sentiment") or {}
+    macro = gs.get("macro") or {}
+    dxy = (macro.get("DXY") or {})
+    brent = (macro.get("BRENT") or {})
+    if dxy or brent:
+        lines.append("<b>🧭 Macro Watch</b>")
+        headers = ["Metric", "Last", "%Chg"]
+        rows = []
+        if dxy:
+            rows.append([
+                "DXY",
+                f"{float(dxy.get('last', 0) or 0):,.2f}",
+                _pct(float(dxy.get('pct', 0) or 0)),
+            ])
+        if brent:
+            rows.append([
+                "Brent",
+                f"${float(brent.get('last', 0) or 0):,.2f}",
+                _pct(float(brent.get('pct', 0) or 0)),
+            ])
+        if rows:
+            lines.append("<pre>")
+            lines.append(_make_table(headers, rows, align=['left', 'right', 'right']))
+            lines.append("</pre>")
+            lines.append("")
+
     # Forex — only at pre-market & 9 PM
     forex = snapshot.get("forex")
     if forex and show_extras:
@@ -1626,11 +2108,23 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     except Exception:
                         pass
 
+                # For symbols shown in this message, backfill missing FY totals from internet.
+                # Local snapshot data remains the source of truth when available.
+                preview_divs = sorted(dividends, key=lambda x: _parse_date(x.get('ex_date','')) or today)
+                fallback_symbols = [
+                    d.get("symbol", "") for d in preview_divs[:10] if d.get("symbol", "")
+                ]
+                if fallback_symbols:
+                    try:
+                        annual_totals = _fill_missing_annual_totals_online(fallback_symbols, annual_totals)
+                    except Exception:
+                        pass
+
                 lines.append("<b>💰 Upcoming Dividends:</b>")
                 lines.append("<i>Yield = this div \u00f7 LTP | Ann.Yield = prior-year total \u00f7 LTP</i>")
                 lines.append("")
                 shown = 0
-                for a in sorted(dividends, key=lambda x: _parse_date(x.get('ex_date','')) or today):
+                for a in preview_divs:
                     sym      = a.get('symbol', '')
                     subject  = a.get('subject', '')
                     ex_date  = a.get('ex_date', '')
@@ -1944,6 +2438,53 @@ def format_preopen_msg(snapshot: Dict) -> str:
         return "<b>🌅 Pre-Open Market</b>\n\nPre-open data not available"
 
     lines = ["<b>🌅 Pre-Open Market Analysis</b>", ""]
+
+    # India VIX context for pre-market risk framing
+    vix = (snapshot.get("indices") or {}).get("INDIA VIX", {})
+    if vix:
+        try:
+            vix_last = float(vix.get("last", 0) or 0)
+            vix_pct = float(vix.get("pct", 0) or 0)
+        except (TypeError, ValueError):
+            vix_last, vix_pct = 0.0, 0.0
+        if vix_last > 0:
+            if vix_last >= 24:
+                risk = "High Fear"
+            elif vix_last >= 18:
+                risk = "Elevated"
+            elif vix_last >= 13:
+                risk = "Normal"
+            else:
+                risk = "Calm"
+            lines.append(f"<b>😶 India VIX:</b> {vix_last:.2f} ({_pct(vix_pct)}) • {risk}")
+            lines.append("")
+
+    # Global cues before Indian market open
+    gidx = snapshot.get("global_indices") or {}
+    if gidx:
+        parts = []
+        for name in ("S&P 500", "NASDAQ", "DOW", "NIKKEI", "HANG SENG", "FTSE"):
+            d = gidx.get(name)
+            if not d:
+                continue
+            parts.append(f"{name}:{_pct(float(d.get('pct', 0) or 0))}")
+        if parts:
+            lines.append("<b>🌍 Global Cues:</b>")
+            lines.append("  " + " | ".join(parts[:4]))
+            if len(parts) > 4:
+                lines.append("  " + " | ".join(parts[4:]))
+            lines.append("")
+
+    fg = ((snapshot.get("global_sentiment") or {}).get("fear_greed") or {})
+    if fg:
+        try:
+            score = float(fg.get("score", 0) or 0)
+        except (TypeError, ValueError):
+            score = 0.0
+        rating = str(fg.get("rating", "") or "").title()
+        lines.append(f"<b>😶‍🌫️ Fear & Greed:</b> {score:.1f}/100 ({rating})")
+        lines.append("")
+
     lines.append(f"Advances: 🟢 {po.get('advances', 0)} | Declines: 🔴 {po.get('declines', 0)}")
     lines.append("")
 

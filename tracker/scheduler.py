@@ -2,7 +2,7 @@
 Scheduler - Smart Market Hours Scheduling
 ==========================================
 
-8 notification slots with context-appropriate data per time:
+8 weekday notification slots with context-appropriate data per time:
 
 09:00 → Pre-open analysis (market preview)
 09:08 → Pre-open final snapshot (IEP settled)
@@ -12,6 +12,9 @@ Scheduler - Smart Market Hours Scheduling
 15:35 → Market close (full snapshot + day delta)
 18:00 → Post-market (FII/DII final + corporate actions)
 21:00 → Evening digest (full summary + insider trading)
+
+1 weekend slot:
+Sun 21:00 → Weekend global cues (Yahoo + CNN only) — Monday preview
 
 NOTE: All times are IST. GitHub Actions must set TZ=Asia/Kolkata.
 """
@@ -180,16 +183,23 @@ def _run_job_safe(run_fn: Callable, cfg: dict, label: str, on_complete: Optional
             on_complete()
 
 
-def setup_schedule(run_fn: Callable, slots: Optional[list] = None, completion_tracker: Optional[dict] = None) -> List[str]:
+def setup_schedule(
+    run_fn: Callable,
+    slots: Optional[list] = None,
+    completion_tracker: Optional[dict] = None,
+    weekend_fn: Optional[Callable] = None,
+) -> List[str]:
     """
     Set up scheduled jobs.
 
     Args:
-        run_fn: Function to call for each slot (accepts keyword args).
-        slots:  List of time strings to schedule (e.g. ["09:00","09:30"]).
-                If None, schedules ALL slots in NOTIFICATION_TIMES.
-        completion_tracker: Dict with 'completed' and 'jobs_to_track' keys for tracking.
-    
+        run_fn:             Weekday run function (accepts keyword args).
+        slots:              List of time strings to schedule (e.g. ["09:00","09:30"]).
+                            If None, schedules ALL slots in NOTIFICATION_TIMES.
+        completion_tracker: Dict with 'completed' and 'jobs_to_track' keys.
+        weekend_fn:         Optional callable for the Sunday 21:00 global report.
+                            Signature: weekend_fn() -> None.
+
     Returns:
         List of time strings that were scheduled.
     """
@@ -213,21 +223,41 @@ def setup_schedule(run_fn: Callable, slots: Optional[list] = None, completion_tr
             return job
 
         schedule.every().day.at(time_str).do(make_job())
-        logger.info(f"  📌 Scheduled: {label} at {time_str} IST")
+        logger.info(f"  📌 Scheduled: {label} at {time_str} IST (weekdays)")
 
-    logger.info(f"Total slots: {len(times_to_schedule)}")
+    # Weekend global report: Sunday 21:00 IST — no NSE calls, just Yahoo+CNN
+    if weekend_fn is not None:
+        def _sunday_report():
+            if _now_ist().weekday() == 6:  # Sunday only
+                logger.info("▶ Weekend global report at 21:00 IST")
+                try:
+                    weekend_fn()
+                except Exception as e:
+                    logger.error(f"✖ Weekend report failed: {e}")
+            # Saturday: skip silently (weekday check already handled above)
+
+        schedule.every().day.at("21:00").do(_sunday_report)
+        logger.info("  📌 Scheduled: Weekend Global Report at 21:00 IST (Sunday only)")
+
+    logger.info(f"Total weekday slots: {len(times_to_schedule)}")
     return list(times_to_schedule)
 
 
-def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
-             run_fn: Optional[Callable] = None, slots: Optional[List[str]] = None):
+def run_loop(
+    run_for_minutes: int = 0,
+    run_immediately: bool = False,
+    run_fn: Optional[Callable] = None,
+    slots: Optional[List[str]] = None,
+    weekend_fn: Optional[Callable] = None,
+):
     """Run the scheduler loop with proper timeout and late-start handling.
 
     Args:
         run_for_minutes: Exit after this many minutes (0 = run forever).
         run_immediately: If True, run ALL missed slots NOW before waiting.
-        run_fn:          The run function to execute for each slot.
+        run_fn:          The weekday run function to execute for each slot.
         slots:           List of slot times to schedule (if None, schedules all).
+        weekend_fn:      Optional callable for Sunday 21:00 global report.
     """
     if run_fn is None:
         logger.error("❌ run_fn is required for scheduler")
@@ -242,7 +272,12 @@ def run_loop(run_for_minutes: int = 0, run_immediately: bool = False,
     }
     
     # Set up scheduled jobs with completion tracking
-    scheduled_slots = setup_schedule(run_fn, slots=slots, completion_tracker=completion_tracker)
+    scheduled_slots = setup_schedule(
+        run_fn,
+        slots=slots,
+        completion_tracker=completion_tracker,
+        weekend_fn=weekend_fn,
+    )
     total_jobs = len(scheduled_slots)
     jobs_to_track.update(scheduled_slots)
     
