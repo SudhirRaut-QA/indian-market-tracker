@@ -9,12 +9,13 @@
 
 1. [Market Participants](#1--market-participants)
 2. [Key Indices](#2--key-indices)
-3. [Market Health Signals](#3--market-health-signals)
-4. [Trading Terms](#4--trading-terms)
-5. [Pivot & Support/Resistance Levels](#5--pivot--supportresistance-levels)
-6. [Options Terms](#6--options-terms)
-7. [Message Labels Explained](#7--message-labels-decoded)
-8. [Frequently Asked Questions](#8--faq)
+3. [Global Market Intelligence](#3--global-market-intelligence)
+4. [Market Health Signals](#4--market-health-signals)
+5. [Trading Terms](#5--trading-terms)
+6. [Pivot & Support/Resistance Levels](#6--pivot--supportresistance-levels)
+7. [Options Terms](#7--options-terms)
+8. [Message Labels Explained](#8--message-labels-decoded)
+9. [Frequently Asked Questions](#9--faq)
 
 ---
 
@@ -101,7 +102,123 @@ Top 12 banking stocks. Banks are very important — their health reflects the wh
 
 ---
 
-## 3. 📊 Market Health Signals
+## 4. 🌐 Global Market Intelligence
+
+### Why Global Indices Matter for Indian Markets
+India's markets don't exist in isolation. When the US market crashes overnight, Indian markets often open weak. When global sentiment is positive, FII money flows into India.
+
+> 💡 The bot collects global data at every 18:00 and 21:00 IST slot (US market opens 19:30 IST), and every Sunday for the Weekend Global Report.
+
+### Global Indices You'll See
+
+| Index | Country | What It Tracks |
+|-------|---------|---------------|
+| **S&P 500** | 🇺🇸 USA | 500 largest US companies — the global benchmark |
+| **NASDAQ** | 🇺🇸 USA | US tech stocks (Apple, Google, Microsoft, Nvidia) |
+| **Dow Jones (DJIA)** | 🇺🇸 USA | 30 iconic US companies — oldest major index |
+| **Nikkei 225** | 🇯🇵 Japan | Japan's top 225 companies — key Asia signal |
+| **Hang Seng** | 🇭🇰 Hong Kong | Hong Kong blue chips — China proxy |
+| **FTSE 100** | 🇬🇧 UK | UK's 100 largest companies — European signal |
+
+```
+🌐 Global Cues (21:00 IST snapshot):
+S&P 500:  +0.8%  📈    NASDAQ: +1.2%  📈    Nikkei:  -0.3%  📉
+Hang Seng: -0.6% 📉   FTSE:   +0.4%  📈
+
+🌎 Global Avg: +0.3% → Mildly positive Monday open expected
+```
+
+---
+
+### DXY — US Dollar Index
+**What it is:** Measures the US Dollar against a basket of 6 major currencies (Euro, Yen, Pound, etc.).
+
+**Why it matters for India:**
+- **DXY Rising** → Dollar strengthening → Rupee weakens → FII outflows from India (they get less USD when they sell INR assets)
+- **DXY Falling** → Dollar weakening → Rupee strengthens → FII inflows often increase
+
+| DXY Move | INR Impact | Indian Market Impact |
+|----------|-----------|---------------------|
+| DXY +1%+ | INR falls | IT stocks benefit (export earnings), FII may reduce |
+| DXY -1%+ | INR rises | Import-heavy sectors benefit, FII inflows |
+
+---
+
+### Fear & Greed Index — The US Mood Meter
+**Source:** CNN Business  
+**Range:** 0 (Extreme Fear) to 100 (Extreme Greed)
+
+**Simple analogy:** It's a thermometer measuring how nervous or confident US investors feel right now.
+
+| Score | Label | What It Means for India |
+|-------|-------|--------------------------|
+| 0–24 | 🟥 Extreme Fear | Global risk-off — FII sells everything including India |
+| 25–44 | 🔴 Fear | Caution globally, India may face outflows |
+| 45–54 | ⚪ Neutral | Mixed signals, watch domestic cues |
+| 55–74 | 🟢 Greed | Risk appetite up — FII likely buying EM assets |
+| 75–100 | 🟢 Extreme Greed | Euphoria — contrarian caution, markets may be extended |
+
+```
+😱 Fear & Greed: 68 (Greed) 🟢
+█████████████░░░░░░░  68/100
+→ Positive global sentiment — FII flows supportive
+```
+
+---
+
+### MCX — Multi Commodity Exchange
+**What it is:** India's commodity futures exchange. Gold, Silver, Crude Oil, Natural Gas are traded here.
+
+**Why it matters:**
+- **Gold rising** → Safe-haven demand → Risk-off sentiment globally
+- **Crude rising** → Inflation pressure → RBI may hold rates; import bill increases for India
+- **Natural Gas** → Power sector cost signal
+
+The bot tracks global commodity futures (via Yahoo Finance) as drivers for MCX and related Indian stocks:
+
+| Commodity | Symbol | Indian Stocks Affected |
+|-----------|--------|------------------------|
+| Gold | GC=F | TATAGOLD, GOLDBEES, Titan, Kalyan |
+| Silver | SI=F | TATSILV, Hindustan Zinc |
+| Crude Oil | CL=F | ONGC, Reliance, BPCL, IOC |
+| Natural Gas | NG=F | GAIL, IGL, MGL |
+| Brent Crude | BZ=F | Same as Crude + refining margin |
+
+---
+
+### Phase 4 — Signal Intelligence
+**What it is:** The bot's most advanced layer. It combines FII flows (Phase 1), corporate events (Phase 2), and global cues (Phase 3) to **predict which sectors are likely to outperform tomorrow** and picks the top 3 stocks.
+
+```
+🎯 Phase 4 Signal Intelligence:
+Top Sectors:  IT (score 78)  •  PHARMA (score 65)  •  FMCG (score 61)
+Top Picks:    INFY | Entry ₹1,820 | Score 82 | 5d proj: +2.1%
+              SUNPHARMA | Entry ₹1,240 | Score 74 | 5d proj: +1.6%
+
+Accuracy (last 5 sessions): 🟩🟩⬜🟩⬜  60% hit rate (3H / 2M)
+```
+
+**Accuracy bar explained:**
+- 🟩 = Hit (stock gained ≥0.5% from entry within the window)
+- ⬜ = Miss (stock fell ≤0.5%) or Neutral (excluded from rate)
+
+---
+
+### Bulk Deals & Block Deals
+**Bulk Deal:** A single trade of >0.5% of a company's total shares in one day. Reported to NSE end-of-day.
+
+**Block Deal:** A large pre-negotiated trade (minimum ₹10 Cr) executed in a special 15-minute window at market open (8:45–9:00 AM).
+
+**Why it matters:**
+- Institution buying in bulk = smart money accumulating
+- Promoter selling in bulk = watch out (they may know something)
+
+```
+📦 Bulk Deal: HDFC AMC | BOUGHT 1.2% stake | ₹2,450 avg price
+            Buyer: ABC Mutual Fund → Institutional accumulation signal
+```
+
+---
 
 ### Market Breadth — How Wide Is the Rally?
 **What it is:** Count of stocks that went UP vs DOWN today.
@@ -151,7 +268,7 @@ Like comparing a photo of your room in the morning vs evening — the "delta" is
 
 ---
 
-## 4. 🎯 Trading Terms
+## 5. 🎯 Trading Terms
 
 ### LTP — Last Traded Price
 Simply the **most recent price** at which a stock was bought or sold.
@@ -216,7 +333,7 @@ A stock with **momentum** is moving fast in one direction with high volume — l
 
 ---
 
-## 5. 📐 Pivot & Support/Resistance Levels
+## 6. 📐 Pivot & Support/Resistance Levels
 
 ### What Are Pivots?
 **Pivot points** are price levels calculated from yesterday's High, Low, and Close. Traders all over the world use the same formulas, making these levels act as **magnets** — price tends to bounce or break at these points.
@@ -282,7 +399,7 @@ Institutional traders (big funds) use VWAP to judge if they're getting a "good" 
 
 ---
 
-## 6. 📊 Options Terms
+## 7. 📊 Options Terms
 
 ### PCR — Put-Call Ratio
 **What it is:** Number of Put options ÷ Number of Call options outstanding.
@@ -326,7 +443,7 @@ Falling OI + Rising Price → Short covering (weak, may not sustain)
 
 ---
 
-## 7. 💬 Message Labels Decoded
+## 8. 💬 Message Labels Decoded
 
 Here is how to read your Telegram messages:
 
@@ -370,7 +487,7 @@ VIX 16.2 = normal risk — standard position sizes.
 
 ---
 
-## 8. ❓ FAQ
+## 9. ❓ FAQ
 
 **Q: What does ₹Cr mean?**
 Crore Rupees. 1 Crore = 10 million = 1,00,00,000. So ₹9,977 Cr = roughly ₹100 billion — massive amounts of money.

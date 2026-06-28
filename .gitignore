@@ -32,3 +32,6 @@ Thumbs.db
 
 # Temporary probe/debug scripts
 probe_*.py
+create_mock_*.py
+show_ann_*.py
+phase_plan_extract.txt

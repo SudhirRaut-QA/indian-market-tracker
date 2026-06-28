@@ -171,23 +171,25 @@ git push -u origin main
 **From tomorrow, you'll receive Telegram messages automatically at:**
 - 09:00, 09:08, 09:15, 09:30, 11:00 IST (Morning Session)
 - 15:35, 18:00, 21:00 IST (Afternoon Session)
+- 21:00 IST **Sunday only** — Weekend Global Report (S&P, NASDAQ, Nikkei, Fear & Greed, Monday preview)
 
 ---
 
 ## 🛠️ CLI Reference Card
 
 ```
-COMMAND                                  WHAT IT DOES
-────────────────────────────────────────────────────────────────────
-python -m tracker --now                  Quick run — FII/DII + indices
-python -m tracker --now --full           Everything — all data
-python -m tracker --now --preopen        Pre-open market analysis
-python -m tracker --now --corporate      Corporate actions + insider trades
-python -m tracker --now --no-telegram    Skip Telegram (data only)
-python -m tracker --now --no-excel       Skip Excel logging
-python -m tracker --schedule             Run 8-slot daily scheduler locally
-python -m tracker --setup                Verify your .env configuration
-────────────────────────────────────────────────────────────────────
+COMMAND                                          WHAT IT DOES
+────────────────────────────────────────────────────────────────────────────
+python -m tracker --now                          Quick run — FII/DII + indices
+python -m tracker --now --full                   Everything — all data including global + Phase 4
+python -m tracker --now --preopen                Pre-open market analysis
+python -m tracker --now --corporate              Corporate actions + insider + bulk/block deals
+python -m tracker --now --no-telegram            Skip Telegram (data only)
+python -m tracker --now --no-excel               Skip Excel logging
+python -m tracker --schedule                     Run 8-slot daily + Sunday weekend scheduler
+python -m tracker --schedule --slots "15:35"     Run a specific slot only
+python -m tracker --setup                        Verify your .env configuration
+────────────────────────────────────────────────────────────────────────────
 ```
 
 ---

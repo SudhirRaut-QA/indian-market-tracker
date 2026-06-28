@@ -77,7 +77,13 @@ Think of this as a **robot news reporter** that watches the stock market all day
 | 📡 **MCX Price Drivers** | Global commodity futures — Gold, Silver, Crude Oil, Natural Gas (via Yahoo Finance spark) | Context for metal/energy stocks and MCX-linked trades |
 | 🩺 **Feed Health Monitor** | Per-source live status (🟢 ok / 🟡 no-data / 🔴 error) persisted to `feed_health.json` and shown in every corporate Telegram message | Know instantly which data is fresh vs degraded |
 | 🔍 **Insider Trading** | PIT disclosures — who's buying their own stock | Promoters buying = confidence signal |
-| 🔄 **Delta Engine** | Snapshot comparison — what changed since last check | Spot reversals and accelerations |
+| � **Bulk & Block Deals** | Large trades (>0.5% equity in one shot) by institutions | Spot smart-money accumulation or distribution |
+| 🌐 **Global Indices** | S&P 500, NASDAQ, Dow Jones, Nikkei 225, Hang Seng, FTSE 100 (via Yahoo Finance) | Pre-market global cues — see what drove overnight moves |
+| 😱 **Fear & Greed Index** | CNN composite sentiment (0=Extreme Fear, 100=Extreme Greed) | Contrarian indicator — high greed = caution, high fear = opportunity |
+| 🎯 **Phase 4 Signal Intelligence** | Multi-factor sector scoring (FII flows + global cues + sentiment) → Top 3 stock picks per session | Prioritise your watch with quantified conviction |
+| 📈 **Phase 4 Accuracy Tracker** | Rolling 5-session hit-rate with P&L table (entry→current, %) | Know if the system's picks are actually working |
+| 🌍 **Weekend Global Report** | Sunday 21:00 IST — global equity, Fear & Greed, DXY + Brent composite outlook | Monday morning edge: see what Asia and the US did over the weekend |
+| �🔄 **Delta Engine** | Snapshot comparison — what changed since last check | Spot reversals and accelerations |
 | 📑 **Excel Logger** | All data auto-saved to 7 colour-coded sheets | Your own offline analytics database |
 | ☁️ **Google Drive** | Auto-upload after every run | Cloud backup, accessible anywhere |
 
@@ -113,6 +119,11 @@ Think of this as a **robot news reporter** that watches the stock market all day
             │  ┌──────────────────────┐     │
             │  │  trading_engine.py   │     │
             │  │  (Pivot, VWAP, Bias) │     │
+            │  └──────────┬───────────┘     │
+            │             ▼                 │
+            │  ┌──────────────────────┐     │
+            │  │  signal_detector.py  │     │
+            │  │  (Phase 1-4 Signals) │     │
             │  └──────────┬───────────┘     │
             │             ▼                 │
             │  ┌──────────────────────┐     │
@@ -183,9 +194,11 @@ IST     UTC      Slot               What You Receive
 09:15   03:45    Market Open        First prints, index direction, big movers
 09:30   04:00    Early Session      FII/DII flows + sector + options PCR
 11:00   05:30    Mid-Morning        Full snapshot + delta (what changed?)
-15:35   10:05    Market Close       Day's closing snapshot + full day delta
-18:00   12:30    Post-Market        Provisional FII/DII + corporate actions
-21:00   15:30    Evening Digest     Final data + insider trading + watchlist
+15:35   10:05    Market Close       Day's closing snapshot + Phase 4 picks logged
+18:00   12:30    Post-Market        Provisional FII/DII (fresh) + corporate actions
+21:00   15:30    Evening Digest     Final data + global indices (live US session) + watchlist
+──────  ───────  ─────────────────  ─────────────────────────────────────────
+Sun     15:30    Weekend Global     S&P/NASDAQ/Nikkei/Hang Seng + Fear & Greed + Monday preview
 ──────  ───────  ─────────────────  ─────────────────────────────────────────
 ```
 
@@ -293,13 +306,27 @@ This project is **public on GitHub** — here is exactly what is and isn't safe:
 
 | Source | Data Provided |
 |--------|--------------|
-| [NSE India](https://www.nseindia.com) | FII/DII, 21 indices, 16 sectors, options chain, corporate actions, insider trading, pre-open |
+| [NSE India](https://www.nseindia.com) | FII/DII, 21 indices, 16 sectors, options chain, corporate actions, insider trading, bulk/block deals, pre-open |
+| [Yahoo Finance](https://finance.yahoo.com) (spark API) | Global indices (S&P 500, NASDAQ, Dow Jones, Nikkei 225, Hang Seng, FTSE 100), DXY Dollar Index, Brent Crude, Gold, Silver, Natural Gas futures |
+| [CNN Fear & Greed](https://production.dataviz.cnn.io/index/fearandgreed/current) | US market sentiment score (0–100) — Extreme Fear → Greed |
 | [Fawaz Currency API](https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json) | USD/INR, EUR/INR, GBP/INR, JPY/INR |
 | NSE Quote API | TATAGOLD, TATSILV, GOLDBEES, LIQUIDBEES ETF prices |
 
 ---
 
-## 🆕 Recent Enhancements (Apr 2026)
+## 🆕 Recent Enhancements (Jun 2026)
+
+### Phase 1–4 Signal Intelligence
+
+| Phase | Enhancement | Detail |
+|-------|-------------|--------|
+| **Phase 1** | FII/DII Rolling Signal | Historical profiling with daily-dedup (snapshot counting fixed), magnitude override at ±₹2,000 Cr threshold |
+| **Phase 2** | Bulk & Block Deals | Large institutional trades tracked alongside insider PIT disclosures |
+| **Phase 3** | Global Intelligence | S&P 500, NASDAQ, Dow, Nikkei, Hang Seng, FTSE via Yahoo Finance; CNN Fear & Greed; DXY + Brent macro overlay |
+| **Phase 4** | Sector Prediction & Picks | Multi-factor sector scoring → Top 3 stock picks with entry price, score, 5-day return projection |
+| **Add-on** | Accuracy Feedback Loop | `log_phase4_picks` + `compute_phase4_accuracy` — rolling hit-rate bar, P&L per pick, 5-session window |
+| **Add-on** | Weekend Global Report | Sunday 21:00 IST slot — global equity table, Fear & Greed bar, composite outlook emoji |
+| **Critical Fix** | Cache-Mode Staleness | 18:00/21:00 cache slots now always refresh FII/DII + global indices + sentiment (was silently 5 h+ stale) |
 
 ### Trader-Grade Algorithm
 
