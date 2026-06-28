@@ -44,28 +44,39 @@ def _pct(val: float) -> str:
 
 def _extract_dividend_amount(subject: str) -> float:
     """Extract dividend amount from subject string.
-    
-    Examples:
-      'Interim Dividend - Rs 10 Per Share' -> 10.0
-      'Final Dividend - Re 1.50 Per Share' -> 1.50
-      'Dividend Rs. 5.25 per share' -> 5.25
+
+    Handles NSE and BSE format variations:
+      'Interim Dividend - Rs 10 Per Share'        -> 10.0
+      'Final Dividend - Re 1.50 Per Share'         -> 1.50
+      'Dividend Rs. 5.25 per share'                -> 5.25
+      'Dividend - Rs5/- per share'                 -> 5.0
+      'Dividend - \u20b910 per share'                   -> 10.0
+      'Dividend - INR 3.50 per share'              -> 3.50
+      'Dividend @ Rs 8 per equity share'           -> 8.0
+      'Dividend 2.50 per share'                    -> 2.50 (plain number)
     """
     import re
     if not subject:
         return 0.0
-    
-    # Match patterns like "Rs 10", "Re 1.50", "Rs. 5.25"
+
+    # Ordered by specificity — most specific patterns first
     patterns = [
-        r'Rs\.?\s*(\d+(?:\.\d+)?)',  # Rs 10, Rs. 10.5
-        r'Re\.?\s*(\d+(?:\.\d+)?)',  # Re 1, Re. 1.5
+        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)\s*(?:/-)?\s*per',  # Rs 10/- per  Rs10 per
+        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)',                  # Rs 10, Re 1.50, Rs. 5.25
+        r'\u20b9\s*([\d,]+(?:\.\d+)?)',                           # \u20b910, \u20b9 5.25
+        r'INR\s*([\d,]+(?:\.\d+)?)',                             # INR 3.50
+        r'@\s*(?:Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*per',          # @ 8 per  @ Rs 8 per
+        r'([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+|equity\s+share|share)',  # 2.50 per share
     ]
-    
+
     for pattern in patterns:
         match = re.search(pattern, subject, re.IGNORECASE)
         if match:
             try:
-                return float(match.group(1))
-            except (ValueError, IndexError):
+                val = float(match.group(1).replace(',', ''))
+                if 0 < val < 100_000:   # sanity: plausible dividend per share
+                    return val
+            except (ValueError, IndexError, AttributeError):
                 continue
     return 0.0
 
@@ -137,19 +148,41 @@ def _yield_indicator(yield_pct: float) -> str:
 
 
 def _build_annual_dividend_totals(data_dir: str) -> dict:
-    """Read stored snapshots to sum all dividends per symbol with ex_date in current year.
-    Returns {symbol: total_annual_div_Rs} — zero extra API calls.
+    """Scan ALL stored snapshots to sum dividends per symbol, grouped by ex_date year.
+
+    Priority:
+      1. Previous calendar year (e.g. 2025) — complete, reliable for annual yield.
+      2. Current year YTD fallback when no prior-year data exists yet.
+
+    Returns {symbol: {"total": float, "label": str}} — zero extra API calls.
+    Deduplication is by (symbol, ex_date) so each payout is counted once.
     """
     import json as _json
     from pathlib import Path as _Path
-    year = datetime.now().year
-    snap_dir = _Path(data_dir) / "snapshots"
+
+    def _parse_ex_year(date_str: str):
+        """Return the 4-digit year from an ex_date string, or None."""
+        if not date_str:
+            return None
+        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
+            try:
+                return datetime.strptime(date_str.strip(), fmt).year
+            except (ValueError, TypeError):
+                continue
+        return None
+
+    today     = datetime.now()
+    prev_year = today.year - 1
+    curr_year = today.year
+    snap_dir  = _Path(data_dir) / "snapshots"
     if not snap_dir.exists():
         return {}
+
     seen: set = set()
-    totals: dict = {}
-    # Only process snapshots from the current year (filename snapshot_YYYY...)
-    for sf in snap_dir.glob(f"snapshot_{year}*.json"):
+    # year_buckets[year][symbol] = cumulative_div
+    year_buckets: dict = {prev_year: {}, curr_year: {}}
+
+    for sf in snap_dir.glob("snapshot_*.json"):
         try:
             data = _json.loads(sf.read_text(encoding="utf-8"))
             for a in data.get("corporate_actions") or []:
@@ -163,12 +196,27 @@ def _build_annual_dividend_totals(data_dir: str) -> dict:
                 if key in seen:
                     continue
                 seen.add(key)
+                ex_year = _parse_ex_year(ex_date)
+                if ex_year not in year_buckets:
+                    continue
                 div = _extract_dividend_amount(a.get("subject", ""))
                 if div > 0:
-                    totals[sym] = totals.get(sym, 0.0) + div
+                    bucket = year_buckets[ex_year]
+                    bucket[sym] = bucket.get(sym, 0.0) + div
         except Exception:
             continue
-    return totals
+
+    prev_data = year_buckets[prev_year]
+    curr_data = year_buckets[curr_year]
+
+    if prev_data:
+        # Previous year is complete — preferred for annual yield
+        return {sym: {"total": total, "label": f"FY{prev_year}"}
+                for sym, total in prev_data.items()}
+    else:
+        # No previous year data yet — show current year YTD
+        return {sym: {"total": total, "label": f"{curr_year} YTD"}
+                for sym, total in curr_data.items()}
 
 
 def _emoji_pct(val: float) -> str:
@@ -1579,7 +1627,7 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                         pass
 
                 lines.append("<b>💰 Upcoming Dividends:</b>")
-                lines.append("<i>Yield = this div / LTP | Ann.Yield = total 2026 divs / LTP</i>")
+                lines.append("<i>Yield = this div \u00f7 LTP | Ann.Yield = prior-year total \u00f7 LTP</i>")
                 lines.append("")
                 shown = 0
                 for a in sorted(dividends, key=lambda x: _parse_date(x.get('ex_date','')) or today):
@@ -1600,7 +1648,15 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     yield_pct = round(div_amt / ltp_val * 100, 2) if (ltp_val > 0 and div_amt > 0) else 0.0
 
                     # Annual dividend for this symbol (from stored snapshots)
-                    annual_div   = annual_totals.get(sym, 0)
+                    annual_div   = 0.0
+                    annual_label = ""
+                    ann_raw      = annual_totals.get(sym)
+                    if isinstance(ann_raw, dict):
+                        annual_div   = float(ann_raw.get("total", 0) or 0)
+                        annual_label = ann_raw.get("label", "Annual")
+                    elif ann_raw:
+                        annual_div   = float(ann_raw)
+                        annual_label = "Annual"
                     annual_yield = round(annual_div / ltp_val * 100, 2) if (ltp_val > 0 and annual_div > 0) else 0.0
 
                     # "Per ₹1000 invested" metric — intuitive for retail investors
@@ -1616,10 +1672,11 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     ltp_str      = f"₹{ltp_val:,.2f}" if ltp_val else None
                     pe_str       = f"PE:{pe_val:.1f}" if pe_val > 0 else None
                     div_str      = f"₹{div_amt:.2f}" if div_amt else None
-                    yield_str    = f"{yield_pct:.2f}%" if yield_pct else None
-                    yind         = _yield_indicator(yield_pct) if yield_pct else ""
+                    # Yield: show N/A when div is known but LTP is missing (can't calculate)
+                    yield_str    = f"{yield_pct:.2f}%" if yield_pct > 0 else ("N/A" if (div_amt > 0 and ltp_val == 0) else None)
+                    yind         = _yield_indicator(yield_pct) if yield_pct > 0 else ""
                     per1k_str    = f"₹{per_1000:.2f}/₹1k" if per_1000 else None
-                    # Annual: show whenever historical total exists for this year
+                    # Annual: show whenever historical total exists (prev year preferred)
                     annual_str   = f"₹{annual_div:.2f}" if annual_div > 0 else None
                     ann_yld_str  = f"{annual_yield:.2f}%" if annual_yield else None
 
@@ -1632,21 +1689,22 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                         line1_parts.append(pe_str)
                     lines.append(" | ".join(line1_parts))
 
-                    # Line 2: dividend amount, yield, per-1000 metric
+                    # Line 2: dividend amount, yield (or N/A if no LTP), per-1000 metric
                     line2_parts = []
                     if div_str:
                         line2_parts.append(f"{div_type}: <b>{div_str}</b>")
                     if yield_str:
-                        line2_parts.append(f"Yield: <b>{yield_str}{yind}</b>")
+                        yield_display = f"Yield: <b>{yield_str}{yind}</b>" if yield_str != "N/A" else "Yield: <i>N/A (no LTP)</i>"
+                        line2_parts.append(yield_display)
                     if per1k_str:
                         line2_parts.append(per1k_str)
                     if line2_parts:
                         lines.append("  " + " | ".join(line2_parts))
 
-                    # Line 3: annual total (only when > this single dividend)
+                    # Line 3: annual total labelled with year (e.g. FY2025 or 2026 YTD)
                     line3_parts = []
-                    if annual_str:
-                        line3_parts.append(f"2026 Annual: ₹{annual_div:.2f}")
+                    if annual_str and annual_label:
+                        line3_parts.append(f"{annual_label}: ₹{annual_div:.2f}")
                     if ann_yld_str:
                         line3_parts.append(f"Ann.Yield: {ann_yld_str}")
                     if line3_parts:
