@@ -73,7 +73,9 @@ Think of this as a **robot news reporter** that watches the stock market all day
 | 🤖 **Self-Tuning Algo** | EOD review auto-adjusts confidence floor, sector blacklist | Gets smarter every trading day |
 | 🥇 **Commodities** | Gold & Silver ETF prices (TATAGOLD, TATSILV) | Hedge signals and inflation gauge |
 | 💱 **Forex** | USD/INR, EUR/INR, GBP/INR, JPY/INR | Impact on IT, pharma, export stocks |
-| 📋 **Corporate Actions** | Dividends, splits, rights issues, bonuses | Never miss an important date |
+| 📋 **Corporate Actions** | Multi-source: NSE + BSE + NSE Board Meetings + NSE Announcements; Dividends with yield% & annual totals, splits, rights, bonuses | Never miss an important date — 90+ upcoming events per run |
+| 📡 **MCX Price Drivers** | Global commodity futures — Gold, Silver, Crude Oil, Natural Gas (via Yahoo Finance spark) | Context for metal/energy stocks and MCX-linked trades |
+| 🩺 **Feed Health Monitor** | Per-source live status (🟢 ok / 🟡 no-data / 🔴 error) persisted to `feed_health.json` and shown in every corporate Telegram message | Know instantly which data is fresh vs degraded |
 | 🔍 **Insider Trading** | PIT disclosures — who's buying their own stock | Promoters buying = confidence signal |
 | 🔄 **Delta Engine** | Snapshot comparison — what changed since last check | Spot reversals and accelerations |
 | 📑 **Excel Logger** | All data auto-saved to 7 colour-coded sheets | Your own offline analytics database |
@@ -103,7 +105,9 @@ Think of this as a **robot news reporter** that watches the stock market all day
             │         tracker/              │
             │  ┌──────────────────────┐     │
             │  │  nse_scraper.py      │◄────┼─── NSE India API
-            │  │  (Live market data)  │     │    Forex API
+            │  │  (Live market data)  │◄────┼─── BSE India API (TLS)
+            │  │                      │◄────┼─── Yahoo Finance (MCX drivers)
+            │  │                      │◄────┼─── Forex API
             │  └──────────┬───────────┘     │
             │             ▼                 │
             │  ┌──────────────────────┐     │
@@ -160,7 +164,8 @@ python -m tracker --schedule
 python -m tracker --now                            Quick fetch (FII + indices)
 python -m tracker --now --full                     Full run (all data)
 python -m tracker --now --preopen                  Pre-open market analysis
-python -m tracker --now --corporate                Corporate actions + insider
+python -m tracker --now --corporate                Corporate actions (fast — skips indices)
+python -m tracker --now --corporate --full         Corporate + full market data
 python -m tracker --now --no-telegram --no-excel   Data only (JSON snapshot)
 python -m tracker --schedule                       8-slot daily scheduler
 python -m tracker --setup                          Verify configuration
@@ -243,6 +248,10 @@ indian-market-tracker/
 │
 ├── 📂 data/                       Auto-generated runtime data
 │   ├── excel/market_tracker.xlsx  Excel workbook (all history)
+│   ├── excel/upcoming_dividends_latest.xlsx  Dividend tracker with yield & PE
+│   ├── excel/rebuild_upcoming_dividends.py   Rebuild dividend Excel from NSE
+│   ├── excel/DIVIDEND_WORKFLOW.md            One-click dividend workflow docs
+│   ├── feed_health.json           Per-source feed status (updated every run)
 │   └── snapshots/                 JSON snapshots for delta comparison
 │
 ├── .env                           🔒 GITIGNORED — your secrets go here

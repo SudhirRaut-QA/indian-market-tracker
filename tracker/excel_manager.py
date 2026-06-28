@@ -653,29 +653,34 @@ class ExcelManager:
             return
 
         headers = [
-            "Log Date", "Type", "Symbol", "Company", "Subject",
+            "Log Date", "Source", "Type", "Symbol", "Company", "Subject",
             "Ex-Date", "Record Date", "BC Start", "BC End",
             "LTP", "% Change", "PE", "Div Amount", "Div Yield %",
             "52W High", "52W Low",
         ]
         ws = self._get_or_create_sheet(wb, name, headers)
 
-        # Build set of existing (symbol, subject) for dedup
+        # Dedup by (symbol, ex_date, subject-prefix) — allows same company
+        # to appear for different quarters/ex-dates
         existing: Set[Tuple] = set()
         for r in range(2, ws.max_row + 1):
             key = (
-                ws.cell(row=r, column=3).value,   # Symbol
-                ws.cell(row=r, column=5).value,    # Subject
+                ws.cell(row=r, column=4).value,   # Symbol (col shifted +1)
+                ws.cell(row=r, column=7).value,   # Ex-Date
+                (ws.cell(row=r, column=6).value or "")[:30].lower(),  # Subject prefix
             )
             existing.add(key)
 
         for a in actions:
-            key = (a["symbol"], a["subject"])
+            symbol = a.get("symbol", "")
+            subject = a.get("subject", "")
+            ex_date = a.get("ex_date", "")
+            key = (symbol, ex_date, subject[:30].lower())
             if key in existing:
                 continue
             existing.add(key)
 
-            action_type = _classify_action(a.get("subject", ""))
+            action_type = _classify_action(subject)
             ltp = a.get("ltp", 0) or 0
             try:
                 ltp = float(ltp)
@@ -691,14 +696,15 @@ class ExcelManager:
             div_amount = 0.0
             div_yield = 0.0
             if action_type == "Dividend":
-                div_amount = _extract_dividend_amount(a.get("subject", ""))
+                div_amount = _extract_dividend_amount(subject)
                 if div_amount > 0 and ltp > 0:
                     div_yield = round(div_amount / ltp * 100, 2)
 
+            source = a.get("source", "NSE")
             row = ws.max_row + 1
             vals = [
-                date, action_type, a["symbol"], a["company"], a["subject"],
-                a["ex_date"], a.get("record_date", ""),
+                date, source, action_type, symbol, a.get("company", ""), subject,
+                ex_date, a.get("record_date", ""),
                 a.get("bc_start", ""), a.get("bc_end", ""),
                 ltp, pct_change, pe, div_amount, div_yield,
                 a.get("week52_high", 0), a.get("week52_low", 0),

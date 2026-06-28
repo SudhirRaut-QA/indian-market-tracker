@@ -32,8 +32,10 @@ from .telegram_bot import (
     format_options_msg, format_commodities_msg, format_corporate_msg,
     format_preopen_msg, format_delta_alert, format_bulk_deals_msg,
     identify_watchlist, format_watchlist_msg, format_expert_opinion,
-    format_weekly_toppers,
+    format_weekly_toppers, format_categorized_signals_msg,
+    format_corporate_dividends_table_msg,
 )
+from .signal_detector import SignalDetector
 from .excel_manager import ExcelManager
 from .trading_engine import generate_intraday_setups, format_trading_msg
 from .trade_tracker import (
@@ -64,6 +66,7 @@ def run_once(
     label: str = "Manual Run",
     use_cache: bool = False,
     slot_time: str = None,
+    include_core: bool = True,
 ):
     """Run a single data collection + notification cycle.
     
@@ -106,6 +109,7 @@ def run_once(
                 include_corporate=include_corporate,
                 include_insider=include_insider,
                 include_bulk_deals=include_bulk_deals,
+                include_core=include_core,
             )
             
             # Merge fresh data into cached snapshot
@@ -137,6 +141,7 @@ def run_once(
             include_corporate=include_corporate,
             include_insider=include_insider,
             include_bulk_deals=include_bulk_deals,
+            include_core=include_core,
         )
 
     if snapshot.get("errors"):
@@ -257,7 +262,10 @@ def run_once(
 
         # Corporate + Insider — only in evening slots when data is fresh
         if (include_corporate or include_insider) and (snapshot.get("corporate_actions") or snapshot.get("insider_trading")):
-            messages.append(("📋 Corporate", format_corporate_msg(snapshot)))
+            messages.append(("📋 Corporate", format_corporate_msg(snapshot, data_dir=str(config.DATA_DIR))))
+            div_table_msg = format_corporate_dividends_table_msg(snapshot)
+            if div_table_msg:
+                messages.append(("📄 All Dividends", div_table_msg))
 
         # Bulk & Block Deals
         if include_bulk_deals and (snapshot.get("bulk_deals") or snapshot.get("block_deals")):
@@ -287,6 +295,21 @@ def run_once(
                     messages.append(("🤖 Algo Insight", algo_msg))
             except Exception as _e:
                 logger.warning(f"format_algo_insight_msg failed: {_e}")
+
+        # Phase 1 Intelligence Report — EOD (15:35) and evening (18:00, 21:00)
+        if slot_time in ("15:35", "18:00", "21:00") and snapshot.get("sectors"):
+            try:
+                detector = SignalDetector()
+                cat_signals = detector.analyze_with_categories(
+                    snapshot,
+                    delta=delta,
+                    data_dir=str(config.DATA_DIR),
+                )
+                sig_msg = format_categorized_signals_msg(cat_signals)
+                if sig_msg:
+                    messages.append(("📊 Signals", sig_msg))
+            except Exception as _e:
+                logger.warning(f"Categorized signals failed: {_e}")
 
         # Weekly Watchlist Toppers — Friday 21:00 slot (end of week summary)
         if slot_time == "21:00" and ist_now.weekday() == 4:  # Friday
@@ -465,12 +488,21 @@ Examples:
         return
 
     if args.now:
+        corporate_only = (
+            args.corporate
+            and not args.full
+            and not args.sectors
+            and not args.options
+            and not args.preopen
+            and not args.bulk_deals
+        )
         inc_sectors = args.full or args.sectors
         inc_options = args.full or args.options
         inc_preopen = args.preopen
         inc_corporate = args.full or args.corporate
         inc_insider = args.full or args.insider or args.corporate
         inc_bulk_deals = args.full or args.bulk_deals
+        inc_core = not corporate_only
 
         run_once(
             include_sectors=inc_sectors,
@@ -482,6 +514,7 @@ Examples:
             send_telegram=not args.no_telegram,
             save_excel=not args.no_excel,
             save_json=not args.no_json,
+            include_core=inc_core,
         )
         return
 

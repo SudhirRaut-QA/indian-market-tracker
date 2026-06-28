@@ -17,7 +17,7 @@ Message types:
 
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 
 import requests
@@ -68,6 +68,107 @@ def _extract_dividend_amount(subject: str) -> float:
             except (ValueError, IndexError):
                 continue
     return 0.0
+
+
+def _extract_buyback_price(subject: str) -> float:
+    """Extract buyback offer price from subject like 'Buy Back @ Rs 1450 Per Share'."""
+    import re as _re
+    patterns = [
+        r'@\s*Rs\.?\s*([\d,]+(?:\.\d+)?)',
+        r'at\s+(?:not\s+exceeding\s+)?Rs\.?\s*([\d,]+(?:\.\d+)?)',
+        r'price\s+of\s+Rs\.?\s*([\d,]+(?:\.\d+)?)',
+        r'Rs\.?\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
+    ]
+    for p in patterns:
+        m = _re.search(p, subject, _re.IGNORECASE)
+        if m:
+            try:
+                return float(m.group(1).replace(',', ''))
+            except (ValueError, TypeError):
+                continue
+    return 0.0
+
+
+def _action_category(subject: str) -> str:
+    """Classify corporate action subject into a short category label."""
+    s = subject.lower()
+    if any(k in s for k in ("dividend", "interim div", "final div")):
+        return "dividend"
+    if any(k in s for k in ("bonus", "bonus issue")):
+        return "bonus"
+    if any(k in s for k in ("split", "sub-division", "subdivision")):
+        return "split"
+    if any(k in s for k in ("buyback", "buy back", "buy-back")):
+        return "buyback"
+    if any(k in s for k in ("rights issue", "rights entitlement")):
+        return "rights"
+    if any(k in s for k in ("amalgamation", "merger", "scheme of arrangement")):
+        return "merger"
+    if any(k in s for k in ("demerger", "de-merger", "spin-off")):
+        return "demerger"
+    if "interest" in s:
+        return "interest"
+    if any(k in s for k in ("agm", "annual general", "egm", "extraordinary")):
+        return "agm"
+    return "other"
+
+
+def _div_type_tag(subject: str) -> str:
+    """Extract dividend type from subject: Interim / Final / Special / Dividend."""
+    s = subject.lower()
+    if "interim" in s:
+        return "Interim"
+    if "final" in s:
+        return "Final"
+    if "special" in s:
+        return "Special"
+    return "Div"
+
+
+def _yield_indicator(yield_pct: float) -> str:
+    """Return emoji quality indicator for dividend yield."""
+    if yield_pct >= 3.0:
+        return "🟢"   # Excellent
+    if yield_pct >= 1.5:
+        return "🟡"   # Good
+    if yield_pct >= 0.5:
+        return "⚪"   # Average
+    return "🔸"        # Low
+
+
+def _build_annual_dividend_totals(data_dir: str) -> dict:
+    """Read stored snapshots to sum all dividends per symbol with ex_date in current year.
+    Returns {symbol: total_annual_div_Rs} — zero extra API calls.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+    year = datetime.now().year
+    snap_dir = _Path(data_dir) / "snapshots"
+    if not snap_dir.exists():
+        return {}
+    seen: set = set()
+    totals: dict = {}
+    # Only process snapshots from the current year (filename snapshot_YYYY...)
+    for sf in snap_dir.glob(f"snapshot_{year}*.json"):
+        try:
+            data = _json.loads(sf.read_text(encoding="utf-8"))
+            for a in data.get("corporate_actions") or []:
+                if "dividend" not in a.get("subject", "").lower():
+                    continue
+                sym     = a.get("symbol", "")
+                ex_date = a.get("ex_date", "")
+                if not sym or not ex_date:
+                    continue
+                key = (sym, ex_date)
+                if key in seen:
+                    continue
+                seen.add(key)
+                div = _extract_dividend_amount(a.get("subject", ""))
+                if div > 0:
+                    totals[sym] = totals.get(sym, 0.0) + div
+        except Exception:
+            continue
+    return totals
 
 
 def _emoji_pct(val: float) -> str:
@@ -597,6 +698,144 @@ def format_weekly_toppers(snapshot: Dict, data_dir: str) -> Optional[str]:
         lines.append("  ⚠️ Tough week for picks. Market conditions may need different strategy.")
 
     return "\n".join(lines)
+
+
+def format_categorized_signals_msg(signals: Dict) -> str:
+    """
+    Phase 1: Format scored + categorised stock signals for Telegram.
+
+    Categories:
+      🚀 INTRADAY  — same-day momentum plays
+      🔄 SWING     — 3-10 day hold
+      💎 LONG-TERM — 6m+ value / compounder plays
+    Plus: 🎯 Dividend Captures, ⚡ Volume Spikes
+    """
+    if not signals:
+        return ""
+
+    now_str  = datetime.now().strftime("%d %b %Y  %I:%M %p")
+    fii_score = signals.get("fii_sentiment", 0)
+    if fii_score >= 7:
+        fii_label = "🟢 FII Bullish"
+    elif fii_score >= 4:
+        fii_label = "🟡 FII Neutral"
+    else:
+        fii_label = "🔴 FII Bearish"
+
+    L = [
+        f"<b>📊 Market Intelligence Report — {now_str}</b>",
+        f"<i>Market Mood: {fii_label}</i>",
+        "",
+    ]
+
+    # ── Category emoji + header ──────────────────────────────────────────────
+    CATEGORY_META = {
+        "INTRADAY":  ("🚀", "INTRADAY Plays", "Trade today, exit before close"),
+        "SWING":     ("🔄", "SWING Plays",    "Hold 3-10 days"),
+        "LONG-TERM": ("💎", "LONG-TERM Picks", "Hold 6 months+"),
+    }
+
+    for cat_key, (emoji, title, subtitle) in CATEGORY_META.items():
+        stocks = signals.get(
+            {"INTRADAY": "intraday", "SWING": "swing", "LONG-TERM": "long_term"}[cat_key], []
+        )
+        if not stocks:
+            continue
+
+        L.append(f"<b>{emoji} {title}</b>")
+        L.append(f"<i>{subtitle}</i>")
+        L.append("")
+
+        for s in stocks:
+            sym      = s.get("symbol", "")
+            ltp      = s.get("ltp", 0)
+            pct      = s.get("pct", 0)
+            score    = s.get("score", 0)
+            sector   = s.get("sector", "")
+            trend    = s.get("trend", "")
+            reasons  = s.get("reasons", [])
+            vol_r    = s.get("vol_ratio", 0)
+
+            # Skip if no real data
+            if not sym or ltp <= 0:
+                continue
+
+            pct_str    = f"{pct:+.1f}%" if pct else "—"
+            trend_icon = {"UPTREND": "↗", "DOWNTREND": "↘", "SIDEWAYS": "→"}.get(trend, "→")
+            vol_str    = f"Vol {vol_r:.1f}×" if vol_r > 0 else ""
+
+            L.append(
+                f"  <b>{sym}</b>  ₹{ltp:,.2f}  {pct_str}  {trend_icon}"
+            )
+            L.append(
+                f"  Score: <b>{score}/100</b> | {sector}"
+                + (f" | {vol_str}" if vol_str else "")
+            )
+            # Top 2 reasons — skip empty/zero ones
+            clean_reasons = [r for r in reasons if r][:2]
+            for r in clean_reasons:
+                L.append(f"  • {r}")
+            L.append("")
+
+        L.append("")
+
+    # ── Dividend Captures ────────────────────────────────────────────────────
+    div_caps = signals.get("dividend_captures", [])
+    if div_caps:
+        L.append("<b>🎯 Dividend Capture Opportunities</b>")
+        L.append("<i>Buy before ex-date to collect dividend</i>")
+        L.append("")
+        for d in div_caps:
+            sym      = d.get("symbol", "")
+            ltp      = d.get("ltp", 0)
+            div_amt  = d.get("div_amount", 0)
+            yield_p  = d.get("yield_pct", 0)
+            ex_date  = d.get("ex_date", "")
+            days     = d.get("days_left", 0)
+            src      = d.get("source", "NSE")
+            if not sym or ltp <= 0 or div_amt <= 0:
+                continue
+            urgency = "⚠️ TODAY" if days == 0 else (f"{days}d left" if days > 0 else "")
+            L.append(
+                f"  <b>{sym}</b> [{src}]  ₹{ltp:,.2f}"
+            )
+            L.append(
+                f"  Div: ₹{div_amt:.2f} | Yield: <b>{yield_p:.2f}%</b>"
+                f" | Ex: {ex_date} {urgency}"
+            )
+            L.append("")
+        L.append("")
+
+    # ── Volume Spikes ────────────────────────────────────────────────────────
+    vol_spikes = signals.get("volume_spikes", [])
+    if vol_spikes:
+        L.append("<b>⚡ Volume Spikes (Unusual Activity)</b>")
+        L.append("<i>High volume = institutional / smart money interest</i>")
+        L.append("")
+        for s in vol_spikes:
+            sym  = s.get("symbol", "")
+            ltp  = s.get("ltp", 0)
+            pct  = s.get("pct", 0)
+            volr = s.get("vol_ratio", 0)
+            sec  = s.get("sector", "")
+            if not sym or ltp <= 0:
+                continue
+            L.append(
+                f"  <b>{sym}</b>  ₹{ltp:,.2f}  {pct:+.1f}%  |  {volr:.1f}× avg vol  |  {sec}"
+            )
+        L.append("")
+
+    # ── Legend ───────────────────────────────────────────────────────────────
+    L.append("─" * 36)
+    L.append(
+        "<i>Score 0-100 based on: momentum, 52W position, "
+        "volume, FII sentiment, historical trend. "
+        "Not financial advice — do your own research.</i>"
+    )
+
+    return "\n".join(L)
+
+
 def format_expert_opinion(snapshot: Dict, delta: Optional[Dict] = None) -> Optional[str]:
     """Actionable market analysis with specific sector and breadth insights."""
     indices = snapshot.get("indices") or {}
@@ -1197,6 +1436,25 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
             lines.append("</pre>")
             lines.append("")
 
+    # MCX-linked global commodity drivers (always shown when available)
+    mcx = snapshot.get("mcx_drivers") or {}
+    if mcx:
+        lines.append("<b>⚙️ MCX Driver Proxies</b>")
+        headers = ["Contract", "Last", "%Chg"]
+        rows = []
+        for _, item in mcx.items():
+            rows.append([
+                item.get("name", ""),
+                f"{item.get('last', 0):,.2f}",
+                _pct(float(item.get("pct", 0) or 0)),
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        lines.append("<i>These are global futures proxies used as MCX sentiment drivers</i>")
+        lines.append("")
+
     # Forex — only at pre-market & 9 PM
     forex = snapshot.get("forex")
     if forex and show_extras:
@@ -1224,17 +1482,19 @@ def format_commodities_msg(snapshot: Dict, delta: Optional[Dict] = None, slot_ti
     return "\n".join(lines)
 
 
-def format_corporate_msg(snapshot: Dict) -> str:
-    """Corporate actions + insider trading. Only shows UPCOMING events (future ex-dates)."""
+def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
+    """Corporate actions + insider trading. Only shows UPCOMING events (today → +21 days),
+    skips any row where all key data is 0/null/blank."""
     lines = ["<b>📋 Corporate Actions & Insider Trading</b>", ""]
 
     today = datetime.now().date()
+    cutoff = today + timedelta(days=21)
 
     def _parse_date(date_str):
-        """Parse NSE date formats: '13-Mar-2026' or '06-03-2026'."""
+        """Parse NSE/BSE date formats: '13-Mar-2026', '06-03-2026', '06/07/2026'."""
         if not date_str or date_str == 'N/A':
             return None
-        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y"):
+        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
             try:
                 return datetime.strptime(date_str, fmt).date()
             except (ValueError, TypeError):
@@ -1242,98 +1502,248 @@ def format_corporate_msg(snapshot: Dict) -> str:
         return None
 
     def _is_upcoming(action):
-        """Return True only if ex_date is today or in the future."""
+        """Return True only if ex_date is today or within next 21 days."""
         ex = _parse_date(action.get('ex_date', ''))
-        return ex is not None and ex >= today
+        return ex is not None and today <= ex <= cutoff
 
-    # Corporate actions — FILTER to upcoming only
+    def _source_badge(action):
+        src = action.get('source', 'NSE')
+        return f"[{src}]" if src else "[NSE]"
+
+    # Corporate actions — filter to upcoming 21 days only
     actions = snapshot.get("corporate_actions")
+    src_counts = snapshot.get("corporate_sources") or {}
+    if src_counts:
+        src_text = ", ".join(f"{k}:{v}" for k, v in sorted(src_counts.items()))
+        lines.append(f"<i>Live Sources → {src_text}</i>")
+        lines.append("")
+
+    health = snapshot.get("feed_health") or {}
+    if health:
+        lines.append("<b>🩺 Feed Health</b>")
+        status_map = {
+            "ok": "🟢 ok",
+            "no-data": "🟡 no-data",
+            "error": "🔴 error",
+        }
+        rows = []
+        for key in ("NSE_CA", "BSE_CA", "NSE_BM", "NSE_ANN", "NSE_ER", "MCX_DRV"):
+            h = health.get(key) or {}
+            status = str(h.get("status", "-")).strip() or "-"
+            status_disp = status_map.get(status, status)
+            cnt = int(h.get("last_count", 0) or 0)
+            succ = str(h.get("last_success", "") or "")
+            succ_disp = succ[11:19] if len(succ) >= 19 else (succ[:19] if succ else "-")
+            rows.append([key, status_disp, str(cnt), succ_disp])
+        table = _make_table(["Feed", "Status", "Count", "Last OK"], rows, align=['left', 'left', 'right', 'left'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        lines.append("")
+
+    mcx = snapshot.get("mcx_drivers") or {}
+    if mcx:
+        lines.append("<b>⚙️ MCX Price Drivers</b>")
+        headers = ["Contract", "Last", "%Chg"]
+        rows = []
+        for _, item in mcx.items():
+            rows.append([
+                item.get("name", ""),
+                f"{item.get('last', 0):,.2f}",
+                _pct(float(item.get("pct", 0) or 0)),
+            ])
+        table = _make_table(headers, rows, align=['left', 'right', 'right'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        lines.append("")
     if actions:
         upcoming = [a for a in actions if _is_upcoming(a)]
         if upcoming:
-            lines.append(f"<b>📌 Upcoming Corporate Actions ({len(upcoming)} events)</b>")
+            lines.append(f"<b>📌 Upcoming Corporate Actions — Next 21 Days ({len(upcoming)} events)</b>")
             lines.append("")
 
             dividends = [a for a in upcoming if "dividend" in a.get("subject", "").lower()]
-            splits = [a for a in upcoming if "split" in a.get("subject", "").lower()]
-            bonus = [a for a in upcoming if "bonus" in a.get("subject", "").lower()]
-            others = [a for a in upcoming if a not in dividends and a not in splits and a not in bonus]
-            
+            splits    = [a for a in upcoming if "split"    in a.get("subject", "").lower()]
+            bonus     = [a for a in upcoming if "bonus"    in a.get("subject", "").lower()]
+            others    = [a for a in upcoming
+                         if a not in dividends and a not in splits and a not in bonus]
+
             if dividends:
-                lines.append("<b>💰 Upcoming Dividends:</b>")
-                for a in dividends[:8]:
-                    sym = a.get('symbol', '')
-                    subject = a.get('subject', '')
-                    ex_date = a.get('ex_date', 'N/A')
-                    ltp = a.get('ltp', 0)
-                    pe = a.get('pe', 0)
-                    div_amt = _extract_dividend_amount(subject)
+                # Build annual dividend totals from stored snapshots (zero API calls)
+                annual_totals: dict = {}
+                if data_dir:
                     try:
-                        ltp_val = float(ltp) if ltp else 0
-                        pe_val = float(pe) if pe else 0
-                        yield_pct = (div_amt / ltp_val * 100) if (ltp_val and div_amt) else 0
+                        annual_totals = _build_annual_dividend_totals(data_dir)
+                    except Exception:
+                        pass
+
+                lines.append("<b>💰 Upcoming Dividends:</b>")
+                lines.append("<i>Yield = this div / LTP | Ann.Yield = total 2026 divs / LTP</i>")
+                lines.append("")
+                shown = 0
+                for a in sorted(dividends, key=lambda x: _parse_date(x.get('ex_date','')) or today):
+                    sym      = a.get('symbol', '')
+                    subject  = a.get('subject', '')
+                    ex_date  = a.get('ex_date', '')
+                    badge    = _source_badge(a)
+                    try:
+                        ltp_val = float(a.get('ltp') or 0)
                     except (ValueError, TypeError):
-                        ltp_val, pe_val, yield_pct = 0, 0, 0
-                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
-                    pe_str = f"{pe_val:.1f}" if pe_val else "—"
-                    div_str = f"₹{div_amt:.2f}" if div_amt else "—"
-                    yield_str = f"{yield_pct:.2f}%" if yield_pct else "—"
+                        ltp_val = 0.0
+                    try:
+                        pe_val = float(a.get('pe') or 0)
+                    except (ValueError, TypeError):
+                        pe_val = 0.0
+                    div_amt   = _extract_dividend_amount(subject)
+                    div_type  = _div_type_tag(subject)
+                    yield_pct = round(div_amt / ltp_val * 100, 2) if (ltp_val > 0 and div_amt > 0) else 0.0
+
+                    # Annual dividend for this symbol (from stored snapshots)
+                    annual_div   = annual_totals.get(sym, 0)
+                    annual_yield = round(annual_div / ltp_val * 100, 2) if (ltp_val > 0 and annual_div > 0) else 0.0
+
+                    # "Per ₹1000 invested" metric — intuitive for retail investors
+                    per_1000 = round(div_amt / ltp_val * 1000, 2) if (ltp_val > 0 and div_amt > 0) else 0.0
+
+                    # Skip row if we have no useful data at all
+                    if not sym or not ex_date:
+                        continue
+                    if ltp_val == 0 and div_amt == 0:
+                        continue
+
+                    # Build display strings (never show "—" for zero values — skip the field)
+                    ltp_str      = f"₹{ltp_val:,.2f}" if ltp_val else None
+                    pe_str       = f"PE:{pe_val:.1f}" if pe_val > 0 else None
+                    div_str      = f"₹{div_amt:.2f}" if div_amt else None
+                    yield_str    = f"{yield_pct:.2f}%" if yield_pct else None
+                    yind         = _yield_indicator(yield_pct) if yield_pct else ""
+                    per1k_str    = f"₹{per_1000:.2f}/₹1k" if per_1000 else None
+                    # Annual: show whenever historical total exists for this year
+                    annual_str   = f"₹{annual_div:.2f}" if annual_div > 0 else None
+                    ann_yld_str  = f"{annual_yield:.2f}%" if annual_yield else None
+
                     link = _nse_link(sym)
-                    lines.append(f"  {link} | LTP: {ltp_str} | PE: {pe_str}")
-                    lines.append(f"  Dividend: {div_str} | Yield: {yield_str}")
+                    # Line 1: symbol, LTP, PE (if available)
+                    line1_parts = [f"  {link} <i>{badge}</i>"]
+                    if ltp_str:
+                        line1_parts.append(f"LTP: <b>{ltp_str}</b>")
+                    if pe_str:
+                        line1_parts.append(pe_str)
+                    lines.append(" | ".join(line1_parts))
+
+                    # Line 2: dividend amount, yield, per-1000 metric
+                    line2_parts = []
+                    if div_str:
+                        line2_parts.append(f"{div_type}: <b>{div_str}</b>")
+                    if yield_str:
+                        line2_parts.append(f"Yield: <b>{yield_str}{yind}</b>")
+                    if per1k_str:
+                        line2_parts.append(per1k_str)
+                    if line2_parts:
+                        lines.append("  " + " | ".join(line2_parts))
+
+                    # Line 3: annual total (only when > this single dividend)
+                    line3_parts = []
+                    if annual_str:
+                        line3_parts.append(f"2026 Annual: ₹{annual_div:.2f}")
+                    if ann_yld_str:
+                        line3_parts.append(f"Ann.Yield: {ann_yld_str}")
+                    if line3_parts:
+                        lines.append("  📊 " + " | ".join(line3_parts))
+
                     lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
                     lines.append("")
-            
+                    shown += 1
+                    if shown >= 10:
+                        remaining = len(dividends) - shown
+                        if remaining > 0:
+                            lines.append(
+                                f"  <i>... and {remaining} more dividend actions "
+                                f"(see 📄 All Dividends message below)</i>"
+                            )
+                            lines.append("")
+                        break
+
             if splits:
                 lines.append("<b>✂️ Upcoming Stock Splits:</b>")
-                for a in splits[:5]:
-                    sym = a.get('symbol', '')
+                for a in sorted(splits, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:5]:
+                    sym     = a.get('symbol', '')
                     subject = a.get('subject', '')[:120]
-                    ex_date = a.get('ex_date', 'N/A')
-                    ltp = a.get('ltp', 0)
+                    ex_date = a.get('ex_date', '')
+                    badge   = _source_badge(a)
+                    if not sym or not ex_date:
+                        continue
                     try:
-                        ltp_val = float(ltp) if ltp else 0
+                        ltp_val = float(a.get('ltp') or 0)
                     except (ValueError, TypeError):
-                        ltp_val = 0
-                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
-                    lines.append(f"  {_nse_link(sym)} | LTP: {ltp_str}")
+                        ltp_val = 0.0
+                    ltp_str = f"₹{ltp_val:,.2f}" if ltp_val else "—"
+                    lines.append(f"  {_nse_link(sym)} <i>{badge}</i> | LTP: {ltp_str}")
                     lines.append(f"  {subject}")
-                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
-                    lines.append("")
-            
-            if bonus:
-                lines.append("<b>🎁 Upcoming Bonus Issues:</b>")
-                for a in bonus[:5]:
-                    sym = a.get('symbol', '')
-                    subject = a.get('subject', '')[:120]
-                    ex_date = a.get('ex_date', 'N/A')
-                    ltp = a.get('ltp', 0)
-                    try:
-                        ltp_val = float(ltp) if ltp else 0
-                    except (ValueError, TypeError):
-                        ltp_val = 0
-                    ltp_str = f"₹{ltp_val:,.0f}" if ltp_val else "—"
-                    lines.append(f"  {_nse_link(sym)} | LTP: {ltp_str}")
-                    lines.append(f"  {subject}")
-                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
-                    lines.append("")
-            
-            if others:
-                lines.append("<b>📋 Other Actions:</b>")
-                for a in others[:3]:
-                    sym = a.get('symbol', '')
-                    subject = a.get('subject', '')[:120]
-                    ex_date = a.get('ex_date', 'N/A')
-                    lines.append(f"  {_nse_link(sym)} — {subject}")
                     lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
                     lines.append("")
 
-            if not (dividends or splits or bonus or others):
-                lines.append("<i>No upcoming corporate actions</i>")
+            if bonus:
+                lines.append("<b>🎁 Upcoming Bonus Issues:</b>")
+                for a in sorted(bonus, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:5]:
+                    sym     = a.get('symbol', '')
+                    subject = a.get('subject', '')[:120]
+                    ex_date = a.get('ex_date', '')
+                    badge   = _source_badge(a)
+                    if not sym or not ex_date:
+                        continue
+                    try:
+                        ltp_val = float(a.get('ltp') or 0)
+                    except (ValueError, TypeError):
+                        ltp_val = 0.0
+                    ltp_str = f"₹{ltp_val:,.2f}" if ltp_val else "—"
+                    lines.append(f"  {_nse_link(sym)} <i>{badge}</i> | LTP: {ltp_str}")
+                    lines.append(f"  {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+
+            if others:
+                lines.append("<b>📋 Other Actions:</b>")
+                for a in sorted(others, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:3]:
+                    sym     = a.get('symbol', '')
+                    subject = a.get('subject', '')[:120]
+                    ex_date = a.get('ex_date', '')
+                    badge   = _source_badge(a)
+                    if not sym or not ex_date:
+                        continue
+                    lines.append(f"  {_nse_link(sym)} <i>{badge}</i> — {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+
+            # If ALL sections ended up empty after null-filtering
+            total_shown = sum(1 for l in lines if "Ex-Date:" in l)
+            if total_shown == 0:
+                lines.append("<i>No upcoming corporate actions with complete data</i>")
         else:
-            lines.append("<i>No upcoming corporate actions in the next 7 days</i>")
+            lines.append("<i>No upcoming corporate actions in the next 21 days</i>")
     else:
         lines.append("<i>No corporate actions data available</i>")
+
+    earnings = snapshot.get("earnings_calendar") or []
+    if earnings:
+        lines.append("")
+        lines.append(f"<b>🧾 Upcoming Earnings (Next 21 Days): {len(earnings)}</b>")
+        headers = ["Symbol", "Date", "Purpose", "Src"]
+        rows = []
+        for e in earnings[:12]:
+            rows.append([
+                str(e.get("symbol", ""))[:12],
+                str(e.get("date", ""))[:11],
+                str(e.get("purpose", ""))[:28],
+                str(e.get("source", "NSE-ER"))[:7],
+            ])
+        table = _make_table(headers, rows, align=['left', 'left', 'left', 'left'])
+        lines.append("<pre>")
+        lines.append(table)
+        lines.append("</pre>")
+        if len(earnings) > 12:
+            lines.append(f"<i>... and {len(earnings)-12} more earnings events</i>")
 
     lines.append("")
     lines.append("─" * 40)
@@ -1402,6 +1812,70 @@ def format_corporate_msg(snapshot: Dict) -> str:
     else:
         lines.append("No insider trading data this week")
 
+    return "\n".join(lines)
+
+
+def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
+    """Compact table with all upcoming dividend actions (today → +21 days).
+
+    Telegram does not support native collapsible sections, so this provides
+    a scrollable full list as a follow-up message.
+    """
+    today = datetime.now().date()
+    cutoff = today + timedelta(days=21)
+
+    def _parse_date(date_str):
+        if not date_str or date_str == "N/A":
+            return None
+        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except (ValueError, TypeError):
+                continue
+        return None
+
+    actions = snapshot.get("corporate_actions") or []
+    dividends = [
+        a for a in actions
+        if "dividend" in a.get("subject", "").lower()
+        and (_parse_date(a.get("ex_date", "")) is not None)
+        and (today <= _parse_date(a.get("ex_date", "")) <= cutoff)
+    ]
+    if not dividends:
+        return None
+
+    rows = []
+    for a in sorted(dividends, key=lambda x: _parse_date(x.get("ex_date", "")) or today):
+        sym = (a.get("symbol") or "")[:12]
+        exd = _parse_date(a.get("ex_date", ""))
+        exs = exd.strftime("%d-%b") if exd else (a.get("ex_date", "")[:9])
+        div = _extract_dividend_amount(a.get("subject", ""))
+        try:
+            ltp = float(a.get("ltp") or 0)
+        except (ValueError, TypeError):
+            ltp = 0.0
+        yld = (div / ltp * 100) if (div > 0 and ltp > 0) else 0.0
+        rows.append([
+            sym,
+            exs,
+            f"₹{div:.2f}" if div > 0 else "-",
+            f"{yld:.2f}%" if yld > 0 else "-",
+            a.get("source", "NSE"),
+        ])
+
+    table = _make_table(
+        ["Symbol", "Ex-Date", "Div", "Yield", "Src"],
+        rows,
+        align=["left", "left", "right", "right", "left"],
+    )
+    lines = [
+        f"<b>📄 All Upcoming Dividends ({len(rows)})</b>",
+        "<i>Full list in compact view (Telegram has no collapsible sections)</i>",
+        "",
+        "<pre>",
+        table,
+        "</pre>",
+    ]
     return "\n".join(lines)
 
 

@@ -21,12 +21,15 @@ CRITICAL NSE rules:
 - 1-2s delays between calls
 """
 
+import json
 import logging
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, Any, Optional, List
 
 import requests
+import urllib3
 
 try:
     from curl_cffi import requests as cffi_requests
@@ -37,6 +40,7 @@ except ImportError:
 from . import config
 
 logger = logging.getLogger(__name__)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class NSESession:
@@ -115,7 +119,11 @@ class NSESession:
             if not self._using_cffi:
                 self.session.headers.update(self.BROWSER_HEADERS)
             
-            resp = self.session.get(config.NSE_BASE_URL, timeout=20)
+            req_kwargs = {"timeout": 20}
+            if not self._using_cffi:
+                req_kwargs["verify"] = False
+
+            resp = self.session.get(config.NSE_BASE_URL, **req_kwargs)
             
             if resp.status_code == 200:
                 cookie_count = len(self.session.cookies)
@@ -160,6 +168,7 @@ class NSESession:
                 resp = self.session.get(
                     url, params=params, timeout=20,
                     headers=self.API_HEADERS,
+                    verify=False if not self._using_cffi else True,
                 )
                 if resp.status_code == 200:
                     body = resp.text.strip()
@@ -201,6 +210,62 @@ class MarketScraper:
 
     def _url(self, path: str) -> str:
         return f"{config.NSE_BASE_URL}{path}"
+
+    def _feed_health_path(self) -> Path:
+        return Path(config.DATA_DIR) / "feed_health.json"
+
+    def _load_feed_health_state(self) -> Dict[str, Dict]:
+        p = self._feed_health_path()
+        if not p.exists():
+            return {}
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def _save_feed_health_state(self, state: Dict[str, Dict]) -> None:
+        p = self._feed_health_path()
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Feed health save failed: {e}")
+
+    def _mark_feed_health(
+        self,
+        state: Dict[str, Dict],
+        key: str,
+        status: str,
+        count: int = 0,
+        message: str = "",
+    ) -> None:
+        now_iso = datetime.now().isoformat()
+        prev = state.get(key, {}) if isinstance(state.get(key, {}), dict) else {}
+        item = {
+            "status": status,
+            "last_attempt": now_iso,
+            "last_count": int(count or 0),
+            "last_success": prev.get("last_success", ""),
+            "message": message,
+        }
+        if status == "ok" and count > 0:
+            item["last_success"] = now_iso
+        state[key] = item
+
+    def _load_cached_corporate_actions(self) -> List[Dict]:
+        """Fallback: load last known corporate actions from last_snapshot.json."""
+        try:
+            p = Path(config.SNAPSHOT_DIR) / "last_snapshot.json"
+            if not p.exists():
+                return []
+            data = json.loads(p.read_text(encoding="utf-8"))
+            actions = data.get("corporate_actions") or []
+            logger.info(f"Cached corporate actions fallback: {len(actions)}")
+            return actions
+        except Exception as e:
+            logger.warning(f"Cached corporate fallback failed: {e}")
+            return []
 
     # ── 1. FII/DII ──────────────────────────────────────────────────────────
 
@@ -460,10 +525,11 @@ class MarketScraper:
 
     # ── 7. Corporate Actions ─────────────────────────────────────────────────
 
-    def get_corporate_actions(self, days_range: int = 7) -> Optional[List[Dict]]:
+    def get_corporate_actions(self, days_ahead: int = 21) -> Optional[List[Dict]]:
+        """Fetch NSE corporate actions from today to today+days_ahead."""
         today = datetime.now()
-        from_dt = (today - timedelta(days=days_range)).strftime("%d-%m-%Y")
-        to_dt = (today + timedelta(days=days_range)).strftime("%d-%m-%Y")
+        from_dt = today.strftime("%d-%m-%Y")
+        to_dt = (today + timedelta(days=days_ahead)).strftime("%d-%m-%Y")
         url = self._url(f"/api/corporates-corporateActions?index=equities&from_date={from_dt}&to_date={to_dt}")
         raw = self.nse.api_get(url)
         if not raw or not isinstance(raw, list):
@@ -479,11 +545,358 @@ class MarketScraper:
                     "record_date": item.get("recDate", ""),
                     "bc_start": item.get("bcStartDate", ""),
                     "bc_end": item.get("bcEndDate", ""),
+                    "source": "NSE",
                 })
-            logger.info(f"Corporate actions: {len(actions)}")
+            logger.info(f"NSE corporate actions: {len(actions)}")
             return actions
         except Exception as e:
             logger.error(f"Corp actions error: {e}")
+            return None
+
+    def get_nse_board_meetings(self, days_ahead: int = 21) -> Optional[List[Dict]]:
+        """Fetch NSE board meetings/events and map to corporate-action-like rows."""
+        today = datetime.now()
+        from_dt = today.strftime("%d-%m-%Y")
+        to_dt = (today + timedelta(days=days_ahead)).strftime("%d-%m-%Y")
+        url = self._url(
+            f"/api/corporate-board-meetings?index=equities&from_date={from_dt}&to_date={to_dt}"
+        )
+        raw = self.nse.api_get(url)
+        if not raw or not isinstance(raw, list):
+            return []
+        try:
+            actions = []
+            for item in raw:
+                symbol = str(item.get("symbol", "") or "").strip().upper()
+                company = str(item.get("company", "") or item.get("comp", "")).strip()
+                purpose = str(item.get("bmPurpose", "") or item.get("purpose", "")).strip()
+                meeting_date = str(item.get("bmDate", "") or item.get("date", "")).strip()
+                if not symbol or not purpose or not meeting_date:
+                    continue
+                actions.append({
+                    "symbol": symbol,
+                    "company": company,
+                    "subject": f"Board Meeting - {purpose}",
+                    "ex_date": meeting_date,
+                    "record_date": "",
+                    "bc_start": "",
+                    "bc_end": "",
+                    "source": "NSE-BM",
+                })
+            logger.info(f"NSE board meetings: {len(actions)}")
+            return actions
+        except Exception as e:
+            logger.warning(f"NSE board meetings error: {e}")
+            return []
+
+    def get_nse_major_announcements(self, days_ahead: int = 21) -> Optional[List[Dict]]:
+        """Fetch NSE announcements and keep only major corporate-action events."""
+        today = datetime.now()
+        from_dt = today.strftime("%d-%m-%Y")
+        to_dt = (today + timedelta(days=days_ahead)).strftime("%d-%m-%Y")
+        url = self._url(
+            f"/api/corporate-announcements?index=equities&from_date={from_dt}&to_date={to_dt}"
+        )
+        raw = self.nse.api_get(url)
+        if not raw:
+            return []
+
+        if isinstance(raw, dict):
+            rows = raw.get("data") or raw.get("announcements") or []
+        elif isinstance(raw, list):
+            rows = raw
+        else:
+            rows = []
+        if not isinstance(rows, list):
+            return []
+
+        keywords = (
+            "dividend", "buyback", "buy back", "bonus", "split", "sub-division",
+            "rights", "demerger", "merger", "amalgamation", "board meeting",
+            "financial results", "results",
+        )
+        actions: List[Dict] = []
+        try:
+            for item in rows:
+                symbol = str(
+                    item.get("symbol") or item.get("sm_name") or item.get("symbolName") or ""
+                ).strip().upper()
+                company = str(item.get("company") or item.get("comp") or item.get("sm_name") or "").strip()
+                subject = str(
+                    item.get("subject") or item.get("desc") or item.get("headline") or ""
+                ).strip()
+                ex_date = str(
+                    item.get("exDate") or item.get("ex_date") or item.get("date") or item.get("an_dt") or ""
+                ).strip()
+                rec_date = str(item.get("recDate") or item.get("record_date") or "").strip()
+                if not symbol or not subject:
+                    continue
+                subj_l = subject.lower()
+                if not any(k in subj_l for k in keywords):
+                    continue
+                actions.append({
+                    "symbol": symbol,
+                    "company": company,
+                    "subject": f"Announcement - {subject}",
+                    "ex_date": ex_date,
+                    "record_date": rec_date,
+                    "bc_start": "",
+                    "bc_end": "",
+                    "source": "NSE-ANN",
+                })
+            logger.info(f"NSE major announcements: {len(actions)}")
+            return actions
+        except Exception as e:
+            logger.warning(f"NSE major announcements error: {e}")
+            return []
+
+    def get_nse_earnings_calendar(self, days_ahead: int = 21) -> Optional[List[Dict]]:
+        """Fetch upcoming earnings/results events from NSE endpoints."""
+        today = datetime.now()
+        cutoff = today + timedelta(days=days_ahead)
+        from_dt = today.strftime("%d-%m-%Y")
+        to_dt = cutoff.strftime("%d-%m-%Y")
+
+        def _parse_dt(s: str) -> Optional[datetime]:
+            if not s:
+                return None
+            for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d", "%d %b %Y"):
+                try:
+                    return datetime.strptime(str(s).strip(), fmt)
+                except (ValueError, TypeError):
+                    continue
+            return None
+
+        endpoints = [
+            self._url(f"/api/corporates-financial-results?index=equities&from_date={from_dt}&to_date={to_dt}"),
+            self._url(f"/api/corporate-financial-results?index=equities&from_date={from_dt}&to_date={to_dt}"),
+        ]
+        out: Dict[tuple, Dict] = {}
+        for url in endpoints:
+            raw = self.nse.api_get(url)
+            if not raw:
+                continue
+            rows = raw.get("data", []) if isinstance(raw, dict) else raw
+            if not isinstance(rows, list):
+                continue
+            for item in rows:
+                symbol = str(item.get("symbol") or item.get("sm_name") or "").strip().upper()
+                company = str(item.get("company") or item.get("comp") or item.get("sm_name") or "").strip()
+                purpose = str(
+                    item.get("purpose")
+                    or item.get("subject")
+                    or item.get("bmPurpose")
+                    or item.get("desc")
+                    or "Financial Results"
+                ).strip()
+                event_date_raw = str(
+                    item.get("resultDate")
+                    or item.get("bmDate")
+                    or item.get("date")
+                    or item.get("an_dt")
+                    or item.get("meetingDate")
+                    or ""
+                ).strip()
+                if not symbol:
+                    continue
+                dt = _parse_dt(event_date_raw)
+                if not dt or dt.date() < today.date() or dt.date() > cutoff.date():
+                    continue
+                key = (symbol, dt.strftime("%d-%b-%Y"), purpose[:40].lower())
+                out[key] = {
+                    "symbol": symbol,
+                    "company": company,
+                    "purpose": purpose,
+                    "date": dt.strftime("%d-%b-%Y"),
+                    "source": "NSE-ER",
+                }
+        events = list(out.values())
+        logger.info(f"NSE earnings calendar: {len(events)}")
+        return events
+
+    def get_bse_corporate_actions(self, days_ahead: int = 21) -> Optional[List[Dict]]:
+        """Fetch BSE corporate actions for upcoming window with live fallback windows.
+
+        Reliability strategy:
+        1) Preferred live window: today -> today+days_ahead
+        2) Fallback lookbacks: today-7 / today-30
+        3) Re-filter strictly to upcoming [today, today+days_ahead] to avoid stale rows
+        """
+        def _parse_bse_date(s: str) -> Optional[datetime]:
+            if not s:
+                return None
+            for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d", "%Y%m%d"):
+                try:
+                    return datetime.strptime(str(s).strip(), fmt)
+                except (ValueError, TypeError):
+                    continue
+            return None
+
+        def _extract_items(raw_json) -> List[Dict]:
+            if isinstance(raw_json, list):
+                return raw_json
+            if isinstance(raw_json, dict):
+                items = (
+                    raw_json.get("Table")
+                    or raw_json.get("table")
+                    or raw_json.get("data")
+                    or raw_json.get("Data")
+                    or raw_json.get("results")
+                    or raw_json.get("Results")
+                    or []
+                )
+                return items if isinstance(items, list) else []
+            return []
+
+        def _fetch_bse_items(from_dt: str, to_dt: str, use_session: bool = False) -> List[Dict]:
+            url = (
+                "https://api.bseindia.com/BseIndiaAPI/api/CorporateAction/w"
+                f"?strType=C&scripcode=&Category=&Fdate={from_dt}&Tdate={to_dt}"
+            )
+            # BSE probe confirmed: plain requests returns '{}' (empty, 2 bytes) — BSE
+            # now blocks without a real Chrome TLS fingerprint. Use curl_cffi if available.
+            def _bse_get(target_url: str, sess=None) -> Optional[requests.Response]:
+                if HAS_CURL_CFFI:
+                    try:
+                        if sess is None:
+                            return cffi_requests.get(
+                                target_url, headers=headers, timeout=15,
+                                impersonate="chrome131", verify=False,
+                            )
+                        return sess.get(
+                            target_url, headers=headers, timeout=15,
+                            impersonate="chrome131",
+                        )
+                    except Exception as ce:
+                        logger.warning(f"curl_cffi BSE get failed: {ce}")
+                # plain requests fallback
+                try:
+                    return requests.get(target_url, headers=headers, timeout=12, verify=False)
+                except Exception:
+                    return None
+
+            if not use_session:
+                resp = _bse_get(url)
+                if not resp or resp.status_code != 200:
+                    logger.warning(
+                        f"BSE direct returned {resp.status_code if resp else 'None'} for {from_dt}->{to_dt}"
+                    )
+                    return []
+                items = _extract_items(resp.json())
+                if items:
+                    return items
+                logger.info(f"BSE direct: empty response for {from_dt}->{to_dt} (trying warm session)")
+
+            # Warm up: visit BSE homepage to get real cookies, then call data API.
+            if HAS_CURL_CFFI:
+                cffi_sess = cffi_requests.Session()
+                for warm in ("https://www.bseindia.com/", "https://www.bseindia.com/corporates/"):
+                    try:
+                        cffi_sess.get(warm, headers=headers, timeout=10,
+                                      impersonate="chrome131", verify=False)
+                    except Exception:
+                        pass
+                resp = _bse_get(url, sess=cffi_sess)
+            else:
+                sess = requests.Session()
+                for warm in ("https://www.bseindia.com/", "https://www.bseindia.com/corporates/"):
+                    try:
+                        sess.get(warm, headers=headers, timeout=10, verify=False)
+                    except Exception:
+                        pass
+                resp = _bse_get(url, sess=sess)
+
+            if not resp or resp.status_code != 200:
+                logger.warning(
+                    f"BSE warm session returned {resp.status_code if resp else 'None'} for {from_dt}->{to_dt}"
+                )
+                return []
+            return _extract_items(resp.json())
+
+        today = datetime.now()
+        cutoff = today + timedelta(days=days_ahead)
+        headers = {
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.bseindia.com/",
+            "Origin": "https://www.bseindia.com",
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            ),
+        }
+        try:
+            windows = [
+                (today, cutoff),
+                (today - timedelta(days=7), cutoff),
+                (today - timedelta(days=30), cutoff),
+            ]
+            merged_by_key: Dict[tuple, Dict] = {}
+            for w_from, w_to in windows:
+                # BSE API accepts DD/MM/YYYY — YYYYMMDD returns empty {}
+                from_dt = w_from.strftime("%d/%m/%Y")
+                to_dt = w_to.strftime("%d/%m/%Y")
+                items = _fetch_bse_items(from_dt, to_dt, use_session=False)
+                if not items:
+                    items = _fetch_bse_items(from_dt, to_dt, use_session=True)
+                if not items:
+                    logger.info(f"BSE corporate actions: 0 for {from_dt}->{to_dt}")
+                    continue
+
+                for item in items:
+                    symbol = (
+                        item.get("short_name") or item.get("ShortName") or
+                        item.get("SCRIP_ID") or item.get("SecurityCode") or
+                        item.get("SC_CODE") or str(item.get("SCRIP_CD", ""))
+                    )
+                    company = (
+                        item.get("SLONGNAME") or item.get("LongName") or
+                        item.get("companyname") or ""
+                    )
+                    subject = (
+                        item.get("PURPOSE") or item.get("purpose") or
+                        item.get("Subject") or ""
+                    )
+                    ex_date = (
+                        item.get("EX_DATE") or item.get("Ex_Date") or
+                        item.get("exDate") or ""
+                    )
+                    rec_date = (
+                        item.get("REC_DT") or item.get("Rec_Date") or
+                        item.get("recDate") or ""
+                    )
+                    if not symbol or not subject:
+                        continue
+
+                    ex_dt = _parse_bse_date(str(ex_date).strip())
+                    # Freshness guard: include only upcoming events in requested horizon.
+                    if not ex_dt or ex_dt.date() < today.date() or ex_dt.date() > cutoff.date():
+                        continue
+
+                    norm_ex = ex_dt.strftime("%d-%b-%Y")
+                    action = {
+                        "symbol": str(symbol).strip().upper(),
+                        "company": str(company).strip(),
+                        "subject": str(subject).strip(),
+                        "ex_date": norm_ex,
+                        "record_date": str(rec_date).strip(),
+                        "bc_start": "",
+                        "bc_end": "",
+                        "source": "BSE",
+                    }
+                    key = (
+                        action["symbol"],
+                        action["ex_date"],
+                        action["subject"][:30].lower(),
+                    )
+                    merged_by_key[key] = action
+
+            actions = list(merged_by_key.values())
+            logger.info(f"BSE corporate actions: {len(actions)} (live fallback windows)")
+            return actions
+        except Exception as e:
+            logger.warning(f"BSE corp actions error: {e}")
             return None
 
     # ── 8. Bulk/Block Deals ──────────────────────────────────────────────────
@@ -617,44 +1030,152 @@ class MarketScraper:
             logger.error(f"Stock quote {symbol} error: {e}")
             return None
 
-    def enrich_corporate_actions(self, actions: List[Dict], max_enrich: int = 10) -> List[Dict]:
-        """Enrich corporate actions with LTP, PE from stock quotes.
-        Only enriches the first `max_enrich` actions to avoid too many API calls.
+    def _get_sector_stock_lookup(self, sectors: Dict) -> Dict[str, Dict]:
+        """Build symbol→quote dict from already-fetched sector data (no API calls)."""
+        lookup: Dict[str, Dict] = {}
+        for sector_data in sectors.values():
+            for stock in sector_data.get("stocks", []):
+                sym = stock.get("symbol", "")
+                if sym and sym not in lookup:
+                    lookup[sym] = {
+                        "last": stock.get("last", 0),
+                        "pct":  stock.get("pct", 0),
+                        "pe":   0,  # PE not in sector API — fetched via quote if needed
+                        "week52_high": stock.get("year_high", 0),
+                        "week52_low":  stock.get("year_low", 0),
+                    }
+        return lookup
+
+    def _get_stock_quote_fast(self, symbol: str) -> Optional[Dict]:
+        """One-shot quote fetch — NO retry, NO session re-auth on 403.
+        Returns None immediately if session is known-bad (avoids retry storm).
+        """
+        # Bail immediately if session is known-bad — no retries, no delays
+        if not self.nse._cookies_valid:
+            return None
+        try:
+            url = self._url(f"/api/quote-equity?symbol={symbol}")
+            resp = self.nse.session.get(
+                url, timeout=8,
+                headers=self.nse.API_HEADERS,
+                verify=False if not self.nse._using_cffi else True,
+            )
+            if resp.status_code != 200:
+                return None   # skip silently — do NOT re-auth
+            body = resp.text.strip()
+            if not body.startswith(("{", "[")):
+                return None
+            raw = resp.json()
+            pi   = raw.get("priceInfo", {})
+            wk   = pi.get("weekHighLow", {})
+            meta = raw.get("metadata", {})
+            sec  = raw.get("securityInfo", {})
+            pe_raw = meta.get("pdSymbolPe") or sec.get("pe", 0)
+            try:
+                pe_float = float(str(pe_raw).replace(",", "")) if pe_raw else 0.0
+            except (ValueError, TypeError):
+                pe_float = 0.0
+            return {
+                "last":        pi.get("lastPrice", 0),
+                "pct":         pi.get("pChange", 0),
+                "pe":          pe_float,
+                "week52_high": wk.get("max", 0),
+                "week52_low":  wk.get("min", 0),
+            }
+        except Exception:
+            return None
+
+    def enrich_corporate_actions(
+        self,
+        actions: List[Dict],
+        max_api_calls: int = 8,
+        sector_data: Dict = None,
+        prebuilt_lookup: Dict = None,
+    ) -> List[Dict]:
+        """Enrich corporate actions with LTP / PE / 52W data.
+
+        Strategy (fast-first, no timeout):
+        1. prebuilt_lookup (sector + NIFTY 500 already merged by caller)
+        2. Sector data passed directly (legacy path)
+        3. Quote API (one-shot, no re-auth) → adds PE for top max_api_calls symbols.
         """
         if not actions:
             return actions
-        enriched = 0
-        seen_symbols = set()
-        quote_cache = {}
+
+        # Step 1: use pre-built lookup (fastest — no API calls)
+        if prebuilt_lookup:
+            sector_lookup = prebuilt_lookup
+            logger.info(f"Enrichment: using prebuilt lookup ({len(sector_lookup)} symbols)")
+        else:
+            sector_lookup = self._get_sector_stock_lookup(sector_data or {})
+            logger.info(f"Sector lookup: {len(sector_lookup)} symbols available for enrichment")
+
         for a in actions:
             sym = a.get("symbol", "")
-            if not sym or enriched >= max_enrich:
+            if sym and sym in sector_lookup:
+                q = sector_lookup[sym]
+                a.setdefault("ltp",          q["last"])
+                a.setdefault("pct",          q["pct"])
+                a.setdefault("week52_high",  q["week52_high"])
+                a.setdefault("week52_low",   q["week52_low"])
+
+        # Step 2: fetch PE via fast quote API — ONLY if session is healthy
+        # and prebuilt_lookup doesn't already cover most symbols.
+        corp_syms = {a.get("symbol", "") for a in actions}
+        covered_by_lookup = corp_syms & set(sector_lookup.keys())
+        # Skip API calls entirely when prebuilt lookup covers ≥50% of symbols
+        # (avoids 403 retry storm when NSE session is in bad state)
+        effective_max = 0 if (prebuilt_lookup and len(covered_by_lookup) >= len(corp_syms) * 0.5) else max_api_calls
+        if effective_max == 0:
+            logger.info("Skipping PE API calls — prebuilt lookup has sufficient coverage")
+
+        # Prioritise dividend actions that still have pe=0
+        need_pe = [
+            a for a in actions
+            if a.get("symbol") and not a.get("pe") and
+               "dividend" in a.get("subject", "").lower()
+        ]
+        other_need = [
+            a for a in actions
+            if a.get("symbol") and not a.get("pe") and
+               a not in need_pe
+        ]
+        candidates = need_pe + other_need
+
+        api_calls = 0
+        seen: set = set()
+        cache: Dict[str, Dict] = {}
+        for a in candidates:
+            sym = a.get("symbol", "")
+            if not sym:
                 continue
-            if sym in seen_symbols:
-                # Reuse cached quote
-                if sym in quote_cache:
-                    q = quote_cache[sym]
-                    a["ltp"] = q.get("last", 0)
-                    a["pct"] = q.get("pct", 0)
-                    a["pe"] = q.get("pe", 0)
-                    a["week52_high"] = q.get("week52_high", 0)
-                    a["week52_low"] = q.get("week52_low", 0)
+            if sym in cache:
+                q = cache[sym]
+                a["ltp"]         = q["last"]
+                a["pct"]         = q["pct"]
+                a["pe"]          = q["pe"]
+                a["week52_high"] = q["week52_high"]
+                a["week52_low"]  = q["week52_low"]
                 continue
-            seen_symbols.add(sym)
-            try:
-                q = self.get_stock_quote(sym)
-                if q:
-                    quote_cache[sym] = q
-                    a["ltp"] = q.get("last", 0)
-                    a["pct"] = q.get("pct", 0)
-                    a["pe"] = q.get("pe", 0)
-                    a["week52_high"] = q.get("week52_high", 0)
-                    a["week52_low"] = q.get("week52_low", 0)
-                    enriched += 1
-            except Exception as e:
-                logger.warning(f"Enrich {sym}: {e}")
-            time.sleep(1)
-        logger.info(f"Enriched {enriched} corporate actions with LTP/PE")
+            if sym in seen or api_calls >= effective_max:
+                continue
+            seen.add(sym)
+            q = self._get_stock_quote_fast(sym)
+            if q:
+                cache[sym] = q
+                a["ltp"]         = q["last"]
+                a["pct"]         = q["pct"]
+                a["pe"]          = q["pe"]
+                a["week52_high"] = q["week52_high"]
+                a["week52_low"]  = q["week52_low"]
+                api_calls += 1
+                time.sleep(0.5)
+
+        enriched_count = sum(1 for a in actions if a.get("ltp"))
+        logger.info(
+            f"Enrichment done: {enriched_count}/{len(actions)} with LTP, "
+            f"{api_calls} API calls made"
+        )
         return actions
 
     def get_commodity_etfs(self) -> Dict:
@@ -682,6 +1203,227 @@ class MarketScraper:
         logger.info(f"Commodity ETFs: {len(results)}")
         return results
 
+    def _get_dividend_csv_lookup(self) -> Dict[str, Dict]:
+        """Read LTP + PE from upcoming_dividends_latest.csv (built by rebuild script).
+        This is the fastest, most reliable enrichment source — zero API calls.
+        """
+        import csv as csv_mod
+        csv_path = config.DATA_DIR / "excel" / "upcoming_dividends_latest.csv"
+        lookup: Dict[str, Dict] = {}
+        if not csv_path.exists():
+            return lookup
+        try:
+            with open(csv_path, encoding="utf-8") as f:
+                for row in csv_mod.DictReader(f):
+                    sym = row.get("Symbol", "").strip()
+                    try:
+                        ltp = float(str(row.get("LTP_INR", "0") or "0").replace(",", ""))
+                        pe  = float(str(row.get("PE_Ratio",  "0") or "0").replace(",", ""))
+                    except (ValueError, TypeError):
+                        ltp, pe = 0.0, 0.0
+                    if sym and ltp > 0:
+                        lookup[sym] = {"last": ltp, "pct": 0.0, "pe": pe,
+                                       "week52_high": 0.0, "week52_low": 0.0}
+            logger.info(f"CSV enrichment lookup: {len(lookup)} symbols")
+        except Exception as e:
+            logger.warning(f"CSV enrichment error: {e}")
+        return lookup
+
+    def _get_yahoo_quotes_batch(self, symbols: List[str]) -> Dict[str, Dict]:
+        """Fetch LTP from Yahoo Finance spark API for NSE symbols.
+
+        Uses /v8/finance/spark — no authentication needed.
+        Filters out non-equity symbols (bonds, etc.) automatically.
+        """
+        if not symbols:
+            return {}
+        # Filter to plausible NSE equity symbols: alpha-start, ≤15 chars
+        equity_syms = [
+            s for s in symbols
+            if s and s[0].isalpha() and len(s) <= 15 and s.isalnum()
+        ]
+        if not equity_syms:
+            return {}
+        lookup: Dict[str, Dict] = {}
+        ua = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        )
+        batch_size = 20   # Yahoo Finance spark supports ~20 symbols reliably
+        for i in range(0, len(equity_syms), batch_size):
+            batch   = equity_syms[i : i + batch_size]
+            yf_syms = ",".join(f"{s}.NS" for s in batch)
+            url     = (
+                "https://query1.finance.yahoo.com/v8/finance/spark"
+                f"?symbols={yf_syms}&range=1d&interval=1d&includePrePost=false"
+            )
+            try:
+                resp = requests.get(
+                    url, timeout=15, verify=False,
+                    headers={"User-Agent": ua, "Accept": "application/json"},
+                )
+                if resp.status_code == 400:
+                    # Try even smaller sub-batches on 400
+                    for sub_start in range(0, len(batch), 10):
+                        sub = batch[sub_start : sub_start + 10]
+                        sub_url = (
+                            "https://query1.finance.yahoo.com/v8/finance/spark"
+                            f"?symbols={','.join(f'{s}.NS' for s in sub)}"
+                            "&range=1d&interval=1d&includePrePost=false"
+                        )
+                        try:
+                            r2 = requests.get(sub_url, timeout=10, verify=False,
+                                              headers={"User-Agent": ua})
+                            if r2.status_code == 200:
+                                for yf_sym, item in r2.json().items():
+                                    nse_sym = yf_sym.replace(".NS", "")
+                                    closes  = item.get("close") or []
+                                    ltp     = float(closes[-1]) if closes else 0.0
+                                    prev    = float(item.get("chartPreviousClose") or 0)
+                                    pct     = round((ltp - prev) / prev * 100, 2) if prev > 0 else 0.0
+                                    if nse_sym and ltp > 0:
+                                        lookup[nse_sym] = {
+                                            "last": ltp, "pct": pct,
+                                            "pe": 0.0, "week52_high": 0.0, "week52_low": 0.0,
+                                        }
+                        except Exception:
+                            pass
+                        time.sleep(0.2)
+                    continue
+                if resp.status_code != 200:
+                    logger.warning(f"Yahoo spark returned {resp.status_code}")
+                    continue
+                for yf_sym, item in resp.json().items():
+                    nse_sym = yf_sym.replace(".NS", "").replace(".BO", "")
+                    closes  = item.get("close") or []
+                    ltp     = float(closes[-1]) if closes else 0.0
+                    prev    = float(item.get("chartPreviousClose") or 0)
+                    pct     = round((ltp - prev) / prev * 100, 2) if prev > 0 else 0.0
+                    if nse_sym and ltp > 0:
+                        lookup[nse_sym] = {
+                            "last": ltp, "pct": pct,
+                            "pe": 0.0, "week52_high": 0.0, "week52_low": 0.0,
+                        }
+            except Exception as e:
+                logger.warning(f"Yahoo spark batch failed: {e}")
+            if i + batch_size < len(equity_syms):
+                time.sleep(0.3)
+        logger.info(f"Yahoo Finance spark enrichment: {len(lookup)}/{len(equity_syms)} symbols")
+        return lookup
+
+    def _get_mcx_driver_quotes(self) -> Dict[str, Dict]:
+        """Fetch global commodity futures proxies that often drive MCX-linked stocks.
+
+        Probe confirmed: range=1d returns empty close[] on weekends/off-hours.
+        range=5d always returns the last few closes — use the most recent.
+        chartPreviousClose is used for % change when prev close is available.
+        """
+        mapping = {
+            "GC=F": "Gold Futures",
+            "SI=F": "Silver Futures",
+            "CL=F": "Crude Oil Futures",
+            "NG=F": "Natural Gas Futures",
+        }
+        syms = ",".join(mapping.keys())
+        ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"
+        hdr = {"User-Agent": ua, "Accept": "application/json"}
+        out: Dict[str, Dict] = {}
+        try:
+            # range=5d gives last N closes even on weekends/holidays
+            url = (
+                "https://query1.finance.yahoo.com/v8/finance/spark"
+                f"?symbols={syms}&range=5d&interval=1d&includePrePost=false"
+            )
+            resp = requests.get(url, timeout=12, verify=False, headers=hdr)
+            if resp.status_code == 200:
+                raw = resp.json()
+                for sym, item in raw.items():
+                    if not isinstance(item, dict):
+                        continue
+                    closes = [c for c in (item.get("close") or []) if c is not None]
+                    prev_close = item.get("chartPreviousClose")
+                    if not closes:
+                        # Try to fall back to chartPreviousClose alone
+                        if prev_close:
+                            closes = [float(prev_close)]
+                        else:
+                            continue
+                    last = float(closes[-1])
+                    # Use second-to-last as prev if chartPreviousClose not set
+                    prev = float(prev_close) if prev_close else (float(closes[-2]) if len(closes) >= 2 else 0.0)
+                    pct = round((last - prev) / prev * 100, 2) if prev > 0 else 0.0
+                    out[sym] = {
+                        "name": mapping.get(sym, sym),
+                        "last": round(last, 3),
+                        "pct": pct,
+                    }
+            if out:
+                logger.info(f"MCX driver proxies via spark-5d: {len(out)}")
+                return out
+
+            # Fallback: per-symbol chart endpoint (no auth, reliable)
+            for sym in mapping:
+                try:
+                    r = requests.get(
+                        f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=5d&interval=1d",
+                        headers=hdr, timeout=10, verify=False,
+                    )
+                    if r.status_code == 200:
+                        meta = r.json().get("chart", {}).get("result", [{}])[0].get("meta", {})
+                        last = float(meta.get("regularMarketPrice") or 0)
+                        prev = float(meta.get("previousClose") or meta.get("chartPreviousClose") or 0)
+                        pct = round((last - prev) / prev * 100, 2) if (last > 0 and prev > 0) else 0.0
+                        if last > 0:
+                            out[sym] = {"name": mapping[sym], "last": round(last, 3), "pct": pct}
+                except Exception:
+                    pass
+            if out:
+                logger.info(f"MCX driver proxies via chart: {len(out)}")
+                return out
+
+            # Vendor fallback (non-Yahoo): Stooq commodity futures feed
+            stooq_map = {
+                "gc.f": "Gold Futures",
+                "si.f": "Silver Futures",
+                "cl.f": "Crude Oil Futures",
+                "ng.f": "Natural Gas Futures",
+            }
+            stooq_syms = ",".join(stooq_map.keys())
+            stooq_url = (
+                "https://stooq.com/q/l/?s="
+                f"{stooq_syms}&f=sd2t2ohlcv&h&e=csv"
+            )
+            stooq_resp = requests.get(
+                stooq_url,
+                timeout=12,
+                verify=False,
+                headers={"User-Agent": "Mozilla/5.0", "Accept": "text/csv"},
+            )
+            if stooq_resp.status_code == 200 and stooq_resp.text.strip():
+                import csv as _csv
+                rows = _csv.DictReader(stooq_resp.text.splitlines())
+                for row in rows:
+                    sym = str(row.get("Symbol", "")).strip().lower()
+                    if sym not in stooq_map:
+                        continue
+                    try:
+                        close_v = float(row.get("Close") or 0)
+                        open_v = float(row.get("Open") or 0)
+                    except (ValueError, TypeError):
+                        continue
+                    if close_v <= 0:
+                        continue
+                    pct_v = round((close_v - open_v) / open_v * 100, 2) if open_v > 0 else 0.0
+                    out[sym.upper()] = {
+                        "name": stooq_map[sym],
+                        "last": close_v,
+                        "pct": pct_v,
+                    }
+            logger.info(f"MCX driver proxies: {len(out)}")
+        except Exception as e:
+            logger.warning(f"MCX proxy quotes error: {e}")
+        return out
+
     # ── 10. USD/INR Forex ────────────────────────────────────────────────────
 
     def get_usdinr(self) -> Optional[Dict]:
@@ -701,6 +1443,32 @@ class MarketScraper:
             logger.error(f"Forex API error: {e}")
         return None
 
+    def _get_nifty500_lookup(self) -> Dict[str, Dict]:
+        """Fetch NIFTY 500 stocks in a single API call — used as enrichment fallback.
+        Returns symbol→{last, pct, week52_high, week52_low} dict.
+        """
+        url = self._url("/api/equity-stockIndices?index=NIFTY%20500")
+        raw = self.nse.api_get(url)
+        if not raw or not isinstance(raw, dict):
+            logger.warning("NIFTY 500 enrichment lookup failed")
+            return {}
+        lookup: Dict[str, Dict] = {}
+        try:
+            for item in raw.get("data", []):
+                sym = item.get("symbol", "")
+                ltp = item.get("lastPrice", 0) or 0
+                if sym and ltp > 0:
+                    lookup[sym] = {
+                        "last":        float(ltp),
+                        "pct":         item.get("pChange", 0) or 0,
+                        "week52_high": item.get("yearHigh", 0) or 0,
+                        "week52_low":  item.get("yearLow",  0) or 0,
+                    }
+            logger.info(f"NIFTY 500 enrichment lookup: {len(lookup)} symbols")
+        except Exception as e:
+            logger.warning(f"NIFTY 500 lookup parse error: {e}")
+        return lookup
+
     # ── FULL SNAPSHOT ────────────────────────────────────────────────────────
 
     def get_snapshot(
@@ -712,52 +1480,81 @@ class MarketScraper:
         include_insider: bool = False,
         include_bulk_deals: bool = False,
         sector_list: List[str] = None,
+        include_core: bool = True,
     ) -> Dict:
+        feed_health = self._load_feed_health_state()
         snapshot = {
             "timestamp": datetime.now().isoformat(),
             "fii_dii": None, "indices": None, "market_status": None,
             "forex": None, "commodities": {},
+            "mcx_drivers": {},
             "sectors": {}, "option_chain": {},
             "preopen": None, "corporate_actions": None,
+            "corporate_sources": {},
+            "earnings_calendar": [],
+            "feed_health": {},
             "insider_trading": None, "bulk_deals": None, "block_deals": None,
             "errors": [],
         }
 
-        # FII/DII
-        try:
-            snapshot["fii_dii"] = self.get_fii_dii()
-            if not snapshot["fii_dii"]:
-                snapshot["errors"].append("FII/DII unavailable")
-        except Exception as e:
-            snapshot["errors"].append(f"FII/DII: {e}")
-        time.sleep(1.5)
+        if include_core:
+            # FII/DII
+            try:
+                snapshot["fii_dii"] = self.get_fii_dii()
+                if not snapshot["fii_dii"]:
+                    snapshot["errors"].append("FII/DII unavailable")
+            except Exception as e:
+                snapshot["errors"].append(f"FII/DII: {e}")
+            time.sleep(1.5)
 
-        # Indices
-        try:
-            snapshot["indices"] = self.get_indices()
-        except Exception as e:
-            snapshot["errors"].append(f"Indices: {e}")
-        time.sleep(1)
+            # Indices
+            try:
+                snapshot["indices"] = self.get_indices()
+            except Exception as e:
+                snapshot["errors"].append(f"Indices: {e}")
+            time.sleep(1)
 
-        # Market status
-        try:
-            snapshot["market_status"] = self.get_market_status()
-        except Exception as e:
-            snapshot["errors"].append(f"Status: {e}")
-        time.sleep(1)
+            # Market status
+            try:
+                snapshot["market_status"] = self.get_market_status()
+            except Exception as e:
+                snapshot["errors"].append(f"Status: {e}")
+            time.sleep(1)
 
-        # Forex
-        try:
-            snapshot["forex"] = self.get_usdinr()
-        except Exception as e:
-            snapshot["errors"].append(f"Forex: {e}")
+            # Forex
+            try:
+                snapshot["forex"] = self.get_usdinr()
+            except Exception as e:
+                snapshot["errors"].append(f"Forex: {e}")
 
-        # Commodity ETFs
-        try:
-            snapshot["commodities"] = self.get_commodity_etfs()
-        except Exception as e:
-            snapshot["errors"].append(f"Commodities: {e}")
-        time.sleep(1)
+            # Commodity ETFs
+            try:
+                snapshot["commodities"] = self.get_commodity_etfs()
+            except Exception as e:
+                snapshot["errors"].append(f"Commodities: {e}")
+            try:
+                snapshot["mcx_drivers"] = self._get_mcx_driver_quotes()
+                if snapshot["mcx_drivers"]:
+                    self._mark_feed_health(feed_health, "MCX_DRV", "ok", len(snapshot["mcx_drivers"]))
+                else:
+                    self._mark_feed_health(feed_health, "MCX_DRV", "no-data", 0)
+            except Exception as e:
+                snapshot["errors"].append(f"MCX drivers: {e}")
+                self._mark_feed_health(feed_health, "MCX_DRV", "error", 0, str(e))
+            time.sleep(1)
+
+        # In corporate-only mode include_core=False, still fetch MCX drivers
+        # so corporate Telegram message can include key commodity-price drivers.
+        if include_corporate and not snapshot.get("mcx_drivers"):
+            try:
+                snapshot["mcx_drivers"] = self._get_mcx_driver_quotes()
+                if snapshot["mcx_drivers"]:
+                    self._mark_feed_health(feed_health, "MCX_DRV", "ok", len(snapshot["mcx_drivers"]))
+                else:
+                    self._mark_feed_health(feed_health, "MCX_DRV", "no-data", 0)
+            except Exception as e:
+                snapshot["errors"].append(f"MCX drivers: {e}")
+                self._mark_feed_health(feed_health, "MCX_DRV", "error", 0, str(e))
 
         # Sectors
         if include_sectors:
@@ -790,17 +1587,99 @@ class MarketScraper:
                 snapshot["errors"].append(f"Pre-open: {e}")
             time.sleep(1)
 
-        # Corporate actions (daily, once in evening)
+        # Corporate actions (daily, once in evening) — NSE + BSE merged
         if include_corporate:
             try:
-                snapshot["corporate_actions"] = self.get_corporate_actions()
-                # Enrich with LTP, PE from stock quotes
+                nse_actions = self.get_corporate_actions() or []
+                self._mark_feed_health(feed_health, "NSE_CA", "ok" if nse_actions else "no-data", len(nse_actions))
+                nse_board = self.get_nse_board_meetings() or []
+                self._mark_feed_health(feed_health, "NSE_BM", "ok" if nse_board else "no-data", len(nse_board))
+                nse_ann = self.get_nse_major_announcements() or []
+                self._mark_feed_health(feed_health, "NSE_ANN", "ok" if nse_ann else "no-data", len(nse_ann))
+                nse_earnings = self.get_nse_earnings_calendar() or []
+                self._mark_feed_health(feed_health, "NSE_ER", "ok" if nse_earnings else "no-data", len(nse_earnings))
+                time.sleep(1)
+                bse_actions = self.get_bse_corporate_actions() or []
+                self._mark_feed_health(feed_health, "BSE_CA", "ok" if bse_actions else "no-data", len(bse_actions))
+                # Deduplicate by (symbol, ex_date, subject-prefix)
+                seen_keys: Dict[tuple, int] = {}
+                merged = []
+                for a in nse_actions + nse_board + nse_ann + bse_actions:
+                    key = (
+                        a.get("symbol", "").upper(),
+                        a.get("ex_date", ""),
+                        a.get("subject", "")[:30].lower(),
+                    )
+                    idx = seen_keys.get(key)
+                    if idx is None:
+                        seen_keys[key] = len(merged)
+                        merged.append(a)
+                    else:
+                        # Preserve dual-source visibility for overlapping records.
+                        existing = merged[idx]
+                        src_existing = str(existing.get("source", "NSE") or "NSE")
+                        src_new = str(a.get("source", "NSE") or "NSE")
+                        src_parts = {s.strip() for s in src_existing.split("+") if s.strip()}
+                        src_parts.add(src_new)
+                        existing["source"] = "+".join(sorted(src_parts))
+                snapshot["corporate_actions"] = merged if merged else None
+                snapshot["earnings_calendar"] = nse_earnings
+                source_counts: Dict[str, int] = {}
+                for row in merged:
+                    src = str(row.get("source", "NSE") or "NSE")
+                    source_counts[src] = source_counts.get(src, 0) + 1
+                if nse_earnings:
+                    source_counts["NSE-ER"] = len(nse_earnings)
+                snapshot["corporate_sources"] = source_counts
+                logger.info(
+                    f"Corporate merged: NSE={len(nse_actions)} NSE-BM={len(nse_board)} "
+                    f"NSE-ANN={len(nse_ann)} NSE-ER={len(nse_earnings)} BSE={len(bse_actions)} "
+                    f"final={len(merged)}"
+                )
+                if not snapshot["corporate_actions"]:
+                    # Live-only guarantee: do not inject stale cached corporate data.
+                    snapshot["errors"].append("Corporate actions: live sources returned no data")
+                # ── Enrichment: build symbol→LTP lookup ──────────────────────
+                # Priority: sector data → Yahoo Finance spark → NIFTY 500 bulk → CSV
+                enrich_lookup = self._get_sector_stock_lookup(
+                    snapshot.get("sectors", {})
+                )
+                corp_symbols = {a.get("symbol", "") for a in (merged or [])}
+                covered = corp_symbols & set(enrich_lookup.keys())
+
+                # Always try Yahoo Finance spark (fast, reliable, no auth)
+                uncovered = [s for s in corp_symbols if s and s not in enrich_lookup]
+                if uncovered:
+                    logger.info(
+                        f"Sector covers {len(covered)}/{len(corp_symbols)} — "
+                        f"fetching {len(uncovered)} symbols from Yahoo Finance"
+                    )
+                    yf_lookup = self._get_yahoo_quotes_batch(uncovered)
+                    enrich_lookup = {**yf_lookup, **enrich_lookup}  # sector wins
+                    time.sleep(0.5)
+
+                # If still many uncovered, try NIFTY 500 (one NSE bulk call)
+                still_uncovered = corp_symbols - set(enrich_lookup.keys())
+                if len(still_uncovered) > len(corp_symbols) * 0.3:
+                    logger.info(f"Trying NIFTY 500 for {len(still_uncovered)} remaining")
+                    n500 = self._get_nifty500_lookup()
+                    enrich_lookup = {**n500, **enrich_lookup}
+                    time.sleep(1)
+
+                # CSV as last resort (covers recently rebuilt dividend list)
+                csv_lk = self._get_dividend_csv_lookup()
+                enrich_lookup = {**csv_lk, **enrich_lookup}  # live data wins over CSV
+                # Enrich using the combined lookup
                 if snapshot["corporate_actions"]:
                     snapshot["corporate_actions"] = self.enrich_corporate_actions(
-                        snapshot["corporate_actions"], max_enrich=25
+                        snapshot["corporate_actions"],
+                        sector_data=None,
+                        prebuilt_lookup=enrich_lookup,
                     )
             except Exception as e:
                 snapshot["errors"].append(f"Corp actions: {e}")
+                self._mark_feed_health(feed_health, "NSE_CA", "error", 0, str(e))
+                self._mark_feed_health(feed_health, "BSE_CA", "error", 0, str(e))
             time.sleep(1.5)
 
         # Insider trading (daily, once in evening)
@@ -821,6 +1700,9 @@ class MarketScraper:
                 snapshot["block_deals"] = self.get_block_deals()
             except Exception as e:
                 snapshot["errors"].append(f"Block deals: {e}")
+
+        snapshot["feed_health"] = feed_health
+        self._save_feed_health_state(feed_health)
 
         logger.info(f"Snapshot complete ({len(snapshot['errors'])} errors)")
         return snapshot
