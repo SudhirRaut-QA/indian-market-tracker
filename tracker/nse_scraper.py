@@ -756,21 +756,24 @@ class MarketScraper:
         if not need:
             return
 
-        # Cap to avoid slow runs
+        # Cap to avoid slow runs (each symbol = up to 2 API calls + 0.3s delay)
         need = need[:max_symbols]
         logger.info(f"TBA dividend backfill: fetching per-symbol data for {len(need)} symbols")
         patched = 0
+        ann_from = (today - timedelta(days=120)).strftime("%d-%m-%Y")
+        ann_to = today.strftime("%d-%m-%Y")
         for row in need:
             sym = str(row.get("symbol", "") or "").strip().upper()
             target_ex = str(row.get("ex_date", "") or "").strip()
+            resolved = False
             try:
                 # ── Pass 1: per-symbol CA endpoint (fastest, returns structured data) ──
-                url = self._url(
+                ca_url = self._url(
                     f"/api/corporates-corporateActions?index=equities&symbol={sym}"
                 )
-                raw = self.nse.api_get(url)
-                if raw and isinstance(raw, list):
-                    for item in raw:
+                ca_raw = self.nse.api_get(ca_url)
+                if ca_raw and isinstance(ca_raw, list):
+                    for item in ca_raw:
                         item_ex = str(item.get("exDate", "") or "").strip()
                         item_subj = str(item.get("subject", "") or "")
                         if item_ex != target_ex:
@@ -783,56 +786,63 @@ class MarketScraper:
                         if row.get("source") == "NSE-ANN":
                             row["source"] = "NSE"
                         patched += 1
+                        resolved = True
                         logger.info(
                             f"TBA backfill (CA) patched {sym} ex:{target_ex} "
                             f"amount={sum(amounts):.2f} (was: {old_subj[:60]!r})"
                         )
                         break
-                    else:
-                        # ── Pass 2: per-symbol announcements endpoint ──
-                        # NSE sometimes posts dividend declaration announcements
-                        # separately from the structured CA entry.  Collect all
-                        # amounts from recent announcements and synthesise a subject.
-                        ann_from = (today - timedelta(days=120)).strftime("%d-%m-%Y")
-                        ann_to = today.strftime("%d-%m-%Y")
-                        ann_url = self._url(
-                            f"/api/corporate-announcements?index=equities"
-                            f"&symbol={sym}&from_date={ann_from}&to_date={ann_to}"
-                        )
-                        ann_raw = self.nse.api_get(ann_url)
-                        if ann_raw and isinstance(ann_raw, list):
-                            collected: List[float] = []
-                            label_parts: List[str] = []
-                            for ann in ann_raw:
-                                att = str(ann.get("attchmntText", "") or "")
-                                if not att:
-                                    continue
-                                amts = _extract_dividend_amounts(att)
-                                if not amts:
-                                    continue
-                                # Label: guess type from text
-                                att_l = att.lower()
-                                if "special" in att_l:
-                                    lbl = f"Special Dividend - Rs {sum(amts):.2f} per equity share"
-                                elif "interim" in att_l:
-                                    lbl = f"Interim Dividend - Rs {sum(amts):.2f} per equity share"
-                                else:
-                                    lbl = f"Final Dividend - Rs {sum(amts):.2f} per equity share"
-                                collected.extend(amts)
-                                label_parts.append(lbl)
-                            if collected:
-                                # Build synthetic subject that _extract_dividend_amounts can parse
-                                pieces = " and ".join(label_parts)
-                                new_subj = f"{pieces}"
-                                old_subj = row.get("subject", "")
-                                row["subject"] = new_subj
-                                if row.get("source") == "NSE-ANN":
-                                    row["source"] = "NSE-ANN-BACKFILL"
-                                patched += 1
-                                logger.info(
-                                    f"TBA backfill (ANN) patched {sym} ex:{target_ex} "
-                                    f"total={sum(collected):.2f} pieces={pieces[:80]}"
-                                )
+
+                # ── Pass 2: per-symbol announcements endpoint ──
+                # Runs whenever Pass 1 did NOT resolve (CA endpoint failed, returned
+                # empty, or had no future ex-date record).  NSE sometimes posts the
+                # dividend declaration as a separate announcement without an ex-date
+                # field, so the batch CA feed misses it until NSE formally processes it.
+                if not resolved:
+                    ann_url = self._url(
+                        f"/api/corporate-announcements?index=equities"
+                        f"&symbol={sym}&from_date={ann_from}&to_date={ann_to}"
+                    )
+                    ann_raw = self.nse.api_get(ann_url)
+                    if ann_raw and isinstance(ann_raw, list):
+                        collected: List[float] = []
+                        label_parts: List[str] = []
+                        seen_amts: set = set()
+                        for ann in ann_raw:
+                            att = str(ann.get("attchmntText", "") or "")
+                            if not att:
+                                continue
+                            amts = _extract_dividend_amounts(att)
+                            if not amts:
+                                continue
+                            # De-duplicate amounts from multiple announcements
+                            # covering the same component (e.g. two notices for Rs 20)
+                            amt_key = round(sum(amts), 4)
+                            if amt_key in seen_amts:
+                                continue
+                            seen_amts.add(amt_key)
+                            att_l = att.lower()
+                            if "special" in att_l:
+                                lbl = f"Special Dividend - Rs {sum(amts):.2f} per equity share"
+                            elif "interim" in att_l:
+                                lbl = f"Interim Dividend - Rs {sum(amts):.2f} per equity share"
+                            else:
+                                lbl = f"Final Dividend - Rs {sum(amts):.2f} per equity share"
+                            collected.extend(amts)
+                            label_parts.append(lbl)
+                        if collected:
+                            pieces = " and ".join(label_parts)
+                            old_subj = row.get("subject", "")
+                            row["subject"] = pieces
+                            if "NSE-ANN" in str(row.get("source", "")):
+                                row["source"] = "NSE-ANN-BACKFILL"
+                            patched += 1
+                            resolved = True
+                            logger.info(
+                                f"TBA backfill (ANN) patched {sym} ex:{target_ex} "
+                                f"total={sum(collected):.2f} | {pieces[:80]}"
+                            )
+
                 time.sleep(0.3)  # polite delay between per-symbol calls
             except Exception as e:
                 logger.debug(f"TBA backfill failed for {sym}: {e}")
@@ -2275,7 +2285,8 @@ class MarketScraper:
                 # but no amount. Fetch per-symbol NSE endpoint for up to 20 such rows
                 # and patch the subject so _extract_dividend_amounts() can compute yield.
                 try:
-                    self._backfill_tba_dividend_amounts(merged, today, cutoff, max_symbols=20)
+                    # Up to 60 TBA symbols per run (2 API calls + 0.3s each ≈ 36s max)
+                    self._backfill_tba_dividend_amounts(merged, today, cutoff, max_symbols=60)
                 except Exception as e:
                     logger.debug(f"TBA backfill error (non-fatal): {e}")
 
