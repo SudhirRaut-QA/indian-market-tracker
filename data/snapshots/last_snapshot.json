@@ -1,34 +1,400 @@
 {
-  "timestamp": "2026-06-30T12:43:44.821906",
-  "fii_dii": null,
-  "indices": null,
-  "market_status": null,
-  "forex": null,
+  "timestamp": "2026-06-30 21:00:03 IST",
+  "fii_dii": {
+    "timestamp": "2026-06-30T21:00:06.055817",
+    "date": "30-Jun-2026",
+    "fii": {
+      "buy": 23273.71,
+      "sell": 25830.46,
+      "net": -2556.75
+    },
+    "dii": {
+      "buy": 23432.58,
+      "sell": 16590.24,
+      "net": 6842.34
+    },
+    "total_net": 4285.59,
+    "signal": "DII Defensive",
+    "interpretation": "FII selling, DII buying — DII supporting"
+  },
+  "indices": {
+    "NIFTY 50": {
+      "last": 23865.75,
+      "change": -80.5,
+      "pct": -0.34,
+      "open": 24032.05,
+      "high": 24035.55,
+      "low": 23829.2,
+      "prev_close": 23946.25,
+      "advances": "25",
+      "declines": "25",
+      "unchanged": "0"
+    },
+    "NIFTY NEXT 50": {
+      "last": 71629.45,
+      "change": 119.15,
+      "pct": 0.17,
+      "open": 71716.9,
+      "high": 71970.05,
+      "low": 71358.45,
+      "prev_close": 71510.3,
+      "advances": "32",
+      "declines": "18",
+      "unchanged": "0"
+    },
+    "NIFTY BANK": {
+      "last": 57542.9,
+      "change": -184.45,
+      "pct": -0.32,
+      "open": 58011.95,
+      "high": 58011.95,
+      "low": 57456.65,
+      "prev_close": 57727.35,
+      "advances": "8",
+      "declines": "6",
+      "unchanged": "0"
+    },
+    "NIFTY FINANCIAL SERVICES": {
+      "last": 26554.55,
+      "change": -43.8,
+      "pct": -0.16,
+      "open": 26724.85,
+      "high": 26729.7,
+      "low": 26505.75,
+      "prev_close": 26598.35,
+      "advances": "11",
+      "declines": "9",
+      "unchanged": "0"
+    },
+    "NIFTY MIDCAP 50": {
+      "last": 17594.9,
+      "change": 73.9,
+      "pct": 0.42,
+      "open": 17568.2,
+      "high": 17669,
+      "low": 17475.55,
+      "prev_close": 17521,
+      "advances": "33",
+      "declines": "16",
+      "unchanged": "1"
+    },
+    "INDIA VIX": {
+      "last": 13.6,
+      "change": -0.01,
+      "pct": -0.07,
+      "open": 13.61,
+      "high": 13.97,
+      "low": 13.15,
+      "prev_close": 13.61,
+      "advances": 0,
+      "declines": 0,
+      "unchanged": 0
+    },
+    "NIFTY SMALLCAP 50": {
+      "last": 9332.55,
+      "change": 97.5,
+      "pct": 1.06,
+      "open": 9264.15,
+      "high": 9355.25,
+      "low": 9251.5,
+      "prev_close": 9235.05,
+      "advances": "39",
+      "declines": "11",
+      "unchanged": "0"
+    },
+    "NIFTY AUTO": {
+      "last": 26479.8,
+      "change": 62.2,
+      "pct": 0.24,
+      "open": 26537,
+      "high": 26664.3,
+      "low": 26067.7,
+      "prev_close": 26417.6,
+      "advances": "9",
+      "declines": "5",
+      "unchanged": "1"
+    },
+    "NIFTY FMCG": {
+      "last": 48794.2,
+      "change": -333.45,
+      "pct": -0.68,
+      "open": 49119.8,
+      "high": 49159.4,
+      "low": 48712.7,
+      "prev_close": 49127.65,
+      "advances": "7",
+      "declines": "8",
+      "unchanged": "0"
+    },
+    "NIFTY IT": {
+      "last": 26299.05,
+      "change": -739.45,
+      "pct": -2.73,
+      "open": 26989.95,
+      "high": 27032.2,
+      "low": 26208.5,
+      "prev_close": 27038.5,
+      "advances": "1",
+      "declines": "9",
+      "unchanged": "0"
+    },
+    "NIFTY METAL": {
+      "last": 12519.15,
+      "change": -25.85,
+      "pct": -0.21,
+      "open": 12529.25,
+      "high": 12573.05,
+      "low": 12442.1,
+      "prev_close": 12545,
+      "advances": "7",
+      "declines": "8",
+      "unchanged": "0"
+    },
+    "NIFTY PHARMA": {
+      "last": 25326.4,
+      "change": 98.5,
+      "pct": 0.39,
+      "open": 25274.75,
+      "high": 25476.55,
+      "low": 25173.05,
+      "prev_close": 25227.9,
+      "advances": "16",
+      "declines": "4",
+      "unchanged": "0"
+    },
+    "NIFTY PSU BANK": {
+      "last": 8492.65,
+      "change": -61.2,
+      "pct": -0.72,
+      "open": 8583.15,
+      "high": 8598.7,
+      "low": 8481.4,
+      "prev_close": 8553.85,
+      "advances": "5",
+      "declines": "7",
+      "unchanged": "0"
+    },
+    "NIFTY REALTY": {
+      "last": 829.55,
+      "change": 10.7,
+      "pct": 1.31,
+      "open": 823.25,
+      "high": 835.3,
+      "low": 818.55,
+      "prev_close": 818.85,
+      "advances": "8",
+      "declines": "2",
+      "unchanged": "0"
+    },
+    "NIFTY OIL & GAS": {
+      "last": 11030.25,
+      "change": 18.2,
+      "pct": 0.17,
+      "open": 11040.85,
+      "high": 11069.2,
+      "low": 10952.25,
+      "prev_close": 11012.05,
+      "advances": "10",
+      "declines": "5",
+      "unchanged": "0"
+    },
+    "NIFTY100 LOW VOLATILITY 30": {
+      "last": 19683.1,
+      "change": -50.35,
+      "pct": -0.26,
+      "open": 19779.15,
+      "high": 19786.4,
+      "low": 19638.75,
+      "prev_close": 19733.45,
+      "advances": "14",
+      "declines": "16",
+      "unchanged": "0"
+    },
+    "NIFTY200 MOMENTUM 30": {
+      "last": 30912.9,
+      "change": -25.05,
+      "pct": -0.08,
+      "open": 30909.9,
+      "high": 31047.6,
+      "low": 30704.8,
+      "prev_close": 30937.95,
+      "advances": "16",
+      "declines": "14",
+      "unchanged": "0"
+    },
+    "NIFTY HIGH BETA 50": {
+      "last": 4296,
+      "change": 25.5,
+      "pct": 0.6,
+      "open": 4284.35,
+      "high": 4316.9,
+      "low": 4271.05,
+      "prev_close": 4270.5,
+      "advances": "37",
+      "declines": "13",
+      "unchanged": "0"
+    },
+    "NIFTY COMMODITIES": {
+      "last": 9792.95,
+      "change": -26.95,
+      "pct": -0.27,
+      "open": 9825.55,
+      "high": 9837.75,
+      "low": 9756.9,
+      "prev_close": 9819.9,
+      "advances": "14",
+      "declines": "16",
+      "unchanged": "0"
+    },
+    "NIFTY ENERGY": {
+      "last": 39740.5,
+      "change": 22.5,
+      "pct": 0.06,
+      "open": 39784.75,
+      "high": 39848.05,
+      "low": 39521.2,
+      "prev_close": 39718,
+      "advances": "25",
+      "declines": "15",
+      "unchanged": "0"
+    },
+    "NIFTY INDIA DEFENCE": {
+      "last": 9519.4,
+      "change": 128.4,
+      "pct": 1.37,
+      "open": 9368.9,
+      "high": 9575.95,
+      "low": 9307.95,
+      "prev_close": 9391,
+      "advances": "17",
+      "declines": "2",
+      "unchanged": "0"
+    }
+  },
+  "market_status": {
+    "Capital Market": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026 15:30",
+      "index": "NIFTY 50",
+      "last": 23865.75,
+      "variation": -80.5,
+      "pct": -0.34
+    },
+    "Currency": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "Commodity": {
+      "status": "Open",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "Debt": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "currencyfuture": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "94.9025",
+      "variation": "",
+      "pct": ""
+    }
+  },
+  "forex": {
+    "usdinr": 94.5644,
+    "usdeur": 0.8773,
+    "usdgbp": 0.7556,
+    "usdjpy": 162.1795,
+    "date": "2026-06-30"
+  },
   "commodities": {},
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4039.3,
-      "pct": 0.22
+      "last": 4038.9,
+      "pct": 0.21
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 3.197,
-      "pct": -4.37
+      "last": 3.319,
+      "pct": -0.72
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 59.185,
-      "pct": 1.43
+      "last": 60.02,
+      "pct": 2.87
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 70.19,
-      "pct": -2.41
+      "last": 70.26,
+      "pct": -2.31
     }
   },
-  "global_indices": {},
-  "global_sentiment": {},
+  "global_indices": {
+    "S&P 500": {
+      "symbol": "^GSPC",
+      "last": 7479.92,
+      "pct": 1.55
+    },
+    "NASDAQ": {
+      "symbol": "^IXIC",
+      "last": 26100.012,
+      "pct": 2.0
+    },
+    "DOW": {
+      "symbol": "^DJI",
+      "last": 52328.25,
+      "pct": 1.28
+    },
+    "NIKKEI": {
+      "symbol": "^N225",
+      "last": 69468.11,
+      "pct": 0.42
+    },
+    "HANG SENG": {
+      "symbol": "^HSI",
+      "last": 22881.02,
+      "pct": -1.95
+    },
+    "FTSE": {
+      "symbol": "^FTSE",
+      "last": 10522.32,
+      "pct": 0.9
+    }
+  },
+  "global_sentiment": {
+    "fear_greed": {
+      "score": 29.46,
+      "rating": "fear",
+      "previous_close": 27.0285714285714,
+      "timestamp": "2026-06-30T15:28:49+00:00"
+    },
+    "macro": {
+      "DXY": {
+        "symbol": "DX-Y.NYB",
+        "last": 101.139,
+        "pct": -0.29
+      },
+      "BRENT": {
+        "symbol": "BZ=F",
+        "last": 73.81,
+        "pct": -1.93
+      }
+    }
+  },
   "quality_lookup": {},
   "sectors": {},
   "option_chain": {},
@@ -44,8 +410,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 10437.0,
-      "pct": -1.46
+      "ltp": 10603.0,
+      "pct": 0.1
     },
     {
       "symbol": "MAHSCOOTER",
@@ -57,8 +423,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 12543.0,
-      "pct": 1.28
+      "ltp": 12501.0,
+      "pct": 0.94
     },
     {
       "symbol": "BAJAJFINSV",
@@ -70,8 +436,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1780.4,
-      "pct": 1.2
+      "ltp": 1780.2,
+      "pct": 1.19
     },
     {
       "symbol": "WELCORP",
@@ -83,8 +449,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1517.8,
-      "pct": 0.46
+      "ltp": 1521.9,
+      "pct": 0.73
     },
     {
       "symbol": "PATINTLOG",
@@ -109,8 +475,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 999.75,
-      "pct": 1.8
+      "ltp": 1004.75,
+      "pct": 2.31
     },
     {
       "symbol": "DSFCL",
@@ -135,8 +501,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 330.15,
-      "pct": -1.54
+      "ltp": 327.05,
+      "pct": -2.46
     },
     {
       "symbol": "LLOYDSENT",
@@ -148,8 +514,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 74.3,
-      "pct": -1.26
+      "ltp": 73.82,
+      "pct": -1.9
     },
     {
       "symbol": "CHEMBOND",
@@ -161,8 +527,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 189.0,
-      "pct": 1.61
+      "ltp": 188.97,
+      "pct": 1.59
     },
     {
       "symbol": "BALAMINES",
@@ -174,8 +540,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1985.0,
-      "pct": 4.9
+      "ltp": 2035.9,
+      "pct": 7.59
     },
     {
       "symbol": "BHARATFORG",
@@ -200,8 +566,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 417.0,
-      "pct": 0.42
+      "ltp": 418.3,
+      "pct": 0.73
     },
     {
       "symbol": "M&M",
@@ -213,8 +579,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 3105.0,
-      "pct": 0.39
+      "ltp": 3068.8,
+      "pct": -0.78
     },
     {
       "symbol": "MAHLIFE",
@@ -226,8 +592,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 365.95,
-      "pct": -0.3
+      "ltp": 366.45,
+      "pct": -0.16
     },
     {
       "symbol": "THERMAX",
@@ -239,8 +605,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 5136.0,
-      "pct": 0.21
+      "ltp": 5159.5,
+      "pct": 0.67
     },
     {
       "symbol": "TECHM",
@@ -252,8 +618,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1404.6,
-      "pct": -2.04
+      "ltp": 1404.7,
+      "pct": -2.03
     },
     {
       "symbol": "TEAMLEASE",
@@ -265,8 +631,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1445.6,
-      "pct": -0.11
+      "ltp": 1445.1,
+      "pct": -0.15
     },
     {
       "symbol": "KRISHANA",
@@ -278,8 +644,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 680.15,
-      "pct": -0.29
+      "ltp": 688.0,
+      "pct": 0.86
     },
     {
       "symbol": "KIRLPNU",
@@ -291,8 +657,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1926.8,
-      "pct": 1.11
+      "ltp": 1953.0,
+      "pct": 2.48
     },
     {
       "symbol": "AKUMS",
@@ -304,8 +670,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 622.25,
-      "pct": -0.38
+      "ltp": 623.15,
+      "pct": -0.24
     },
     {
       "symbol": "SWARAJENG",
@@ -317,7 +683,7 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 3997.3,
+      "ltp": 3997.6,
       "pct": 0.92
     },
     {
@@ -330,8 +696,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 3993.8,
-      "pct": -0.83
+      "ltp": 4098.0,
+      "pct": 1.76
     },
     {
       "symbol": "JSWDULUX",
@@ -343,8 +709,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 3246.9,
-      "pct": -0.49
+      "ltp": 3228.1,
+      "pct": -1.07
     },
     {
       "symbol": "SKFINDIA",
@@ -356,8 +722,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1671.0,
-      "pct": 0.92
+      "ltp": 1672.5,
+      "pct": 1.01
     },
     {
       "symbol": "SHRIRAMFIN",
@@ -369,8 +735,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1046.85,
-      "pct": 1.38
+      "ltp": 1042.15,
+      "pct": 0.92
     },
     {
       "symbol": "REDINGTON",
@@ -382,8 +748,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 277.06,
-      "pct": 0.56
+      "ltp": 276.18,
+      "pct": 0.24
     },
     {
       "symbol": "RAYMONDREL",
@@ -395,8 +761,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 623.3,
-      "pct": -0.1
+      "ltp": 619.2,
+      "pct": -0.76
     },
     {
       "symbol": "EXIDEIND",
@@ -408,8 +774,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 390.9,
-      "pct": 1.13
+      "ltp": 387.6,
+      "pct": 0.27
     },
     {
       "symbol": "ESCORTS",
@@ -421,8 +787,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2930.2,
-      "pct": 1.14
+      "ltp": 2935.9,
+      "pct": 1.34
     },
     {
       "symbol": "WELENT",
@@ -434,8 +800,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 603.0,
-      "pct": 5.02
+      "ltp": 601.45,
+      "pct": 4.75
     },
     {
       "symbol": "MBAPL",
@@ -447,8 +813,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 561.95,
-      "pct": -0.05
+      "ltp": 562.0,
+      "pct": -0.04
     },
     {
       "symbol": "MAXHEALTH",
@@ -460,8 +826,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1145.25,
-      "pct": -0.4
+      "ltp": 1129.25,
+      "pct": -1.8
     },
     {
       "symbol": "CANFINHOME",
@@ -473,8 +839,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 871.75,
-      "pct": 4.11
+      "ltp": 867.95,
+      "pct": 3.66
     },
     {
       "symbol": "UNIONBANK",
@@ -486,8 +852,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 173.62,
-      "pct": -0.54
+      "ltp": 172.43,
+      "pct": -1.22
     },
     {
       "symbol": "PILANIINVS",
@@ -499,8 +865,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4360.7,
-      "pct": 0.29
+      "ltp": 4349.0,
+      "pct": 0.02
     },
     {
       "symbol": "SUNDARMFIN",
@@ -512,8 +878,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4560.6,
-      "pct": 0.29
+      "ltp": 4506.7,
+      "pct": -0.9
     },
     {
       "symbol": "SUNPHARMA",
@@ -525,8 +891,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1868.9,
-      "pct": -0.31
+      "ltp": 1862.5,
+      "pct": -0.66
     },
     {
       "symbol": "CERA",
@@ -538,8 +904,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 6389.5,
-      "pct": -1.14
+      "ltp": 6451.5,
+      "pct": -0.19
     },
     {
       "symbol": "TSFINV",
@@ -551,8 +917,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 435.45,
-      "pct": -1.91
+      "ltp": 440.15,
+      "pct": -0.86
     },
     {
       "symbol": "DODLA",
@@ -564,8 +930,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1116.2,
-      "pct": -0.45
+      "ltp": 1122.7,
+      "pct": 0.12
     },
     {
       "symbol": "JSWSTEEL",
@@ -577,8 +943,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1229.1,
-      "pct": -0.27
+      "ltp": 1226.4,
+      "pct": -0.49
     },
     {
       "symbol": "UNITDSPR",
@@ -590,8 +956,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1351.0,
-      "pct": 0.71
+      "ltp": 1350.4,
+      "pct": 0.66
     },
     {
       "symbol": "MPHASIS",
@@ -603,8 +969,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2167.0,
-      "pct": -1.85
+      "ltp": 2161.6,
+      "pct": -2.09
     },
     {
       "symbol": "SFL",
@@ -616,8 +982,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 740.5,
-      "pct": -0.29
+      "ltp": 746.9,
+      "pct": 0.57
     },
     {
       "symbol": "JKCEMENT",
@@ -629,8 +995,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 5516.5,
-      "pct": 3.7
+      "ltp": 5444.5,
+      "pct": 2.35
     },
     {
       "symbol": "APOLLOTYRE",
@@ -642,8 +1008,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 430.75,
-      "pct": 2.4
+      "ltp": 430.2,
+      "pct": 2.27
     },
     {
       "symbol": "AXISBANK",
@@ -655,8 +1021,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1358.4,
-      "pct": 0.12
+      "ltp": 1345.7,
+      "pct": -0.82
     },
     {
       "symbol": "MAHLOG",
@@ -668,8 +1034,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 374.05,
-      "pct": 0.44
+      "ltp": 373.9,
+      "pct": 0.4
     },
     {
       "symbol": "BSE",
@@ -681,8 +1047,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 3894.8,
-      "pct": 0.9
+      "ltp": 3865.6,
+      "pct": 0.15
     },
     {
       "symbol": "BSOFT",
@@ -694,8 +1060,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 286.85,
-      "pct": -4.1
+      "ltp": 286.3,
+      "pct": -4.28
     },
     {
       "symbol": "CAMS",
@@ -707,8 +1073,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 793.85,
-      "pct": 0.66
+      "ltp": 796.85,
+      "pct": 1.04
     },
     {
       "symbol": "VSTIND",
@@ -720,8 +1086,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 260.4,
-      "pct": -0.04
+      "ltp": 260.3,
+      "pct": -0.08
     },
     {
       "symbol": "WELSPUNLIV",
@@ -733,8 +1099,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 161.05,
-      "pct": -0.61
+      "ltp": 158.84,
+      "pct": -1.97
     },
     {
       "symbol": "ZFCVINDIA",
@@ -746,8 +1112,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2528.0,
-      "pct": -5.88
+      "ltp": 2566.0,
+      "pct": -4.47
     },
     {
       "symbol": "NESTLEIND",
@@ -759,8 +1125,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1402.0,
-      "pct": 1.06
+      "ltp": 1405.2,
+      "pct": 1.29
     },
     {
       "symbol": "ORIENTELEC",
@@ -772,8 +1138,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 175.0,
-      "pct": -0.23
+      "ltp": 175.46,
+      "pct": 0.03
     },
     {
       "symbol": "GRINDWELL",
@@ -785,8 +1151,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2185.8,
-      "pct": 1.82
+      "ltp": 2166.1,
+      "pct": 0.9
     },
     {
       "symbol": "HINDALCO",
@@ -798,8 +1164,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 960.5,
-      "pct": -0.34
+      "ltp": 956.6,
+      "pct": -0.75
     },
     {
       "symbol": "M&MFIN",
@@ -811,8 +1177,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 321.0,
-      "pct": 1.78
+      "ltp": 315.8,
+      "pct": 0.13
     },
     {
       "symbol": "SPLPETRO",
@@ -824,8 +1190,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 725.5,
-      "pct": -0.76
+      "ltp": 713.95,
+      "pct": -2.34
     },
     {
       "symbol": "MOTHERSON",
@@ -837,8 +1203,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 149.69,
-      "pct": -0.58
+      "ltp": 148.11,
+      "pct": -1.63
     },
     {
       "symbol": "HERITGFOOD",
@@ -850,8 +1216,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 332.05,
-      "pct": 0.53
+      "ltp": 328.25,
+      "pct": -0.62
     },
     {
       "symbol": "BBL",
@@ -863,8 +1229,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2898.0,
-      "pct": 4.08
+      "ltp": 2884.9,
+      "pct": 3.61
     },
     {
       "symbol": "KFINTECH",
@@ -876,8 +1242,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 888.9,
-      "pct": 2.25
+      "ltp": 879.8,
+      "pct": 1.21
     },
     {
       "symbol": "COROMANDEL",
@@ -889,8 +1255,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1983.1,
-      "pct": 3.62
+      "ltp": 2005.0,
+      "pct": 4.76
     },
     {
       "symbol": "CRAFTSMAN",
@@ -902,8 +1268,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 9477.5,
-      "pct": 0.95
+      "ltp": 9460.0,
+      "pct": 0.77
     },
     {
       "symbol": "VMART",
@@ -915,8 +1281,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 765.9,
-      "pct": 1.39
+      "ltp": 779.05,
+      "pct": 3.13
     },
     {
       "symbol": "BLUESTARCO",
@@ -928,8 +1294,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1638.9,
-      "pct": 0.21
+      "ltp": 1628.3,
+      "pct": -0.44
     },
     {
       "symbol": "BIKAJI",
@@ -941,8 +1307,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 647.8,
-      "pct": 0.81
+      "ltp": 650.75,
+      "pct": 1.27
     },
     {
       "symbol": "BALKRISIND",
@@ -954,8 +1320,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2202.6,
-      "pct": 1.61
+      "ltp": 2180.4,
+      "pct": 0.59
     },
     {
       "symbol": "LMW",
@@ -967,8 +1333,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 15914.0,
-      "pct": -0.37
+      "ltp": 15720.0,
+      "pct": -1.58
     },
     {
       "symbol": "ATUL",
@@ -980,8 +1346,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 6525.0,
-      "pct": -1.26
+      "ltp": 6464.5,
+      "pct": -2.18
     },
     {
       "symbol": "HONAUT",
@@ -993,8 +1359,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 39510.0,
-      "pct": 1.26
+      "ltp": 39735.0,
+      "pct": 1.83
     },
     {
       "symbol": "3MINDIA",
@@ -1017,8 +1383,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1591.9,
-      "pct": 0.33
+      "ltp": 1594.0,
+      "pct": 0.47
     },
     {
       "symbol": "HAPPSTMNDS",
@@ -1030,8 +1396,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 339.25,
-      "pct": 0.47
+      "ltp": 341.05,
+      "pct": 1.01
     },
     {
       "symbol": "PFIZER",
@@ -1043,8 +1409,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4438.9,
-      "pct": 0.77
+      "ltp": 4439.4,
+      "pct": 0.78
     },
     {
       "symbol": "DABUR",
@@ -1056,8 +1422,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 424.3,
-      "pct": -0.47
+      "ltp": 422.2,
+      "pct": -0.96
     },
     {
       "symbol": "CUMMINSIND",
@@ -1069,8 +1435,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 5628.0,
-      "pct": 1.56
+      "ltp": 5659.5,
+      "pct": 2.13
     },
     {
       "symbol": "NH",
@@ -1082,8 +1448,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1965.9,
-      "pct": 3.31
+      "ltp": 1971.7,
+      "pct": 3.62
     },
     {
       "symbol": "ZYDUSWELL",
@@ -1095,8 +1461,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 575.5,
-      "pct": 1.06
+      "ltp": 575.4,
+      "pct": 1.04
     },
     {
       "symbol": "NEWGEN",
@@ -1108,8 +1474,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 471.5,
-      "pct": 0.69
+      "ltp": 471.55,
+      "pct": 0.7
     },
     {
       "symbol": "POKARNA",
@@ -1121,8 +1487,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1055.4,
-      "pct": -0.69
+      "ltp": 1037.2,
+      "pct": -2.4
     },
     {
       "symbol": "SHRIPISTON",
@@ -1134,8 +1500,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4192.2,
-      "pct": 4.57
+      "ltp": 4187.4,
+      "pct": 4.45
     },
     {
       "symbol": "KPRMILL",
@@ -1147,8 +1513,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1143.0,
-      "pct": 1.02
+      "ltp": 1177.3,
+      "pct": 4.05
     },
     {
       "symbol": "GRAPHITE",
@@ -1160,8 +1526,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 612.4,
-      "pct": -0.35
+      "ltp": 613.4,
+      "pct": -0.19
     },
     {
       "symbol": "NESCO",
@@ -1173,8 +1539,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1081.1,
-      "pct": -1.15
+      "ltp": 1078.4,
+      "pct": -1.4
     },
     {
       "symbol": "RAINBOW",
@@ -1186,8 +1552,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1419.3,
-      "pct": 0.98
+      "ltp": 1414.2,
+      "pct": 0.62
     },
     {
       "symbol": "CHOLAFIN",
@@ -1199,8 +1565,357 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1797.1,
-      "pct": 1.3
+      "ltp": 1789.8,
+      "pct": 0.89
+    },
+    {
+      "symbol": "THYROCARE",
+      "company": "Thyrocare Technologies Limited",
+      "subject": "Announcement - Thyrocare Technologies Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on June 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with voti",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 549.3,
+      "pct": 4.75
+    },
+    {
+      "symbol": "MUTHOOTMF",
+      "company": "Muthoot Microfin Limited",
+      "subject": "Announcement - Muthoot Microfin Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 214.37,
+      "pct": 3.23
+    },
+    {
+      "symbol": "SUVIDHAA",
+      "company": "Suvidhaa Infoserve Limited",
+      "subject": "Announcement - Suvidhaa Infoserve Limited has informed the Exchange that Board of Directors at its meeting held on Jun 30, 2026, has decided to issue equity shares on rights basis.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2.69,
+      "pct": -1.47
+    },
+    {
+      "symbol": "HINDCOMPOS",
+      "company": "Hindustan Composites Limited",
+      "subject": "Announcement - Hindustan Composites Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 420.55,
+      "pct": 1.07
+    },
+    {
+      "symbol": "WEALTH",
+      "company": "Wealth First Portfolio Managers Limited",
+      "subject": "Announcement - Wealth First Portfolio Managers Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 962.1,
+      "pct": -2.63
+    },
+    {
+      "symbol": "MAHABANK",
+      "company": "Bank of Maharashtra",
+      "subject": "Announcement - Bank of Maharashtra has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 91.44,
+      "pct": -2.57
+    },
+    {
+      "symbol": "INDHOTEL",
+      "company": "The Indian Hotels Company Limited",
+      "subject": "Announcement - The Indian Hotels Company Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with vo",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 713.95,
+      "pct": 0.98
+    },
+    {
+      "symbol": "QPOWER",
+      "company": "Quality Power Electrical Equipments Limited",
+      "subject": "Announcement - Quality Power Electrical Equipments Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1223.4,
+      "pct": 1.33
+    },
+    {
+      "symbol": "GFSTEELS",
+      "company": "Grand Foundry Limited",
+      "subject": "Announcement - Grand Foundry Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 13.61
+    },
+    {
+      "symbol": "NDLVENTURE",
+      "company": "NDL Ventures Limited",
+      "subject": "Announcement - Outcome of Board Meeting held on June 30,2026 for further updaye on For Further Update On The Proposed Scheme Of Merger By Absorption Of Hinduja Leyland Finance Limited ('Transferor Company/HLFL/Company') Into NDL Ventur",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 131.59,
+      "pct": 1.11
+    },
+    {
+      "symbol": "POLYCAB",
+      "company": "Polycab India Limited",
+      "subject": "Announcement - Polycab India Limited has informed the Exchange regarding Proceedings of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 9961.0,
+      "pct": 1.86
+    },
+    {
+      "symbol": "INSPIRISYS",
+      "company": "Inspirisys Solutions Limited",
+      "subject": "Announcement - Inspirisys Solutions Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 104.13,
+      "pct": -1.38
+    },
+    {
+      "symbol": "CINEVISTA",
+      "company": "Cinevista Limited",
+      "subject": "Announcement - Cinevista Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 17.45,
+      "pct": -4.7
+    },
+    {
+      "symbol": "DEVIT",
+      "company": "Dev Information Technology Limited",
+      "subject": "Announcement - Dev Information Technology Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 28.51,
+      "pct": 11.24
+    },
+    {
+      "symbol": "GLAXO",
+      "company": "GlaxoSmithKline Pharmaceuticals Limited",
+      "subject": "Announcement - GlaxoSmithKline Pharmaceuticals Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along w",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2450.3,
+      "pct": 4.07
+    },
+    {
+      "symbol": "PIXTRANS",
+      "company": "Pix Transmissions Limited",
+      "subject": "Announcement - Pix Transmissions Limited has informed the Exchange that Record date for the purpose of Dividend & Meeting  is 14-Jul-2026.",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1835.6,
+      "pct": -1.82
+    },
+    {
+      "symbol": "ZENSARTECH",
+      "company": "Zensar Technologies Limited",
+      "subject": "Announcement - Zensar Technologies Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 425.3,
+      "pct": -1.87
+    },
+    {
+      "symbol": "SRF",
+      "company": "SRF Limited",
+      "subject": "Announcement - SRF Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2739.0,
+      "pct": 2.79
+    },
+    {
+      "symbol": "SHRENIK",
+      "company": "Shrenik Limited",
+      "subject": "Announcement - Shrenik Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 0.4
+    },
+    {
+      "symbol": "HPIL",
+      "company": "Hindprakash Industries Limited",
+      "subject": "Announcement - Hindprakash Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 126.09,
+      "pct": 0.07
+    },
+    {
+      "symbol": "BHAGYANGR",
+      "company": "Bhagyanagar India Limited",
+      "subject": "Announcement - Bhagyanagar India Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 431.85,
+      "pct": 4.88
+    },
+    {
+      "symbol": "IDBI",
+      "company": "IDBI Bank Limited",
+      "subject": "Announcement - IDBI Bank Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 83.53,
+      "pct": -2.83
+    },
+    {
+      "symbol": "SHANTIGOLD",
+      "company": "Shanti Gold International Limited",
+      "subject": "Announcement - Shanti Gold International Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026 - Approval of fund raising by way of Rights Issue",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 223.69,
+      "pct": 0.46
+    },
+    {
+      "symbol": "MAPMYINDIA",
+      "company": "C.E. Info Systems Limited",
+      "subject": "Announcement - C.E. Info Systems Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 809.75,
+      "pct": -1.0
+    },
+    {
+      "symbol": "PRUDENT",
+      "company": "Prudent Corporate Advisory Services Limited",
+      "subject": "Announcement - Prudent Corporate Advisory Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2994.2,
+      "pct": 1.33
+    },
+    {
+      "symbol": "PRUDENT",
+      "company": "Prudent Corporate Advisory Services Limited",
+      "subject": "Announcement - Prudent Corporate Advisory Services Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2994.2,
+      "pct": 1.33
+    },
+    {
+      "symbol": "IRFC",
+      "company": "Indian Railway Finance Corporation Limited",
+      "subject": "Announcement - Indian Railway Finance Corporation Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
+      "ex_date": "30-Jun-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 90.53,
+      "pct": -0.09
     },
     {
       "symbol": "REFEX",
@@ -1212,8 +1927,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 360.0,
-      "pct": 1.18
+      "ltp": 356.2,
+      "pct": 0.11
     },
     {
       "symbol": "SHAH",
@@ -1225,8 +1940,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4.19,
-      "pct": 3.46
+      "ltp": 4.13,
+      "pct": 1.98
     },
     {
       "symbol": "SMLMAH",
@@ -1238,8 +1953,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3993.8,
-      "pct": -0.83
+      "ltp": 4098.0,
+      "pct": 1.76
     },
     {
       "symbol": "APARINDS",
@@ -1251,8 +1966,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 15909.0,
-      "pct": -0.48
+      "ltp": 15695.0,
+      "pct": -1.82
     },
     {
       "symbol": "ASPINWALL",
@@ -1264,8 +1979,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 253.0,
-      "pct": 0.57
+      "ltp": 247.1,
+      "pct": -1.78
     },
     {
       "symbol": "CONTROLPR",
@@ -1277,8 +1992,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 623.0,
-      "pct": 0.92
+      "ltp": 621.7,
+      "pct": 0.7
     },
     {
       "symbol": "MRF",
@@ -1290,8 +2005,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 126680.0,
-      "pct": 2.12
+      "ltp": 127820.0,
+      "pct": 3.04
     },
     {
       "symbol": "ROLEXRINGS",
@@ -1303,8 +2018,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 149.4,
-      "pct": 1.14
+      "ltp": 149.58,
+      "pct": 1.27
     },
     {
       "symbol": "TITAN",
@@ -1316,8 +2031,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4392.8,
-      "pct": 2.7
+      "ltp": 4404.0,
+      "pct": 2.96
     },
     {
       "symbol": "AEROFLEX",
@@ -1329,8 +2044,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 471.55,
-      "pct": 0.54
+      "ltp": 471.6,
+      "pct": 0.55
     },
     {
       "symbol": "MGEL",
@@ -1342,7 +2057,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 16.0
+      "ltp": 15.91,
+      "pct": -0.56
     },
     {
       "symbol": "SOBHA",
@@ -1354,8 +2070,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1390.6,
-      "pct": 0.24
+      "ltp": 1378.5,
+      "pct": -0.63
     },
     {
       "symbol": "MWL",
@@ -1367,8 +2083,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 378.0,
-      "pct": 2.45
+      "ltp": 375.75,
+      "pct": 1.84
     },
     {
       "symbol": "SMARTLINK",
@@ -1380,8 +2096,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 177.95,
-      "pct": 3.66
+      "ltp": 180.02,
+      "pct": 4.86
     },
     {
       "symbol": "FRACTAL",
@@ -1393,8 +2109,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 890.1,
-      "pct": -0.08
+      "ltp": 887.2,
+      "pct": -0.4
     },
     {
       "symbol": "NIACL",
@@ -1406,8 +2122,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 179.52,
-      "pct": -1.03
+      "ltp": 178.01,
+      "pct": -1.86
     },
     {
       "symbol": "SURYODAY",
@@ -1419,8 +2135,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 175.96,
-      "pct": 1.39
+      "ltp": 175.61,
+      "pct": 1.19
     },
     {
       "symbol": "MODISONLTD",
@@ -1432,8 +2148,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 294.0,
-      "pct": -4.59
+      "ltp": 297.65,
+      "pct": -3.41
     },
     {
       "symbol": "GANGAFORGE",
@@ -1445,8 +2161,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2.43,
-      "pct": 1.25
+      "ltp": 2.45,
+      "pct": 2.08
     },
     {
       "symbol": "CDSL",
@@ -1458,8 +2174,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1312.1,
-      "pct": 1.09
+      "ltp": 1305.5,
+      "pct": 0.59
     },
     {
       "symbol": "UPL",
@@ -1471,8 +2187,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 570.0,
-      "pct": 0.28
+      "ltp": 571.2,
+      "pct": 0.49
     },
     {
       "symbol": "UTIAMC",
@@ -1484,8 +2200,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 935.35,
-      "pct": 0.91
+      "ltp": 935.1,
+      "pct": 0.88
     },
     {
       "symbol": "UTIAMC",
@@ -1497,8 +2213,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 935.35,
-      "pct": 0.91
+      "ltp": 935.1,
+      "pct": 0.88
     },
     {
       "symbol": "ABREL",
@@ -1510,8 +2226,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1325.2,
-      "pct": 0.78
+      "ltp": 1323.6,
+      "pct": 0.65
     },
     {
       "symbol": "KRISHANA",
@@ -1523,8 +2239,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 680.15,
-      "pct": -0.29
+      "ltp": 688.0,
+      "pct": 0.86
     },
     {
       "symbol": "KHAICHEM",
@@ -1536,8 +2252,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 54.5,
-      "pct": -1.85
+      "ltp": 53.54,
+      "pct": -3.58
     },
     {
       "symbol": "MBAPL",
@@ -1549,8 +2265,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 561.95,
-      "pct": -0.05
+      "ltp": 562.0,
+      "pct": -0.04
     },
     {
       "symbol": "BFINVEST",
@@ -1562,8 +2278,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 448.75,
-      "pct": 0.43
+      "ltp": 446.7,
+      "pct": -0.03
     },
     {
       "symbol": "PATINTLOG",
@@ -1588,8 +2304,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 378.0,
-      "pct": 2.45
+      "ltp": 375.75,
+      "pct": 1.84
     },
     {
       "symbol": "RPGLIFE",
@@ -1601,8 +2317,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2287.9,
-      "pct": 0.42
+      "ltp": 2292.5,
+      "pct": 0.62
     },
     {
       "symbol": "TCS",
@@ -1614,8 +2330,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2048.9,
-      "pct": -2.34
+      "ltp": 2031.5,
+      "pct": -3.17
     },
     {
       "symbol": "MAGADSUGAR",
@@ -1627,8 +2343,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 457.0,
-      "pct": 1.44
+      "ltp": 461.65,
+      "pct": 2.48
     },
     {
       "symbol": "AVADHSUGAR",
@@ -1640,8 +2356,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 466.45,
-      "pct": -0.07
+      "ltp": 463.6,
+      "pct": -0.69
     },
     {
       "symbol": "BSOFT",
@@ -1653,8 +2369,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 286.85,
-      "pct": -4.1
+      "ltp": 286.3,
+      "pct": -4.28
     },
     {
       "symbol": "ONWARDTEC",
@@ -1666,8 +2382,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 285.15,
-      "pct": -0.64
+      "ltp": 286.25,
+      "pct": -0.26
     },
     {
       "symbol": "DSFCL",
@@ -1692,8 +2408,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 740.5,
-      "pct": -0.29
+      "ltp": 746.9,
+      "pct": 0.57
     },
     {
       "symbol": "KRISHNADEF",
@@ -1705,8 +2421,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1224.6,
-      "pct": -1.8
+      "ltp": 1207.4,
+      "pct": -3.18
     },
     {
       "symbol": "DJML",
@@ -1718,8 +2434,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 117.41,
-      "pct": 1.75
+      "ltp": 115.26,
+      "pct": -0.11
     },
     {
       "symbol": "DJML",
@@ -1731,8 +2447,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 117.41,
-      "pct": 1.75
+      "ltp": 115.26,
+      "pct": -0.11
     },
     {
       "symbol": "KPRMILL",
@@ -1744,8 +2460,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1143.0,
-      "pct": 1.02
+      "ltp": 1177.3,
+      "pct": 4.05
     },
     {
       "symbol": "MAXHEALTH",
@@ -1757,8 +2473,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1145.25,
-      "pct": -0.4
+      "ltp": 1129.25,
+      "pct": -1.8
     },
     {
       "symbol": "NESTLEIND",
@@ -1770,8 +2486,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1402.0,
-      "pct": 1.06
+      "ltp": 1405.2,
+      "pct": 1.29
     },
     {
       "symbol": "WELCORP",
@@ -1783,8 +2499,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1517.8,
-      "pct": 0.46
+      "ltp": 1521.9,
+      "pct": 0.73
     },
     {
       "symbol": "PTL",
@@ -1796,8 +2512,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 42.32,
-      "pct": 0.19
+      "ltp": 42.44,
+      "pct": 0.47
     },
     {
       "symbol": "KIRLPNU",
@@ -1809,8 +2525,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1926.8,
-      "pct": 1.11
+      "ltp": 1953.0,
+      "pct": 2.48
     },
     {
       "symbol": "APOLLOTYRE",
@@ -1822,8 +2538,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 430.75,
-      "pct": 2.4
+      "ltp": 430.2,
+      "pct": 2.27
     },
     {
       "symbol": "ROSSARI",
@@ -1835,8 +2551,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 527.95,
-      "pct": 0.95
+      "ltp": 525.35,
+      "pct": 0.45
     },
     {
       "symbol": "BALKRISIND",
@@ -1848,8 +2564,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2202.6,
-      "pct": 1.61
+      "ltp": 2180.4,
+      "pct": 0.59
     },
     {
       "symbol": "HESTERBIO",
@@ -1861,8 +2577,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2192.6,
-      "pct": -0.27
+      "ltp": 2165.9,
+      "pct": -1.49
     },
     {
       "symbol": "RRKABEL",
@@ -1874,8 +2590,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2367.0,
-      "pct": -5.41
+      "ltp": 2395.2,
+      "pct": -4.28
     },
     {
       "symbol": "DCMSRIND",
@@ -1887,8 +2603,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 37.71,
-      "pct": 1.23
+      "ltp": 37.72,
+      "pct": 1.26
     },
     {
       "symbol": "SUNDRMBRAK",
@@ -1900,8 +2616,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 820.1,
-      "pct": 1.76
+      "ltp": 826.25,
+      "pct": 2.52
     },
     {
       "symbol": "DCMSIL",
@@ -1913,8 +2629,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 74.48,
-      "pct": 1.99
+      "ltp": 73.98,
+      "pct": 1.3
     },
     {
       "symbol": "SUMICHEM",
@@ -1926,8 +2642,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 421.8,
-      "pct": 0.45
+      "ltp": 420.85,
+      "pct": 0.23
     },
     {
       "symbol": "RAYMONDREL",
@@ -1939,8 +2655,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 623.3,
-      "pct": -0.1
+      "ltp": 619.2,
+      "pct": -0.76
     },
     {
       "symbol": "DYCL",
@@ -1952,8 +2668,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 372.05,
-      "pct": 0.66
+      "ltp": 367.75,
+      "pct": -0.5
     },
     {
       "symbol": "DYCL",
@@ -1965,8 +2681,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 372.05,
-      "pct": 0.66
+      "ltp": 367.75,
+      "pct": -0.5
     },
     {
       "symbol": "BALAMINES",
@@ -1978,8 +2694,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1985.0,
-      "pct": 4.9
+      "ltp": 2035.9,
+      "pct": 7.59
     },
     {
       "symbol": "JKCEMENT",
@@ -1991,8 +2707,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5516.5,
-      "pct": 3.7
+      "ltp": 5444.5,
+      "pct": 2.35
     },
     {
       "symbol": "KFINTECH",
@@ -2004,8 +2720,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 888.9,
-      "pct": 2.25
+      "ltp": 879.8,
+      "pct": 1.21
     },
     {
       "symbol": "LLOYDSENT",
@@ -2017,8 +2733,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 74.3,
-      "pct": -1.26
+      "ltp": 73.82,
+      "pct": -1.9
     },
     {
       "symbol": "PILANIINVS",
@@ -2030,8 +2746,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4360.7,
-      "pct": 0.29
+      "ltp": 4349.0,
+      "pct": 0.02
     },
     {
       "symbol": "SOMATEX",
@@ -2043,8 +2759,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 92.95,
-      "pct": 1.97
+      "ltp": 88.33,
+      "pct": -3.09
     },
     {
       "symbol": "ESCORTS",
@@ -2056,8 +2772,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2930.2,
-      "pct": 1.14
+      "ltp": 2935.9,
+      "pct": 1.34
     },
     {
       "symbol": "SUNPHARMA",
@@ -2069,8 +2785,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1868.9,
-      "pct": -0.31
+      "ltp": 1862.5,
+      "pct": -0.66
     },
     {
       "symbol": "ORIENTELEC",
@@ -2082,8 +2798,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 175.0,
-      "pct": -0.23
+      "ltp": 175.46,
+      "pct": 0.03
     },
     {
       "symbol": "TARACHAND",
@@ -2095,8 +2811,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 56.02,
-      "pct": -0.55
+      "ltp": 56.01,
+      "pct": -0.57
     },
     {
       "symbol": "TARACHAND",
@@ -2108,8 +2824,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 56.02,
-      "pct": -0.55
+      "ltp": 56.01,
+      "pct": -0.57
     },
     {
       "symbol": "CANFINHOME",
@@ -2121,8 +2837,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 871.75,
-      "pct": 4.11
+      "ltp": 867.95,
+      "pct": 3.66
     },
     {
       "symbol": "M&MFIN",
@@ -2134,8 +2850,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 321.0,
-      "pct": 1.78
+      "ltp": 315.8,
+      "pct": 0.13
     },
     {
       "symbol": "BHARATFORG",
@@ -2160,8 +2876,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 189.0,
-      "pct": 1.61
+      "ltp": 188.97,
+      "pct": 1.59
     },
     {
       "symbol": "TTKHLTCARE",
@@ -2173,8 +2889,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 917.5,
-      "pct": -1.05
+      "ltp": 916.35,
+      "pct": -1.17
     },
     {
       "symbol": "DBOL",
@@ -2186,8 +2902,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 113.01,
-      "pct": -1.36
+      "ltp": 111.56,
+      "pct": -2.63
     },
     {
       "symbol": "ASIANPAINT",
@@ -2199,8 +2915,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 23.0,
-      "ltp": 2668.7,
-      "pct": 0.44
+      "ltp": 2635.7,
+      "pct": -0.8
     },
     {
       "symbol": "ASIANPAINT",
@@ -2212,8 +2928,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2668.7,
-      "pct": 0.44
+      "ltp": 2635.7,
+      "pct": -0.8
     },
     {
       "symbol": "HAPPSTMNDS",
@@ -2225,8 +2941,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 339.25,
-      "pct": 0.47
+      "ltp": 341.05,
+      "pct": 1.01
     },
     {
       "symbol": "POKARNA",
@@ -2238,8 +2954,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1055.4,
-      "pct": -0.69
+      "ltp": 1037.2,
+      "pct": -2.4
     },
     {
       "symbol": "GLOBAL",
@@ -2251,8 +2967,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 103.94,
-      "pct": -0.8
+      "ltp": 103.95,
+      "pct": -0.79
     },
     {
       "symbol": "UNIONBANK",
@@ -2264,8 +2980,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 173.62,
-      "pct": -0.54
+      "ltp": 172.43,
+      "pct": -1.22
     },
     {
       "symbol": "ELGIEQUIP",
@@ -2277,8 +2993,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 603.45,
-      "pct": -0.8
+      "ltp": 598.1,
+      "pct": -1.68
     },
     {
       "symbol": "CUMMINSIND",
@@ -2290,8 +3006,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5628.0,
-      "pct": 1.56
+      "ltp": 5659.5,
+      "pct": 2.13
     },
     {
       "symbol": "NESCO",
@@ -2303,8 +3019,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1081.1,
-      "pct": -1.15
+      "ltp": 1078.4,
+      "pct": -1.4
     },
     {
       "symbol": "GREENLAM",
@@ -2316,8 +3032,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 256.9,
-      "pct": -1.08
+      "ltp": 258.24,
+      "pct": -0.57
     },
     {
       "symbol": "DOLATALGO",
@@ -2329,8 +3045,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 72.44,
-      "pct": 0.37
+      "ltp": 72.48,
+      "pct": 0.43
     },
     {
       "symbol": "SUNDARMFIN",
@@ -2342,8 +3058,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4560.6,
-      "pct": 0.29
+      "ltp": 4506.7,
+      "pct": -0.9
     },
     {
       "symbol": "RAINBOW",
@@ -2355,8 +3071,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1419.3,
-      "pct": 0.98
+      "ltp": 1414.2,
+      "pct": 0.62
     },
     {
       "symbol": "GLOSTERLTD",
@@ -2368,8 +3084,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 727.95,
-      "pct": 0.61
+      "ltp": 731.85,
+      "pct": 1.15
     },
     {
       "symbol": "NH",
@@ -2381,8 +3097,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1965.9,
-      "pct": 3.31
+      "ltp": 1971.7,
+      "pct": 3.62
     },
     {
       "symbol": "JUBLFOOD",
@@ -2394,8 +3110,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 419.6,
-      "pct": 0.45
+      "ltp": 417.6,
+      "pct": -0.02
     },
     {
       "symbol": "HINDALCO",
@@ -2407,8 +3123,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 960.5,
-      "pct": -0.34
+      "ltp": 956.6,
+      "pct": -0.75
     },
     {
       "symbol": "20MICRONS",
@@ -2442,8 +3158,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 156.39,
-      "pct": 1.44
+      "ltp": 154.97,
+      "pct": 0.52
     },
     {
       "symbol": "BIKAJI",
@@ -2455,8 +3171,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 647.8,
-      "pct": 0.81
+      "ltp": 650.75,
+      "pct": 1.27
     },
     {
       "symbol": "HAPPYFORGE",
@@ -2468,8 +3184,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1544.9,
-      "pct": 1.11
+      "ltp": 1537.8,
+      "pct": 0.64
     },
     {
       "symbol": "VEEDOL",
@@ -2481,8 +3197,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1450.9,
-      "pct": 0.15
+      "ltp": 1443.3,
+      "pct": -0.37
     },
     {
       "symbol": "XPROINDIA",
@@ -2494,8 +3210,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1408.4,
-      "pct": 3.24
+      "ltp": 1395.3,
+      "pct": 2.28
     },
     {
       "symbol": "MOTHERSON",
@@ -2507,8 +3223,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 149.69,
-      "pct": -0.58
+      "ltp": 148.11,
+      "pct": -1.63
     },
     {
       "symbol": "HONAUT",
@@ -2520,8 +3236,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 39510.0,
-      "pct": 1.26
+      "ltp": 39735.0,
+      "pct": 1.83
     },
     {
       "symbol": "LMW",
@@ -2533,8 +3249,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 15914.0,
-      "pct": -0.37
+      "ltp": 15720.0,
+      "pct": -1.58
     },
     {
       "symbol": "TSFINV",
@@ -2546,8 +3262,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 435.45,
-      "pct": -1.91
+      "ltp": 440.15,
+      "pct": -0.86
     },
     {
       "symbol": "CRAMC",
@@ -2559,8 +3275,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 246.66,
-      "pct": -0.1
+      "ltp": 246.94,
+      "pct": 0.01
     },
     {
       "symbol": "SAFARI",
@@ -2572,8 +3288,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1591.9,
-      "pct": 0.33
+      "ltp": 1594.0,
+      "pct": 0.47
     },
     {
       "symbol": "SGIL",
@@ -2585,8 +3301,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 585.5,
-      "pct": 4.48
+      "ltp": 585.7,
+      "pct": 4.51
     },
     {
       "symbol": "DHANUKA",
@@ -2598,8 +3314,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1061.1,
-      "pct": 0.57
+      "ltp": 1055.2,
+      "pct": 0.01
     },
     {
       "symbol": "NELCAST",
@@ -2611,8 +3327,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 137.43,
-      "pct": 0.93
+      "ltp": 135.84,
+      "pct": -0.24
     },
     {
       "symbol": "ZYDUSWELL",
@@ -2624,8 +3340,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 575.5,
-      "pct": 1.06
+      "ltp": 575.4,
+      "pct": 1.04
     },
     {
       "symbol": "DODLA",
@@ -2637,8 +3353,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1116.2,
-      "pct": -0.45
+      "ltp": 1122.7,
+      "pct": 0.12
     },
     {
       "symbol": "WELSPUNLIV",
@@ -2650,8 +3366,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 161.05,
-      "pct": -0.61
+      "ltp": 158.84,
+      "pct": -1.97
     },
     {
       "symbol": "BAJAJELEC",
@@ -2663,8 +3379,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 321.45,
-      "pct": 1.37
+      "ltp": 319.5,
+      "pct": 0.76
     },
     {
       "symbol": "WELENT",
@@ -2676,8 +3392,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 603.0,
-      "pct": 5.02
+      "ltp": 601.45,
+      "pct": 4.75
     },
     {
       "symbol": "INDIANHUME",
@@ -2689,8 +3405,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 330.9,
-      "pct": -0.57
+      "ltp": 329.15,
+      "pct": -1.1
     },
     {
       "symbol": "UNITDSPR",
@@ -2702,8 +3418,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1351.0,
-      "pct": 0.71
+      "ltp": 1350.4,
+      "pct": 0.66
     },
     {
       "symbol": "JSWSTEEL",
@@ -2715,8 +3431,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1229.1,
-      "pct": -0.27
+      "ltp": 1226.4,
+      "pct": -0.49
     },
     {
       "symbol": "NILKAMAL",
@@ -2728,8 +3444,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1268.5,
-      "pct": 0.3
+      "ltp": 1259.2,
+      "pct": -0.43
     },
     {
       "symbol": "AKUMS",
@@ -2741,8 +3457,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 622.25,
-      "pct": -0.38
+      "ltp": 623.15,
+      "pct": -0.24
     },
     {
       "symbol": "SKFINDIA",
@@ -2754,8 +3470,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1671.0,
-      "pct": 0.92
+      "ltp": 1672.5,
+      "pct": 1.01
     },
     {
       "symbol": "JSWDULUX",
@@ -2767,8 +3483,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3246.9,
-      "pct": -0.49
+      "ltp": 3228.1,
+      "pct": -1.07
     },
     {
       "symbol": "REDINGTON",
@@ -2780,8 +3496,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 277.06,
-      "pct": 0.56
+      "ltp": 276.18,
+      "pct": 0.24
     },
     {
       "symbol": "ZFCVINDIA",
@@ -2793,8 +3509,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2528.0,
-      "pct": -5.88
+      "ltp": 2566.0,
+      "pct": -4.47
     },
     {
       "symbol": "SKFINDUS",
@@ -2806,8 +3522,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2915.1,
-      "pct": 1.57
+      "ltp": 2891.8,
+      "pct": 0.76
     },
     {
       "symbol": "SKFINDUS",
@@ -2819,8 +3535,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2915.1,
-      "pct": 1.57
+      "ltp": 2891.8,
+      "pct": 0.76
     },
     {
       "symbol": "BBL",
@@ -2832,8 +3548,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2898.0,
-      "pct": 4.08
+      "ltp": 2884.9,
+      "pct": 3.61
     },
     {
       "symbol": "PFIZER",
@@ -2845,21 +3561,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4438.9,
-      "pct": 0.77
+      "ltp": 4439.4,
+      "pct": 0.78
     },
     {
       "symbol": "DRREDDY",
       "company": "Dr. Reddy's Laboratories Limited",
-      "subject": "Announcement - Dr. Reddy's Laboratories Limited has informed the Exchange that Record date for the purpose of Final Dividend  is 10-Jul-2026.",
+      "subject": "Final Dividend - Rs 8.00 per equity share",
       "ex_date": "10-Jul-2026",
       "record_date": "10-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN",
+      "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 1363.6,
-      "pct": -0.88
+      "ltp": 1357.1,
+      "pct": -1.35
     },
     {
       "symbol": "SHRIPISTON",
@@ -2871,8 +3587,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4192.2,
-      "pct": 4.57
+      "ltp": 4187.4,
+      "pct": 4.45
     },
     {
       "symbol": "HERITGFOOD",
@@ -2884,34 +3600,34 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 332.05,
-      "pct": 0.53
+      "ltp": 328.25,
+      "pct": -0.62
     },
     {
       "symbol": "NDRAUTO",
       "company": "Ndr Auto Components Limited",
-      "subject": "Announcement - Ndr Auto Components Limited has informed the Exchange that Record date for the purpose of Dividend  is 20-Jul-2026.",
+      "subject": "Final Dividend - Rs 4.00 per equity share and Final Dividend - Rs 6.00 per equity share",
       "ex_date": "20-Jul-2026",
       "record_date": "20-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN",
+      "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 830.95,
-      "pct": 2.06
+      "ltp": 821.1,
+      "pct": 0.85
     },
     {
       "symbol": "DLINKINDIA",
       "company": "D-Link (India) Limited",
-      "subject": "Announcement - D-Link (India) Limited has informed the Exchange that Record date for the purpose of Dividend  is 10-Jul-2026.",
+      "subject": "Special Dividend - Rs 7.50 per equity share and Final Dividend - Rs 20.00 per equity share",
       "ex_date": "10-Jul-2026",
       "record_date": "10-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN",
+      "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 518.8,
-      "pct": 0.06
+      "ltp": 514.65,
+      "pct": -0.74
     },
     {
       "symbol": "GRINDWELL",
@@ -2923,8 +3639,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2185.8,
-      "pct": 1.82
+      "ltp": 2166.1,
+      "pct": 0.9
     },
     {
       "symbol": "GRINDWELL",
@@ -2936,8 +3652,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2185.8,
-      "pct": 1.82
+      "ltp": 2166.1,
+      "pct": 0.9
     },
     {
       "symbol": "CERA",
@@ -2949,8 +3665,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 6389.5,
-      "pct": -1.14
+      "ltp": 6451.5,
+      "pct": -0.19
     },
     {
       "symbol": "IMPAL",
@@ -2962,8 +3678,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 1097.0,
-      "pct": -0.05
+      "ltp": 1102.1,
+      "pct": 0.41
     },
     {
       "symbol": "BIOCON",
@@ -2975,8 +3691,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 417.0,
-      "pct": 0.42
+      "ltp": 418.3,
+      "pct": 0.73
     },
     {
       "symbol": "GCSL",
@@ -2988,8 +3704,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 432.7,
-      "pct": 2.88
+      "ltp": 430.75,
+      "pct": 2.41
     },
     {
       "symbol": "VMART",
@@ -3001,8 +3717,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 765.9,
-      "pct": 1.39
+      "ltp": 779.05,
+      "pct": 3.13
     },
     {
       "symbol": "THERMAX",
@@ -3014,8 +3730,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5136.0,
-      "pct": 0.21
+      "ltp": 5159.5,
+      "pct": 0.67
     },
     {
       "symbol": "BSE",
@@ -3027,8 +3743,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3894.8,
-      "pct": 0.9
+      "ltp": 3865.6,
+      "pct": 0.15
     },
     {
       "symbol": "DABUR",
@@ -3040,8 +3756,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 424.3,
-      "pct": -0.47
+      "ltp": 422.2,
+      "pct": -0.96
     },
     {
       "symbol": "SHANTIGEAR",
@@ -3053,8 +3769,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 445.15,
-      "pct": 1.07
+      "ltp": 443.85,
+      "pct": 0.77
     },
     {
       "symbol": "BAJAJHLDNG",
@@ -3066,8 +3782,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 10437.0,
-      "pct": -1.46
+      "ltp": 10603.0,
+      "pct": 0.1
     },
     {
       "symbol": "COROMANDEL",
@@ -3079,8 +3795,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1983.1,
-      "pct": 3.62
+      "ltp": 2005.0,
+      "pct": 4.76
     },
     {
       "symbol": "HARSHA",
@@ -3092,8 +3808,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 418.85,
-      "pct": 2.2
+      "ltp": 419.7,
+      "pct": 2.4
     },
     {
       "symbol": "BHARATSE",
@@ -3105,8 +3821,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 190.4,
-      "pct": 1.57
+      "ltp": 189.87,
+      "pct": 1.29
     },
     {
       "symbol": "BLUESTARCO",
@@ -3118,8 +3834,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1638.9,
-      "pct": 0.21
+      "ltp": 1628.3,
+      "pct": -0.44
     },
     {
       "symbol": "FAIRCHEMOR",
@@ -3131,8 +3847,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 676.0,
-      "pct": 5.03
+      "ltp": 670.25,
+      "pct": 4.13
     },
     {
       "symbol": "NEWGEN",
@@ -3144,8 +3860,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 471.5,
-      "pct": 0.69
+      "ltp": 471.55,
+      "pct": 0.7
     },
     {
       "symbol": "RAYMONDREL",
@@ -3157,8 +3873,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 623.3,
-      "pct": -0.1
+      "ltp": 619.2,
+      "pct": -0.76
     },
     {
       "symbol": "M&M",
@@ -3170,8 +3886,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3105.0,
-      "pct": 0.39
+      "ltp": 3068.8,
+      "pct": -0.78
     },
     {
       "symbol": "CAMS",
@@ -3183,8 +3899,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 793.85,
-      "pct": 0.66
+      "ltp": 796.85,
+      "pct": 1.04
     },
     {
       "symbol": "ARMANFIN",
@@ -3196,8 +3912,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1701.1,
-      "pct": 1.73
+      "ltp": 1694.0,
+      "pct": 1.31
     },
     {
       "symbol": "EXIDEIND",
@@ -3209,8 +3925,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 390.9,
-      "pct": 1.13
+      "ltp": 387.6,
+      "pct": 0.27
     },
     {
       "symbol": "BAJAJFINSV",
@@ -3222,8 +3938,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1780.4,
-      "pct": 1.2
+      "ltp": 1780.2,
+      "pct": 1.19
     },
     {
       "symbol": "CHOLAFIN",
@@ -3235,8 +3951,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1797.1,
-      "pct": 1.3
+      "ltp": 1789.8,
+      "pct": 0.89
     },
     {
       "symbol": "MPHASIS",
@@ -3248,8 +3964,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2167.0,
-      "pct": -1.85
+      "ltp": 2161.6,
+      "pct": -2.09
     },
     {
       "symbol": "GEOJITFSL",
@@ -3261,8 +3977,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 77.8,
-      "pct": 0.82
+      "ltp": 77.63,
+      "pct": 0.6
     },
     {
       "symbol": "BAJFINANCE",
@@ -3274,8 +3990,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 999.75,
-      "pct": 1.8
+      "ltp": 1004.75,
+      "pct": 2.31
     },
     {
       "symbol": "MAHLIFE",
@@ -3287,8 +4003,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 365.95,
-      "pct": -0.3
+      "ltp": 366.45,
+      "pct": -0.16
     },
     {
       "symbol": "AGI",
@@ -3300,8 +4016,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 688.05,
-      "pct": 0.47
+      "ltp": 689.3,
+      "pct": 0.66
     },
     {
       "symbol": "AXISBANK",
@@ -3313,8 +4029,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1358.4,
-      "pct": 0.12
+      "ltp": 1345.7,
+      "pct": -0.82
     },
     {
       "symbol": "SPLPETRO",
@@ -3326,8 +4042,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 725.5,
-      "pct": -0.76
+      "ltp": 713.95,
+      "pct": -2.34
     },
     {
       "symbol": "SHRIRAMFIN",
@@ -3339,8 +4055,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1046.85,
-      "pct": 1.38
+      "ltp": 1042.15,
+      "pct": 0.92
     },
     {
       "symbol": "BEPL",
@@ -3352,8 +4068,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 99.6,
-      "pct": 0.73
+      "ltp": 99.42,
+      "pct": 0.55
     },
     {
       "symbol": "SHRIRAMFIN",
@@ -3365,8 +4081,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1046.85,
-      "pct": 1.38
+      "ltp": 1042.15,
+      "pct": 0.92
     },
     {
       "symbol": "M&MFIN",
@@ -3378,8 +4094,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 321.0,
-      "pct": 1.78
+      "ltp": 315.8,
+      "pct": 0.13
     },
     {
       "symbol": "WENDT",
@@ -3391,8 +4107,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 8288.0,
-      "pct": 5.1
+      "ltp": 8246.0,
+      "pct": 4.57
     },
     {
       "symbol": "MAHLOG",
@@ -3404,8 +4120,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 374.05,
-      "pct": 0.44
+      "ltp": 373.9,
+      "pct": 0.4
     },
     {
       "symbol": "LTM",
@@ -3417,8 +4133,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3565.8,
-      "pct": -3.26
+      "ltp": 3538.0,
+      "pct": -4.02
     },
     {
       "symbol": "TECHM",
@@ -3430,8 +4146,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1404.6,
-      "pct": -2.04
+      "ltp": 1404.7,
+      "pct": -2.03
     },
     {
       "symbol": "MAHSCOOTER",
@@ -3443,8 +4159,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 12543.0,
-      "pct": 1.28
+      "ltp": 12501.0,
+      "pct": 0.94
     },
     {
       "symbol": "NESTLEIND",
@@ -3456,8 +4172,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1402.0,
-      "pct": 1.06
+      "ltp": 1405.2,
+      "pct": 1.29
     },
     {
       "symbol": "SMLMAH",
@@ -3469,8 +4185,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3993.8,
-      "pct": -0.83
+      "ltp": 4098.0,
+      "pct": 1.76
     },
     {
       "symbol": "VSTIND",
@@ -3482,8 +4198,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 260.4,
-      "pct": -0.04
+      "ltp": 260.3,
+      "pct": -0.08
     },
     {
       "symbol": "WIPRO",
@@ -3495,8 +4211,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 171.45,
-      "pct": -2.3
+      "ltp": 170.39,
+      "pct": -2.9
     },
     {
       "symbol": "SWARAJENG",
@@ -3508,7 +4224,7 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3997.3,
+      "ltp": 3997.6,
       "pct": 0.92
     },
     {
@@ -3521,8 +4237,34 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 597.95,
-      "pct": -0.66
+      "ltp": 593.2,
+      "pct": -1.45
+    },
+    {
+      "symbol": "ZENSARTECH",
+      "company": "Zensar Technologies Limited",
+      "subject": "Final Dividend - Rs 12.60 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 425.3,
+      "pct": -1.87
+    },
+    {
+      "symbol": "PRUDENT",
+      "company": "Prudent Corporate Advisory Services Limited",
+      "subject": "Final Dividend - Rs 13900.00 per equity share and Final Dividend - Rs 3.50 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 2994.2,
+      "pct": 1.33
     },
     {
       "symbol": "MRF",
@@ -3534,8 +4276,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 126670.0,
-      "pct": 2.11
+      "ltp": 127820.0,
+      "pct": 3.04
     },
     {
       "symbol": "TITAN",
@@ -3547,8 +4289,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 4391.2,
-      "pct": 2.67
+      "ltp": 4404.0,
+      "pct": 2.96
     },
     {
       "symbol": "AEROFLEX",
@@ -3566,14 +4308,15 @@
     {
       "symbol": "MGEL",
       "company": "Mangalam Global Enterprise Limited",
-      "subject": "Final Dividend - Rs 5.00 per equity share and Final Dividend - Rs 0.01 per equity share",
+      "subject": "Final Dividend - Rs 5.00 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 16.0
+      "ltp": 15.91,
+      "pct": -0.56
     },
     {
       "symbol": "SOBHA",
@@ -3585,21 +4328,21 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1391.4,
-      "pct": 0.3
+      "ltp": 1378.5,
+      "pct": -0.63
     },
     {
       "symbol": "MWL",
       "company": "Mangalam Worldwide Limited",
-      "subject": "Final Dividend - Rs 5.00 per equity share and Final Dividend - Rs 10.00 per equity share and Final Dividend - Rs 1.00 per equity share and Final Dividend - Rs 0.30 per equity share and Final Dividend - Rs 50.00 per equity share",
+      "subject": "Final Dividend - Rs 5.00 per equity share and Final Dividend - Rs 10.00 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 377.25,
-      "pct": 2.25
+      "ltp": 375.75,
+      "pct": 1.84
     },
     {
       "symbol": "SMARTLINK",
@@ -3611,8 +4354,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 177.95,
-      "pct": 3.66
+      "ltp": 180.02,
+      "pct": 4.86
     },
     {
       "symbol": "SURYODAY",
@@ -3624,8 +4367,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 175.96,
-      "pct": 1.39
+      "ltp": 175.61,
+      "pct": 1.19
     },
     {
       "symbol": "CDSL",
@@ -3637,8 +4380,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1311.8,
-      "pct": 1.07
+      "ltp": 1305.5,
+      "pct": 0.59
     },
     {
       "symbol": "UPL",
@@ -3650,8 +4393,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 571.0,
-      "pct": 0.46
+      "ltp": 571.2,
+      "pct": 0.49
     },
     {
       "symbol": "UTIAMC",
@@ -3663,21 +4406,21 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 934.8,
-      "pct": 0.85
+      "ltp": 935.1,
+      "pct": 0.88
     },
     {
       "symbol": "ABREL",
       "company": "Aditya Birla Real Estate Limited",
-      "subject": "Final Dividend - Rs 2.50 per equity share and Final Dividend - Rs 8136.00 per equity share and Final Dividend - Rs 3000.00 per equity share and Final Dividend - Rs 650.00 per equity share and Final Dividend - Rs 250.00 per equity share",
+      "subject": "Final Dividend - Rs 2.50 per equity share and Final Dividend - Rs 8136.00 per equity share",
       "ex_date": "14-Jul-2026",
       "record_date": "14-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1324.3,
-      "pct": 0.71
+      "ltp": 1323.6,
+      "pct": 0.65
     },
     {
       "symbol": "KHAICHEM",
@@ -3689,8 +4432,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 54.5,
-      "pct": -1.85
+      "ltp": 53.54,
+      "pct": -3.58
     },
     {
       "symbol": "BFINVEST",
@@ -3702,8 +4445,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 448.75,
-      "pct": 0.43
+      "ltp": 446.7,
+      "pct": -0.03
     },
     {
       "symbol": "TCS",
@@ -3715,8 +4458,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2046.6,
-      "pct": -2.45
+      "ltp": 2031.5,
+      "pct": -3.17
     },
     {
       "symbol": "KRISHNADEF",
@@ -3728,8 +4471,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1223.0,
-      "pct": -1.93
+      "ltp": 1207.4,
+      "pct": -3.18
     },
     {
       "symbol": "DJML",
@@ -3741,8 +4484,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 117.42,
-      "pct": 1.76
+      "ltp": 115.26,
+      "pct": -0.11
     },
     {
       "symbol": "PTL",
@@ -3754,8 +4497,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 42.32,
-      "pct": 0.19
+      "ltp": 42.44,
+      "pct": 0.47
     },
     {
       "symbol": "ROSSARI",
@@ -3767,8 +4510,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 527.0,
-      "pct": 0.76
+      "ltp": 525.35,
+      "pct": 0.45
     },
     {
       "symbol": "HESTERBIO",
@@ -3780,8 +4523,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2192.6,
-      "pct": -0.27
+      "ltp": 2165.9,
+      "pct": -1.49
     },
     {
       "symbol": "DCMSRIND",
@@ -3793,8 +4536,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 37.89,
-      "pct": 1.72
+      "ltp": 37.72,
+      "pct": 1.26
     },
     {
       "symbol": "SUNDRMBRAK",
@@ -3806,8 +4549,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 820.0,
-      "pct": 1.74
+      "ltp": 826.25,
+      "pct": 2.52
     },
     {
       "symbol": "SUMICHEM",
@@ -3819,8 +4562,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 422.1,
-      "pct": 0.52
+      "ltp": 420.85,
+      "pct": 0.23
     },
     {
       "symbol": "DYCL",
@@ -3832,8 +4575,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 372.65,
-      "pct": 0.83
+      "ltp": 367.75,
+      "pct": -0.5
     },
     {
       "symbol": "SOMATEX",
@@ -3845,8 +4588,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 92.95,
-      "pct": 1.97
+      "ltp": 88.33,
+      "pct": -3.09
     },
     {
       "symbol": "TARACHAND",
@@ -3858,8 +4601,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 56.02,
-      "pct": -0.55
+      "ltp": 56.01,
+      "pct": -0.57
     },
     {
       "symbol": "TTKHLTCARE",
@@ -3871,8 +4614,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 917.5,
-      "pct": -1.05
+      "ltp": 916.35,
+      "pct": -1.17
     },
     {
       "symbol": "DBOL",
@@ -3884,8 +4627,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 113.01,
-      "pct": -1.36
+      "ltp": 111.56,
+      "pct": -2.63
     },
     {
       "symbol": "GLOBAL",
@@ -3897,8 +4640,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 103.94,
-      "pct": -0.8
+      "ltp": 103.95,
+      "pct": -0.79
     },
     {
       "symbol": "ELGIEQUIP",
@@ -3910,8 +4653,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 603.7,
-      "pct": -0.76
+      "ltp": 598.1,
+      "pct": -1.68
     },
     {
       "symbol": "GREENLAM",
@@ -3923,8 +4666,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 256.86,
-      "pct": -1.1
+      "ltp": 258.24,
+      "pct": -0.57
     },
     {
       "symbol": "GLOSTERLTD",
@@ -3936,8 +4679,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 727.85,
-      "pct": 0.59
+      "ltp": 731.85,
+      "pct": 1.15
     },
     {
       "symbol": "JUBLFOOD",
@@ -3949,8 +4692,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 419.7,
-      "pct": 0.48
+      "ltp": 417.6,
+      "pct": -0.02
     },
     {
       "symbol": "20MICRONS",
@@ -3973,8 +4716,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 155.88,
-      "pct": 1.11
+      "ltp": 154.97,
+      "pct": 0.52
     },
     {
       "symbol": "HAPPYFORGE",
@@ -3986,8 +4729,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1544.7,
-      "pct": 1.09
+      "ltp": 1537.8,
+      "pct": 0.64
     },
     {
       "symbol": "XPROINDIA",
@@ -3999,8 +4742,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1407.9,
-      "pct": 3.2
+      "ltp": 1395.3,
+      "pct": 2.28
     },
     {
       "symbol": "CRAMC",
@@ -4012,8 +4755,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 246.64,
-      "pct": -0.11
+      "ltp": 246.94,
+      "pct": 0.01
     },
     {
       "symbol": "DHANUKA",
@@ -4025,8 +4768,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1060.0,
-      "pct": 0.46
+      "ltp": 1055.2,
+      "pct": 0.01
     },
     {
       "symbol": "NELCAST",
@@ -4038,21 +4781,21 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 137.43,
-      "pct": 0.93
+      "ltp": 135.84,
+      "pct": -0.24
     },
     {
       "symbol": "BAJAJELEC",
       "company": "Bajaj Electricals Limited",
-      "subject": "Final Dividend - Rs 3.00 per equity share and Final Dividend - Rs 2.00 per equity share",
+      "subject": "Final Dividend - Rs 3.00 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 321.15,
-      "pct": 1.28
+      "ltp": 319.5,
+      "pct": 0.76
     },
     {
       "symbol": "NILKAMAL",
@@ -4064,8 +4807,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1268.5,
-      "pct": 0.3
+      "ltp": 1259.2,
+      "pct": -0.43
     },
     {
       "symbol": "SKFINDUS",
@@ -4077,8 +4820,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2917.1,
-      "pct": 1.64
+      "ltp": 2891.8,
+      "pct": 0.76
     },
     {
       "symbol": "BBL",
@@ -4090,107 +4833,57 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2878.2,
-      "pct": 3.37
-    },
-    {
-      "symbol": "DRREDDY",
-      "company": "Dr. Reddy's Laboratories Limited",
-      "subject": "Final Dividend - Rs 8.00 per equity share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 1362.2,
-      "pct": -0.98
-    },
-    {
-      "symbol": "NDRAUTO",
-      "company": "Ndr Auto Components Limited",
-      "subject": "Final Dividend - Rs 4.00 per equity share and Final Dividend - Rs 6.00 per equity share",
-      "ex_date": "20-Jul-2026",
-      "record_date": "20-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 826.95,
-      "pct": 1.57
-    },
-    {
-      "symbol": "DLINKINDIA",
-      "company": "D-Link (India) Limited",
-      "subject": "Special Dividend - Rs 7.50 per equity share and Final Dividend - Rs 20.00 per equity share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 518.25,
-      "pct": -0.05
+      "ltp": 2884.9,
+      "pct": 3.61
     }
   ],
-  "corporate_sources": {
-    "NSE": 90,
-    "NSE-ANN": 179,
-    "NSE-ANN-BACKFILL+CACHE": 47
-  },
+  "corporate_sources": {},
   "earnings_calendar": [],
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-06-30T12:43:45.855628",
+      "last_attempt": "2026-06-30T17:30:55.272617",
       "last_count": 4,
-      "last_success": "2026-06-30T12:43:45.855628",
+      "last_success": "2026-06-30T17:30:55.272617",
       "message": ""
     },
     "NSE_CA": {
       "status": "ok",
-      "last_attempt": "2026-06-30T12:43:49.942100",
-      "last_count": 90,
-      "last_success": "2026-06-30T12:43:49.942100",
+      "last_attempt": "2026-06-29T21:02:00.239803",
+      "last_count": 94,
+      "last_success": "2026-06-29T21:02:00.239803",
       "message": ""
     },
     "NSE_BM": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T12:43:50.690424",
+      "last_attempt": "2026-06-29T21:02:00.820169",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "NSE_ANN": {
       "status": "ok",
-      "last_attempt": "2026-06-30T12:44:07.986066",
-      "last_count": 185,
-      "last_success": "2026-06-30T12:44:07.986066",
+      "last_attempt": "2026-06-29T21:02:02.245198",
+      "last_count": 28,
+      "last_success": "2026-06-29T21:02:02.245198",
       "message": ""
     },
     "NSE_ER": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T12:44:24.918561",
+      "last_attempt": "2026-06-29T21:02:18.362299",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "BSE_CA": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T12:44:44.173212",
-      "last_count": 0,
-      "last_success": "",
-      "message": ""
-    },
-    "DIV_CSV": {
-      "status": "no-data",
-      "last_attempt": "2026-06-30T12:44:44.173212",
+      "last_attempt": "2026-06-29T21:02:21.105278",
       "last_count": 0,
       "last_success": "",
       "message": ""
     }
   },
-  "insider_trading": [],
+  "insider_trading": null,
   "bulk_deals": null,
   "block_deals": null,
   "errors": []
