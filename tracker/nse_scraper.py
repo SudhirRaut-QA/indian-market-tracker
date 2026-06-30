@@ -2063,6 +2063,8 @@ class MarketScraper:
         # Corporate actions (daily, once in evening) — NSE + BSE merged
         if include_corporate:
             try:
+                today = datetime.now()
+                cutoff = today + timedelta(days=21)
                 nse_actions = self.get_corporate_actions() or []
                 self._mark_feed_health(feed_health, "NSE_CA", "ok" if nse_actions else "no-data", len(nse_actions))
                 nse_board = self.get_nse_board_meetings() or []
