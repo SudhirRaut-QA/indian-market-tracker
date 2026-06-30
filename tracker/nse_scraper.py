@@ -714,6 +714,132 @@ class MarketScraper:
 
     # ── 7. Corporate Actions ─────────────────────────────────────────────────
 
+    def _backfill_tba_dividend_amounts(
+        self,
+        merged: List[Dict],
+        today: "datetime",
+        cutoff: "datetime",
+        max_symbols: int = 20,
+    ) -> None:
+        """For ANN-only dividend rows that have no amount, fetch the per-symbol
+        NSE corporate actions endpoint and patch the subject text with the real
+        dividend amount so that _extract_dividend_amounts() can parse it.
+
+        Called after the main merge + symbol normalization, before enrichment.
+        Mutates rows in-place (subject field).
+        """
+        from tracker.telegram_bot import _extract_dividend_amounts
+
+        # Collect symbols that need backfill: dividend rows with no parseable amount
+        # and an ex_date within the display window.
+        need: List[Dict] = []
+        seen_syms: set = set()
+        for row in merged:
+            subj = str(row.get("subject", "") or "").lower()
+            if "dividend" not in subj:
+                continue
+            if _extract_dividend_amounts(row.get("subject", "") or ""):
+                continue  # already has amount
+            exd = self._parse_action_date(str(row.get("ex_date", "") or ""))
+            if not exd:
+                continue
+            exd_d = exd.date() if hasattr(exd, "date") else exd
+            tod_d = today.date() if hasattr(today, "date") else today
+            cut_d = cutoff.date() if hasattr(cutoff, "date") else cutoff
+            if exd_d < tod_d or exd_d > cut_d:
+                continue
+            sym = str(row.get("symbol", "") or "").strip().upper()
+            if sym and sym not in seen_syms:
+                need.append(row)
+                seen_syms.add(sym)
+
+        if not need:
+            return
+
+        # Cap to avoid slow runs
+        need = need[:max_symbols]
+        logger.info(f"TBA dividend backfill: fetching per-symbol data for {len(need)} symbols")
+        patched = 0
+        for row in need:
+            sym = str(row.get("symbol", "") or "").strip().upper()
+            target_ex = str(row.get("ex_date", "") or "").strip()
+            try:
+                # ── Pass 1: per-symbol CA endpoint (fastest, returns structured data) ──
+                url = self._url(
+                    f"/api/corporates-corporateActions?index=equities&symbol={sym}"
+                )
+                raw = self.nse.api_get(url)
+                if raw and isinstance(raw, list):
+                    for item in raw:
+                        item_ex = str(item.get("exDate", "") or "").strip()
+                        item_subj = str(item.get("subject", "") or "")
+                        if item_ex != target_ex:
+                            continue
+                        amounts = _extract_dividend_amounts(item_subj)
+                        if not amounts:
+                            continue
+                        old_subj = row.get("subject", "")
+                        row["subject"] = item_subj
+                        if row.get("source") == "NSE-ANN":
+                            row["source"] = "NSE"
+                        patched += 1
+                        logger.info(
+                            f"TBA backfill (CA) patched {sym} ex:{target_ex} "
+                            f"amount={sum(amounts):.2f} (was: {old_subj[:60]!r})"
+                        )
+                        break
+                    else:
+                        # ── Pass 2: per-symbol announcements endpoint ──
+                        # NSE sometimes posts dividend declaration announcements
+                        # separately from the structured CA entry.  Collect all
+                        # amounts from recent announcements and synthesise a subject.
+                        ann_from = (today - timedelta(days=120)).strftime("%d-%m-%Y")
+                        ann_to = today.strftime("%d-%m-%Y")
+                        ann_url = self._url(
+                            f"/api/corporate-announcements?index=equities"
+                            f"&symbol={sym}&from_date={ann_from}&to_date={ann_to}"
+                        )
+                        ann_raw = self.nse.api_get(ann_url)
+                        if ann_raw and isinstance(ann_raw, list):
+                            collected: List[float] = []
+                            label_parts: List[str] = []
+                            for ann in ann_raw:
+                                att = str(ann.get("attchmntText", "") or "")
+                                if not att:
+                                    continue
+                                amts = _extract_dividend_amounts(att)
+                                if not amts:
+                                    continue
+                                # Label: guess type from text
+                                att_l = att.lower()
+                                if "special" in att_l:
+                                    lbl = f"Special Dividend - Rs {sum(amts):.2f} per equity share"
+                                elif "interim" in att_l:
+                                    lbl = f"Interim Dividend - Rs {sum(amts):.2f} per equity share"
+                                else:
+                                    lbl = f"Final Dividend - Rs {sum(amts):.2f} per equity share"
+                                collected.extend(amts)
+                                label_parts.append(lbl)
+                            if collected:
+                                # Build synthetic subject that _extract_dividend_amounts can parse
+                                pieces = " and ".join(label_parts)
+                                new_subj = f"{pieces}"
+                                old_subj = row.get("subject", "")
+                                row["subject"] = new_subj
+                                if row.get("source") == "NSE-ANN":
+                                    row["source"] = "NSE-ANN-BACKFILL"
+                                patched += 1
+                                logger.info(
+                                    f"TBA backfill (ANN) patched {sym} ex:{target_ex} "
+                                    f"total={sum(collected):.2f} pieces={pieces[:80]}"
+                                )
+                time.sleep(0.3)  # polite delay between per-symbol calls
+            except Exception as e:
+                logger.debug(f"TBA backfill failed for {sym}: {e}")
+                continue
+
+        logger.info(f"TBA dividend backfill complete: {patched}/{len(need)} symbols resolved")
+
     def get_corporate_actions(self, days_ahead: int = 21) -> Optional[List[Dict]]:
         """Fetch NSE corporate actions from today to today+days_ahead."""
         today = datetime.now()
@@ -2143,6 +2269,16 @@ class MarketScraper:
                 if not snapshot["corporate_actions"]:
                     # Live-only guarantee: do not inject stale cached corporate data.
                     snapshot["errors"].append("Corporate actions: live sources returned no data")
+
+                # ── TBA backfill: per-symbol fetch for dividend rows missing amounts ──
+                # Announcement-only rows (NSE-ANN) often have "record date confirmed"
+                # but no amount. Fetch per-symbol NSE endpoint for up to 20 such rows
+                # and patch the subject so _extract_dividend_amounts() can compute yield.
+                try:
+                    self._backfill_tba_dividend_amounts(merged, today, cutoff, max_symbols=20)
+                except Exception as e:
+                    logger.debug(f"TBA backfill error (non-fatal): {e}")
+
                 # ── Enrichment: build symbol→LTP lookup ──────────────────────
                 # Priority: sector data → Yahoo Finance spark → NIFTY 500 bulk → CSV
                 enrich_lookup = self._get_sector_stock_lookup(
