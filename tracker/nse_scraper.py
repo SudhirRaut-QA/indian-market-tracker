@@ -730,8 +730,25 @@ class MarketScraper:
         """
         from tracker.telegram_bot import _extract_dividend_amounts
 
+        # Build a set of (sym, ex_date_iso) pairs that already have an amount from
+        # another row (e.g. NSE batch CA row for the same dividend).  We skip these
+        # in the need list — the Telegram bot will pick up the CA row with amounts
+        # automatically, so no per-symbol API call is needed.
+        already_resolved: set = set()
+        for row in merged:
+            subj_r = str(row.get("subject", "") or "")
+            if not _extract_dividend_amounts(subj_r):
+                continue
+            sym_r = str(row.get("symbol", "") or "").strip().upper()
+            if not sym_r:
+                continue
+            exd_r = self._parse_action_date(str(row.get("ex_date", "") or ""))
+            if exd_r:
+                exd_r_d = exd_r.date() if hasattr(exd_r, "date") else exd_r
+                already_resolved.add((sym_r, exd_r_d.isoformat()))
+
         # Collect symbols that need backfill: dividend rows with no parseable amount
-        # and an ex_date within the display window.
+        # and an ex_date within the display window, AND no sibling row with amounts.
         need: List[Dict] = []
         seen_syms: set = set()
         for row in merged:
@@ -749,9 +766,13 @@ class MarketScraper:
             if exd_d < tod_d or exd_d > cut_d:
                 continue
             sym = str(row.get("symbol", "") or "").strip().upper()
-            if sym and sym not in seen_syms:
-                need.append(row)
-                seen_syms.add(sym)
+            if not sym or sym in seen_syms:
+                continue
+            # Skip (sym, ex_date) pairs that already have an amount from another row
+            if (sym, exd_d.isoformat()) in already_resolved:
+                continue
+            need.append(row)
+            seen_syms.add(sym)
 
         if not need:
             return
