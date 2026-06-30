@@ -23,6 +23,7 @@ CRITICAL NSE rules:
 
 import json
 import logging
+import re
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -253,12 +254,188 @@ class MarketScraper:
             item["last_success"] = now_iso
         state[key] = item
 
-    def _load_cached_corporate_actions(self) -> List[Dict]:
-        """Fallback: load last known corporate actions from last_snapshot.json."""
+    @staticmethod
+    def _parse_action_date(date_str: str) -> Optional[datetime]:
+        """Parse exchange action dates across NSE/BSE format variants."""
+        if not date_str:
+            return None
+        ds = str(date_str).strip()
+        for fmt in (
+            "%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d",
+            "%d %b %Y", "%d %B %Y", "%d-%B-%Y", "%Y%m%d",
+            "%b %d %Y", "%B %d %Y", "%b %d, %Y", "%B %d, %Y",
+        ):
+            try:
+                return datetime.strptime(ds, fmt)
+            except (ValueError, TypeError):
+                continue
+        return None
+
+    @staticmethod
+    def _extract_buyback_offer_from_text(text: str) -> float:
+        """Extract buyback offer price from subject/announcement text."""
+        if not text:
+            return 0.0
+        pats = (
+            r'@\s*Rs\.?\s*([\d,]+(?:\.\d+)?)',
+            r'at\s+(?:not\s+exceeding\s+)?Rs\.?\s*([\d,]+(?:\.\d+)?)',
+            r'price\s+of\s+Rs\.?\s*([\d,]+(?:\.\d+)?)',
+            r'Rs\.?\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
+        )
+        for pat in pats:
+            m = re.search(pat, text, re.IGNORECASE)
+            if not m:
+                continue
+            try:
+                return float(m.group(1).replace(",", ""))
+            except (ValueError, TypeError):
+                continue
+        return 0.0
+
+    def _extract_future_date_from_text(
+        self,
+        text: str,
+        today: datetime,
+        cutoff: datetime,
+    ) -> Optional[datetime]:
+        """Extract first upcoming date from free text within [today, cutoff]."""
+        if not text:
+            return None
+
+        cleaned = re.sub(r"(\d{1,2})(st|nd|rd|th)", r"\1", str(text), flags=re.IGNORECASE)
+        candidates: List[datetime] = []
+
+        patterns = (
+            r"\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b",
+            r"\b\d{1,2}[-/][A-Za-z]{3,9}[-/]\d{2,4}\b",
+            r"\b\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}\b",
+            r"\b[A-Za-z]{3,9}\s+\d{1,2},\s*\d{4}\b",
+            r"\b[A-Za-z]{3,9}\s+\d{1,2}\s+\d{4}\b",
+        )
+        for pat in patterns:
+            for m in re.finditer(pat, cleaned):
+                raw = m.group(0).replace(",", " ")
+                dt = self._parse_action_date(raw)
+                if not dt:
+                    continue
+                if today.date() <= dt.date() <= cutoff.date():
+                    candidates.append(dt)
+
+        if not candidates:
+            return None
+        return min(candidates)
+
+    @staticmethod
+    def _corporate_action_key(action: Dict) -> tuple:
+        """Stable dedup key that preserves distinct same-day actions.
+
+        Uses normalized full subject (not just prefix) so events like
+        multiple dividends on the same ex-date are not collapsed.
+        """
+        symbol = str(action.get("symbol", "") or "").strip().upper()
+        ex_date = str(action.get("ex_date", "") or "").strip()
+        record_date = str(action.get("record_date", "") or "").strip()
+        subject = re.sub(r"\s+", " ", str(action.get("subject", "") or "")).strip().lower()
+        # Keep source out of key so same event across NSE/BSE can be merged and
+        # displayed with a combined source tag.
+        return (symbol, ex_date, record_date, subject)
+
+    def _load_dividend_actions_from_csv(self, days_ahead: int = 21, max_age_hours: int = 36) -> List[Dict]:
+        """Fallback corporate-dividend rows from local CSV if fresh enough.
+
+        The CSV is used only as a supplementary source when exchange APIs miss
+        certain rows. Freshness guard prevents stale carry-forward data.
+        """
+        import csv as csv_mod
+
+        csv_path = config.DATA_DIR / "excel" / "upcoming_dividends_latest.csv"
+        if not csv_path.exists():
+            return []
+
+        # Freshness guard
+        try:
+            mtime = datetime.fromtimestamp(csv_path.stat().st_mtime)
+            age_hours = (datetime.now() - mtime).total_seconds() / 3600
+            if age_hours > max_age_hours:
+                logger.info(
+                    f"Dividend CSV fallback skipped (stale {age_hours:.1f}h > {max_age_hours}h): {csv_path}"
+                )
+                return []
+        except Exception:
+            return []
+
+        today = datetime.now().date()
+        cutoff = today + timedelta(days=days_ahead)
+        out: List[Dict] = []
+
+        try:
+            with open(csv_path, encoding="utf-8") as f:
+                for row in csv_mod.DictReader(f):
+                    sym = str(row.get("Symbol", "") or "").strip().upper()
+                    if not sym:
+                        continue
+                    ex_raw = str(row.get("Ex_Date", "") or "").strip()
+                    ex_dt = self._parse_action_date(ex_raw)
+                    if not ex_dt:
+                        continue
+                    ex_date = ex_dt.date()
+                    if ex_date < today or ex_date > cutoff:
+                        continue
+
+                    try:
+                        div = float(str(row.get("Dividend_INR", "0") or "0").replace(",", ""))
+                    except (TypeError, ValueError):
+                        div = 0.0
+                    try:
+                        ltp = float(str(row.get("LTP_INR", "0") or "0").replace(",", ""))
+                    except (TypeError, ValueError):
+                        ltp = 0.0
+                    try:
+                        pe = float(str(row.get("PE_Ratio", "0") or "0").replace(",", ""))
+                    except (TypeError, ValueError):
+                        pe = 0.0
+
+                    div_type = str(row.get("Dividend_Type", "") or "Dividend").strip()
+                    if div > 0:
+                        subject = f"{div_type} Dividend - Rs {div:g} Per Share"
+                    else:
+                        subject = f"{div_type} Dividend"
+
+                    out.append({
+                        "symbol": sym,
+                        "company": str(row.get("Company", "") or "").strip(),
+                        "subject": subject,
+                        "ex_date": ex_dt.strftime("%d-%b-%Y"),
+                        "record_date": "",
+                        "bc_start": "",
+                        "bc_end": "",
+                        "source": "DIV-CSV",
+                        "ltp": ltp,
+                        "pe": pe,
+                    })
+        except Exception as e:
+            logger.warning(f"Dividend CSV fallback load failed: {e}")
+            return []
+
+        logger.info(f"Dividend CSV fallback rows: {len(out)}")
+        return out
+
+    def _load_cached_corporate_actions(self, max_age_hours: int = 72) -> List[Dict]:
+        """Fallback: load recent corporate actions from last_snapshot.json.
+
+        Freshness guard avoids pulling very old rows when live feeds are degraded.
+        """
         try:
             p = Path(config.SNAPSHOT_DIR) / "last_snapshot.json"
             if not p.exists():
                 return []
+            if max_age_hours > 0:
+                age_hours = (datetime.now() - datetime.fromtimestamp(p.stat().st_mtime)).total_seconds() / 3600
+                if age_hours > max_age_hours:
+                    logger.info(
+                        f"Cached corporate fallback skipped (stale {age_hours:.1f}h > {max_age_hours}h): {p}"
+                    )
+                    return []
             data = json.loads(p.read_text(encoding="utf-8"))
             actions = data.get("corporate_actions") or []
             logger.info(f"Cached corporate actions fallback: {len(actions)}")
@@ -549,15 +726,23 @@ class MarketScraper:
         try:
             actions = []
             for item in raw:
+                subject = item.get("subject", "")
+                subj_l = str(subject or "").lower()
+                offer_price = (
+                    self._extract_buyback_offer_from_text(str(subject or ""))
+                    if ("buyback" in subj_l or "buy back" in subj_l or "buy-back" in subj_l)
+                    else 0.0
+                )
                 actions.append({
                     "symbol": item.get("symbol", ""),
                     "company": item.get("comp", item.get("company", "")),
-                    "subject": item.get("subject", ""),
+                    "subject": subject,
                     "ex_date": item.get("exDate", ""),
                     "record_date": item.get("recDate", ""),
                     "bc_start": item.get("bcStartDate", ""),
                     "bc_end": item.get("bcEndDate", ""),
                     "source": "NSE",
+                    "offer_price": offer_price if offer_price > 0 else 0.0,
                 })
             logger.info(f"NSE corporate actions: {len(actions)}")
             return actions
@@ -601,11 +786,17 @@ class MarketScraper:
             logger.warning(f"NSE board meetings error: {e}")
             return []
 
-    def get_nse_major_announcements(self, days_ahead: int = 21) -> Optional[List[Dict]]:
-        """Fetch NSE announcements and keep only major corporate-action events."""
+    def get_nse_major_announcements(self, days_ahead: int = 21, lookback_days: int = 120) -> Optional[List[Dict]]:
+        """Fetch NSE announcements and derive upcoming corporate-action rows.
+
+        NSE announcement API is announcement-date oriented (not ex-date oriented),
+        so we read a recent lookback window and then extract upcoming action dates
+        from explicit fields or attachment text.
+        """
         today = datetime.now()
-        from_dt = today.strftime("%d-%m-%Y")
-        to_dt = (today + timedelta(days=days_ahead)).strftime("%d-%m-%Y")
+        cutoff = today + timedelta(days=days_ahead)
+        from_dt = (today - timedelta(days=max(lookback_days, 21))).strftime("%d-%m-%Y")
+        to_dt = today.strftime("%d-%m-%Y")
         url = self._url(
             f"/api/corporate-announcements?index=equities&from_date={from_dt}&to_date={to_dt}"
         )
@@ -637,24 +828,51 @@ class MarketScraper:
                 subject = str(
                     item.get("subject") or item.get("desc") or item.get("headline") or ""
                 ).strip()
+                detail_text = str(item.get("attchmntText") or "").strip()
+                combined = f"{subject} {detail_text}".strip()
                 ex_date = str(
                     item.get("exDate") or item.get("ex_date") or item.get("date") or item.get("an_dt") or ""
                 ).strip()
                 rec_date = str(item.get("recDate") or item.get("record_date") or "").strip()
                 if not symbol or not subject:
                     continue
-                subj_l = subject.lower()
+                subj_l = combined.lower()
                 if not any(k in subj_l for k in keywords):
                     continue
+
+                ex_dt = self._parse_action_date(ex_date) if ex_date else None
+                rec_dt = self._parse_action_date(rec_date) if rec_date else None
+
+                if not ex_dt:
+                    ex_dt = self._extract_future_date_from_text(combined, today, cutoff)
+                if not rec_dt and detail_text:
+                    rec_hint = "" if "record" not in detail_text.lower() else detail_text
+                    rec_dt = self._extract_future_date_from_text(rec_hint, today, cutoff)
+
+                action_dt = ex_dt or rec_dt
+                if not action_dt:
+                    continue
+                if action_dt.date() < today.date() or action_dt.date() > cutoff.date():
+                    continue
+
+                ex_out = (ex_dt or rec_dt).strftime("%d-%b-%Y") if (ex_dt or rec_dt) else ""
+                rec_out = rec_dt.strftime("%d-%b-%Y") if rec_dt else ""
+                offer_price = self._extract_buyback_offer_from_text(combined)
+
+                refined_subject = detail_text if detail_text else subject
+                if offer_price > 0 and ("buyback" in subj_l or "buy back" in subj_l):
+                    refined_subject = f"Buy Back @ Rs {offer_price:g} Per Share"
+
                 actions.append({
                     "symbol": symbol,
                     "company": company,
-                    "subject": f"Announcement - {subject}",
-                    "ex_date": ex_date,
-                    "record_date": rec_date,
+                    "subject": f"Announcement - {refined_subject[:220]}",
+                    "ex_date": ex_out,
+                    "record_date": rec_out,
                     "bc_start": "",
                     "bc_end": "",
                     "source": "NSE-ANN",
+                    "offer_price": offer_price if offer_price > 0 else 0.0,
                 })
             logger.info(f"NSE major announcements: {len(actions)}")
             return actions
@@ -735,14 +953,7 @@ class MarketScraper:
         3) Re-filter strictly to upcoming [today, today+days_ahead] to avoid stale rows
         """
         def _parse_bse_date(s: str) -> Optional[datetime]:
-            if not s:
-                return None
-            for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d", "%Y%m%d"):
-                try:
-                    return datetime.strptime(str(s).strip(), fmt)
-                except (ValueError, TypeError):
-                    continue
-            return None
+            return self._parse_action_date(s)
 
         def _extract_items(raw_json) -> List[Dict]:
             if isinstance(raw_json, list):
@@ -896,11 +1107,12 @@ class MarketScraper:
                         "bc_start": "",
                         "bc_end": "",
                         "source": "BSE",
+                        "offer_price": self._extract_buyback_offer_from_text(str(subject or "")),
                     }
                     key = (
                         action["symbol"],
                         action["ex_date"],
-                        action["subject"][:30].lower(),
+                        re.sub(r"\s+", " ", action["subject"]).strip().lower(),
                     )
                     merged_by_key[key] = action
 
@@ -1323,14 +1535,20 @@ class MarketScraper:
         """
         if not symbols:
             return {}
-        # Filter to plausible NSE equity symbols: alpha-start, ≤15 chars
+        # Filter to plausible NSE equity symbols: alpha-start, ≤20 chars.
+        # Allow '&' and '-' (e.g., M&M, M&MFIN, L&TFH).
         equity_syms = [
             s for s in symbols
-            if s and s[0].isalpha() and len(s) <= 15 and s.isalnum()
+            if s and s[0].isalpha() and len(s) <= 20 and re.match(r"^[A-Za-z][A-Za-z0-9&.-]*$", s)
         ]
         if not equity_syms:
             return {}
         lookup: Dict[str, Dict] = {}
+        from urllib.parse import quote as _url_quote
+
+        def _yf_sym(sym: str) -> str:
+            return f"{_url_quote(sym, safe='')}.NS"
+
         ua = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -1338,7 +1556,7 @@ class MarketScraper:
         batch_size = 20   # Yahoo Finance spark supports ~20 symbols reliably
         for i in range(0, len(equity_syms), batch_size):
             batch   = equity_syms[i : i + batch_size]
-            yf_syms = ",".join(f"{s}.NS" for s in batch)
+            yf_syms = ",".join(_yf_sym(s) for s in batch)
             url     = (
                 "https://query1.finance.yahoo.com/v8/finance/spark"
                 f"?symbols={yf_syms}&range=1d&interval=1d&includePrePost=false"
@@ -1354,7 +1572,7 @@ class MarketScraper:
                         sub = batch[sub_start : sub_start + 10]
                         sub_url = (
                             "https://query1.finance.yahoo.com/v8/finance/spark"
-                            f"?symbols={','.join(f'{s}.NS' for s in sub)}"
+                            f"?symbols={','.join(_yf_sym(s) for s in sub)}"
                             "&range=1d&interval=1d&includePrePost=false"
                         )
                         try:
@@ -1840,15 +2058,13 @@ class MarketScraper:
                 time.sleep(1)
                 bse_actions = self.get_bse_corporate_actions() or []
                 self._mark_feed_health(feed_health, "BSE_CA", "ok" if bse_actions else "no-data", len(bse_actions))
+                csv_actions = self._load_dividend_actions_from_csv(days_ahead=21, max_age_hours=36) or []
+                self._mark_feed_health(feed_health, "DIV_CSV", "ok" if csv_actions else "no-data", len(csv_actions))
                 # Deduplicate by (symbol, ex_date, subject-prefix)
                 seen_keys: Dict[tuple, int] = {}
                 merged = []
-                for a in nse_actions + nse_board + nse_ann + bse_actions:
-                    key = (
-                        a.get("symbol", "").upper(),
-                        a.get("ex_date", ""),
-                        a.get("subject", "")[:30].lower(),
-                    )
+                for a in nse_actions + nse_board + nse_ann + bse_actions + csv_actions:
+                    key = self._corporate_action_key(a)
                     idx = seen_keys.get(key)
                     if idx is None:
                         seen_keys[key] = len(merged)
@@ -1863,6 +2079,32 @@ class MarketScraper:
                         existing["source"] = "+".join(sorted(src_parts))
                 snapshot["corporate_actions"] = merged if merged else None
                 snapshot["earnings_calendar"] = nse_earnings
+
+                # Live feed safeguard: fill upcoming dividend/buyback gaps from
+                # last recent snapshot when exchanges temporarily miss rows.
+                cached_actions = self._load_cached_corporate_actions(max_age_hours=72)
+                if cached_actions:
+                    merged_keys = {self._corporate_action_key(x) for x in merged}
+                    patched = 0
+                    for ca in cached_actions:
+                        subj_l = str(ca.get("subject", "") or "").lower()
+                        if not any(k in subj_l for k in ("dividend", "buyback", "buy back", "buy-back")):
+                            continue
+                        ex_dt = self._parse_action_date(str(ca.get("ex_date", "") or ""))
+                        if not ex_dt or ex_dt.date() < today.date() or ex_dt.date() > cutoff.date():
+                            continue
+                        key = self._corporate_action_key(ca)
+                        if key in merged_keys:
+                            continue
+                        row = dict(ca)
+                        src = str(row.get("source", "CACHE") or "CACHE")
+                        row["source"] = f"{src}+CACHE" if "CACHE" not in src else src
+                        merged.append(row)
+                        merged_keys.add(key)
+                        patched += 1
+                    if patched:
+                        logger.info(f"Corporate gap-fill from cache: +{patched} rows")
+
                 source_counts: Dict[str, int] = {}
                 for row in merged:
                     src = str(row.get("source", "NSE") or "NSE")
@@ -1872,7 +2114,7 @@ class MarketScraper:
                 snapshot["corporate_sources"] = source_counts
                 logger.info(
                     f"Corporate merged: NSE={len(nse_actions)} NSE-BM={len(nse_board)} "
-                    f"NSE-ANN={len(nse_ann)} NSE-ER={len(nse_earnings)} BSE={len(bse_actions)} "
+                    f"NSE-ANN={len(nse_ann)} NSE-ER={len(nse_earnings)} BSE={len(bse_actions)} CSV={len(csv_actions)} "
                     f"final={len(merged)}"
                 )
                 if not snapshot["corporate_actions"]:

@@ -17,6 +17,8 @@ Message types:
 
 import logging
 import os
+import re
+import html
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 
@@ -55,30 +57,85 @@ def _extract_dividend_amount(subject: str) -> float:
       'Dividend @ Rs 8 per equity share'           -> 8.0
       'Dividend 2.50 per share'                    -> 2.50 (plain number)
     """
-    import re
     if not subject:
         return 0.0
 
-    # Ordered by specificity — most specific patterns first
-    patterns = [
-        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)\s*(?:/-)?\s*per',  # Rs 10/- per  Rs10 per
-        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)',                  # Rs 10, Re 1.50, Rs. 5.25
-        r'\u20b9\s*([\d,]+(?:\.\d+)?)',                           # \u20b910, \u20b9 5.25
-        r'INR\s*([\d,]+(?:\.\d+)?)',                             # INR 3.50
-        r'@\s*(?:Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*per',          # @ 8 per  @ Rs 8 per
-        r'([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+|equity\s+share|share)',  # 2.50 per share
+    amounts = _extract_dividend_amounts(subject)
+    if not amounts:
+        return 0.0
+    return round(sum(amounts), 4)
+
+
+def _extract_dividend_amounts(subject: str) -> List[float]:
+    """Extract one or more dividend amounts from subject text.
+
+    Supports multi-dividend lines such as:
+    "Final dividend of Rs 20 per share and Special dividend of Rs 7.50 per share"
+    → [20.0, 7.5]
+    """
+    if not subject:
+        return []
+
+    # Prefer strict "per share" patterns first to avoid unrelated numbers.
+    strict_patterns = [
+        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)\s*(?:/-)?\s*per\s+(?:equity\s+)?share',
+        r'\u20b9\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
+        r'INR\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
+        r'@\s*(?:Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
     ]
 
-    for pattern in patterns:
-        match = re.search(pattern, subject, re.IGNORECASE)
-        if match:
+    out: List[float] = []
+    for pat in strict_patterns:
+        for m in re.finditer(pat, subject, re.IGNORECASE):
             try:
-                val = float(match.group(1).replace(',', ''))
-                if 0 < val < 100_000:   # sanity: plausible dividend per share
-                    return val
+                v = float(m.group(1).replace(',', ''))
             except (ValueError, IndexError, AttributeError):
                 continue
-    return 0.0
+            if 0 < v < 100_000:
+                out.append(v)
+
+    # Fallback: no strict match → retain legacy single-value behavior.
+    if not out:
+        fallback_patterns = [
+            r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)',
+            r'\u20b9\s*([\d,]+(?:\.\d+)?)',
+            r'INR\s*([\d,]+(?:\.\d+)?)',
+            r'([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+|equity\s+share|share)',
+        ]
+        for pat in fallback_patterns:
+            m = re.search(pat, subject, re.IGNORECASE)
+            if not m:
+                continue
+            try:
+                v = float(m.group(1).replace(',', ''))
+            except (ValueError, IndexError, AttributeError):
+                continue
+            if 0 < v < 100_000:
+                out = [v]
+                break
+
+    # De-dup close duplicates while preserving order.
+    unique: List[float] = []
+    for v in out:
+        if not any(abs(v - u) < 1e-6 for u in unique):
+            unique.append(v)
+    return unique
+
+
+def _parse_action_date(date_str: str):
+    """Parse NSE/BSE corporate action dates from known formats."""
+    if not date_str or date_str == "N/A":
+        return None
+    ds = str(date_str).strip()
+    for fmt in (
+        "%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d",
+        "%d %b %Y", "%d %B %Y", "%d-%B-%Y",
+    ):
+        try:
+            return datetime.strptime(ds, fmt).date()
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 def _extract_buyback_price(subject: str) -> float:
@@ -373,7 +430,8 @@ _WATCHLIST_BUILD_SLOTS = {'09:15', '09:30', '11:00'}
 def _nse_link(symbol: str, text: str = None) -> str:
     """Clickable NSE link for a stock symbol."""
     from urllib.parse import quote
-    return f'<a href="{NSE_QUOTE_URL}{quote(symbol)}">{text or symbol}</a>'
+    label = html.escape(str(text or symbol), quote=False)
+    return f'<a href="{NSE_QUOTE_URL}{quote(symbol)}">{label}</a>'
 
 
 # Sector display name map (full NSE name → compact readable label)
@@ -2020,20 +2078,9 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
     today = datetime.now().date()
     cutoff = today + timedelta(days=21)
 
-    def _parse_date(date_str):
-        """Parse NSE/BSE date formats: '13-Mar-2026', '06-03-2026', '06/07/2026'."""
-        if not date_str or date_str == 'N/A':
-            return None
-        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
-            try:
-                return datetime.strptime(date_str, fmt).date()
-            except (ValueError, TypeError):
-                continue
-        return None
-
     def _is_upcoming(action):
         """Return True only if ex_date is today or within next 21 days."""
-        ex = _parse_date(action.get('ex_date', ''))
+        ex = _parse_action_date(action.get('ex_date', ''))
         return ex is not None and today <= ex <= cutoff
 
     def _source_badge(action):
@@ -2057,7 +2104,7 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
             "error": "🔴 error",
         }
         rows = []
-        for key in ("NSE_CA", "BSE_CA", "NSE_BM", "NSE_ANN", "NSE_ER", "MCX_DRV"):
+        for key in ("NSE_CA", "BSE_CA", "NSE_BM", "NSE_ANN", "NSE_ER", "DIV_CSV", "MCX_DRV"):
             h = health.get(key) or {}
             status = str(h.get("status", "-")).strip() or "-"
             status_disp = status_map.get(status, status)
@@ -2094,10 +2141,11 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
             lines.append("")
 
             dividends = [a for a in upcoming if "dividend" in a.get("subject", "").lower()]
+            buybacks  = [a for a in upcoming if _action_category(a.get("subject", "")) == "buyback"]
             splits    = [a for a in upcoming if "split"    in a.get("subject", "").lower()]
             bonus     = [a for a in upcoming if "bonus"    in a.get("subject", "").lower()]
             others    = [a for a in upcoming
-                         if a not in dividends and a not in splits and a not in bonus]
+                         if a not in dividends and a not in buybacks and a not in splits and a not in bonus]
 
             if dividends:
                 # Build annual dividend totals from stored snapshots (zero API calls)
@@ -2110,7 +2158,7 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
 
                 # For symbols shown in this message, backfill missing FY totals from internet.
                 # Local snapshot data remains the source of truth when available.
-                preview_divs = sorted(dividends, key=lambda x: _parse_date(x.get('ex_date','')) or today)
+                preview_divs = sorted(dividends, key=lambda x: _parse_action_date(x.get('ex_date','')) or today)
                 fallback_symbols = [
                     d.get("symbol", "") for d in preview_divs[:10] if d.get("symbol", "")
                 ]
@@ -2124,6 +2172,7 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                 lines.append("<i>Yield = this div \u00f7 LTP | Ann.Yield = prior-year total \u00f7 LTP</i>")
                 lines.append("")
                 shown = 0
+                high_yield_rows = []
                 for a in preview_divs:
                     sym      = a.get('symbol', '')
                     subject  = a.get('subject', '')
@@ -2137,7 +2186,8 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                         pe_val = float(a.get('pe') or 0)
                     except (ValueError, TypeError):
                         pe_val = 0.0
-                    div_amt   = _extract_dividend_amount(subject)
+                    div_parts = _extract_dividend_amounts(subject)
+                    div_amt   = round(sum(div_parts), 4)
                     div_type  = _div_type_tag(subject)
                     yield_pct = round(div_amt / ltp_val * 100, 2) if (ltp_val > 0 and div_amt > 0) else 0.0
 
@@ -2186,7 +2236,11 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     # Line 2: dividend amount, yield (or N/A if no LTP), per-1000 metric
                     line2_parts = []
                     if div_str:
-                        line2_parts.append(f"{div_type}: <b>{div_str}</b>")
+                        if len(div_parts) > 1:
+                            pieces = "+".join(f"{x:g}" for x in div_parts)
+                            line2_parts.append(f"{div_type}: <b>{div_str}</b> (₹{pieces})")
+                        else:
+                            line2_parts.append(f"{div_type}: <b>{div_str}</b>")
                     if yield_str:
                         yield_display = f"Yield: <b>{yield_str}{yind}</b>" if yield_str != "N/A" else "Yield: <i>N/A (no LTP)</i>"
                         line2_parts.append(yield_display)
@@ -2206,6 +2260,17 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
 
                     lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
                     lines.append("")
+
+                    if yield_pct >= 2.0 and ltp_val > 0:
+                        high_yield_rows.append({
+                            "symbol": sym,
+                            "yield": yield_pct,
+                            "div": div_amt,
+                            "ltp": ltp_val,
+                            "date": ex_date,
+                            "source": badge,
+                        })
+
                     shown += 1
                     if shown >= 10:
                         remaining = len(dividends) - shown
@@ -2217,9 +2282,19 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                             lines.append("")
                         break
 
+                if high_yield_rows:
+                    lines.append("<b>⭐ High-Yield Dividends (Yield > 2%)</b>")
+                    for row in sorted(high_yield_rows, key=lambda x: x["yield"], reverse=True)[:8]:
+                        lines.append(
+                            f"  ⭐ {_nse_link(row['symbol'])} <i>{row['source']}</i> | "
+                            f"Yield <b>{row['yield']:.2f}%</b> | Div ₹{row['div']:.2f} | "
+                            f"LTP ₹{row['ltp']:.2f} | Ex {row['date']}"
+                        )
+                    lines.append("")
+
             if splits:
                 lines.append("<b>✂️ Upcoming Stock Splits:</b>")
-                for a in sorted(splits, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:5]:
+                for a in sorted(splits, key=lambda x: _parse_action_date(x.get('ex_date','')) or today)[:5]:
                     sym     = a.get('symbol', '')
                     subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', '')
@@ -2238,7 +2313,7 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
 
             if bonus:
                 lines.append("<b>🎁 Upcoming Bonus Issues:</b>")
-                for a in sorted(bonus, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:5]:
+                for a in sorted(bonus, key=lambda x: _parse_action_date(x.get('ex_date','')) or today)[:5]:
                     sym     = a.get('symbol', '')
                     subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', '')
@@ -2255,9 +2330,69 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
                     lines.append("")
 
+            if buybacks:
+                lines.append("<b>🏷️ Upcoming Buybacks:</b>")
+                # Consolidate best-known values per (symbol, ex-date) across sources.
+                # NSE often has the event row while announcement row may carry richer text.
+                bb_best: Dict[tuple, Dict[str, float]] = {}
+                for x in buybacks:
+                    k = (x.get("symbol", ""), x.get("ex_date", ""))
+                    if not all(k):
+                        continue
+                    try:
+                        x_ltp = float(x.get("ltp") or 0)
+                    except (ValueError, TypeError):
+                        x_ltp = 0.0
+                    try:
+                        x_offer = float(x.get("offer_price") or x.get("buyback_price") or 0)
+                    except (ValueError, TypeError):
+                        x_offer = 0.0
+                    if x_offer <= 0:
+                        x_offer = _extract_buyback_price(str(x.get("subject", "") or ""))
+                    cur = bb_best.get(k, {"ltp": 0.0, "offer": 0.0})
+                    bb_best[k] = {
+                        "ltp": max(cur.get("ltp", 0.0), x_ltp),
+                        "offer": max(cur.get("offer", 0.0), x_offer),
+                    }
+
+                for a in sorted(buybacks, key=lambda x: _parse_action_date(x.get('ex_date', '')) or today)[:6]:
+                    sym = a.get('symbol', '')
+                    subject = a.get('subject', '')[:140]
+                    ex_date = a.get('ex_date', '')
+                    badge = _source_badge(a)
+                    if not sym or not ex_date:
+                        continue
+                    best = bb_best.get((sym, ex_date), {})
+                    try:
+                        ltp_val = float(best.get("ltp") or a.get('ltp') or 0)
+                    except (ValueError, TypeError):
+                        ltp_val = 0.0
+                    try:
+                        offer = float(best.get("offer") or a.get("offer_price") or a.get("buyback_price") or 0)
+                    except (ValueError, TypeError):
+                        offer = 0.0
+                    if offer <= 0:
+                        offer = _extract_buyback_price(subject)
+                    premium_pct = ((offer - ltp_val) / ltp_val * 100) if (offer > 0 and ltp_val > 0) else 0.0
+                    lines.append(f"  {_nse_link(sym)} <i>{badge}</i>")
+                    if offer > 0 and ltp_val > 0:
+                        lines.append(
+                            f"  Offer: <b>₹{offer:,.2f}</b> | LTP: ₹{ltp_val:,.2f} | "
+                            f"Premium: <b>{premium_pct:+.2f}%</b>"
+                        )
+                    elif offer > 0:
+                        lines.append(f"  Offer: <b>₹{offer:,.2f}</b> | LTP: —")
+                    elif ltp_val > 0:
+                        lines.append(f"  Offer: <i>N/A (not in exchange feed)</i> | LTP: ₹{ltp_val:,.2f}")
+                    else:
+                        lines.append("  Offer: <i>N/A (not in exchange feed)</i> | LTP: —")
+                    lines.append(f"  {subject}")
+                    lines.append(f"  📅 Ex-Date: <b>{ex_date}</b>")
+                    lines.append("")
+
             if others:
                 lines.append("<b>📋 Other Actions:</b>")
-                for a in sorted(others, key=lambda x: _parse_date(x.get('ex_date','')) or today)[:3]:
+                for a in sorted(others, key=lambda x: _parse_action_date(x.get('ex_date','')) or today)[:3]:
                     sym     = a.get('symbol', '')
                     subject = a.get('subject', '')[:120]
                     ex_date = a.get('ex_date', '')
@@ -2376,59 +2511,147 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
     today = datetime.now().date()
     cutoff = today + timedelta(days=21)
 
-    def _parse_date(date_str):
-        if not date_str or date_str == "N/A":
-            return None
-        for fmt in ("%d-%b-%Y", "%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
-            try:
-                return datetime.strptime(date_str, fmt).date()
-            except (ValueError, TypeError):
-                continue
-        return None
-
     actions = snapshot.get("corporate_actions") or []
-    dividends = [
-        a for a in actions
-        if "dividend" in a.get("subject", "").lower()
-        and (_parse_date(a.get("ex_date", "")) is not None)
-        and (today <= _parse_date(a.get("ex_date", "")) <= cutoff)
-    ]
-    if not dividends:
-        return None
+    if not actions:
+        return (
+            "<b>📄 All Upcoming Dividends (0)</b>\n"
+            "<i>No dividend actions found in the next 21 days from current live sources.</i>"
+        )
 
-    rows = []
-    for a in sorted(dividends, key=lambda x: _parse_date(x.get("ex_date", "")) or today):
-        sym = (a.get("symbol") or "")[:12]
-        exd = _parse_date(a.get("ex_date", ""))
-        exs = exd.strftime("%d-%b") if exd else (a.get("ex_date", "")[:9])
-        div = _extract_dividend_amount(a.get("subject", ""))
+    def _src_rank(src: str) -> int:
+        s = str(src or "").upper()
+        if "NSE" in s and "ANN" not in s:
+            return 4
+        if "BSE" in s:
+            return 3
+        if "ANN" in s:
+            return 2
+        if "CSV" in s:
+            return 1
+        return 0
+
+    # Build unique dividend events and prefer rows with richer price data.
+    # Announcement-only rows often lack amounts and can create noisy "-" values.
+    by_event: Dict[tuple, Dict[str, Any]] = {}
+    for a in actions:
+        subject = str(a.get("subject", "") or "")
+        if "dividend" not in subject.lower():
+            continue
+        exd = _parse_action_date(a.get("ex_date", ""))
+        if not exd or exd < today or exd > cutoff:
+            continue
+
+        div_parts = _extract_dividend_amounts(subject)
+        div = round(sum(div_parts), 4)
+        if div <= 0:
+            # Hide amount-less rows to avoid confusing dashes in the all-dividends table.
+            continue
+
+        sym = (a.get("symbol") or "").strip().upper()
+        if not sym:
+            continue
+
         try:
             ltp = float(a.get("ltp") or 0)
         except (ValueError, TypeError):
             ltp = 0.0
-        yld = (div / ltp * 100) if (div > 0 and ltp > 0) else 0.0
+        yld = (div / ltp * 100) if (div > 0 and ltp > 0) else None
+
+        evt_key = (sym, exd.isoformat(), round(div, 4))
+        cur = by_event.get(evt_key)
+        candidate = {
+            "sym": sym,
+            "exd": exd,
+            "div": div,
+            "div_parts": div_parts,
+            "ltp": ltp,
+            "yield": yld,
+            "source": a.get("source", "NSE"),
+        }
+        if not cur:
+            by_event[evt_key] = candidate
+            continue
+
+        cur_score = (
+            1 if cur.get("yield") is not None else 0,
+            1 if (cur.get("ltp") or 0) > 0 else 0,
+            _src_rank(cur.get("source", "")),
+        )
+        new_score = (
+            1 if candidate.get("yield") is not None else 0,
+            1 if (candidate.get("ltp") or 0) > 0 else 0,
+            _src_rank(candidate.get("source", "")),
+        )
+        if new_score > cur_score:
+            by_event[evt_key] = candidate
+
+    events = list(by_event.values())
+    if not events:
+        return (
+            "<b>📄 All Upcoming Dividends (0)</b>\n"
+            "<i>No dividend actions with amount details available for the next 21 days.</i>"
+        )
+
+    events.sort(
+        key=lambda e: (
+            e["exd"],
+            -(e["yield"] if e["yield"] is not None else -1.0),
+            e["sym"],
+        )
+    )
+
+    rows: List[List[str]] = []
+    for e in events:
+        div_str = f"₹{e['div']:.2f}"
+        if len(e.get("div_parts") or []) > 1:
+            div_str = f"₹{e['div']:.2f}({len(e['div_parts'])}x)"
         rows.append([
-            sym,
-            exs,
-            f"₹{div:.2f}" if div > 0 else "-",
-            f"{yld:.2f}%" if yld > 0 else "-",
-            a.get("source", "NSE"),
+            e["sym"][:12],
+            e["exd"].strftime("%d-%b"),
+            div_str,
+            f"{e['yield']:.2f}" if e["yield"] is not None else "NA",
         ])
 
-    table = _make_table(
-        ["Symbol", "Ex-Date", "Div", "Yield", "Src"],
-        rows,
-        align=["left", "left", "right", "right", "left"],
-    )
-    lines = [
-        f"<b>📄 All Upcoming Dividends ({len(rows)})</b>",
-        "<i>Full list in compact view (Telegram has no collapsible sections)</i>",
-        "",
-        "<pre>",
-        table,
-        "</pre>",
-    ]
-    return "\n".join(lines)
+    # Keep message under Telegram's 4096-char hard limit while preserving valid HTML.
+    total_rows = len(rows)
+    max_rows = total_rows
+    msg = ""
+    while max_rows > 0:
+        shown_rows = rows[:max_rows]
+        table = _make_table(
+            ["Symbol", "Ex-Date", "Div", "Yield%"],
+            shown_rows,
+            align=["left", "left", "right", "right"],
+        )
+        table = html.escape(table, quote=False)
+
+        high_yield = [e for e in events if (e.get("yield") or 0) >= 2.0]
+        hy_line = ""
+        if high_yield:
+            top = sorted(high_yield, key=lambda x: x.get("yield") or 0, reverse=True)[:8]
+            hy_line = "<b>Yield ≥ 2%:</b> " + ", ".join(
+                f"<b>{html.escape(x['sym'])}</b> ({x['yield']:.2f}%)" for x in top if x.get("yield") is not None
+            )
+
+        lines = [
+            f"<b>📄 All Upcoming Dividends ({total_rows})</b>",
+            "<i>Sorted by Ex-Date, then highest yield first for each date.</i>",
+            hy_line,
+            "",
+            "<pre>",
+            table,
+            "</pre>",
+        ]
+        if max_rows < total_rows:
+            lines.append(f"<i>Showing first {max_rows}/{total_rows} rows (Telegram length limit).</i>")
+
+        msg = "\n".join(lines)
+        if len(msg) <= MAX_MSG_LEN:
+            return msg
+
+        max_rows -= 8
+
+    return "<b>📄 All Upcoming Dividends</b>\n<i>Dividend table unavailable due formatting size constraints.</i>"
 
 
 def format_preopen_msg(snapshot: Dict) -> str:
