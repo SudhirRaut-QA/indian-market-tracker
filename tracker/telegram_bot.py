@@ -2180,7 +2180,10 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                         continue
                     parts = _extract_dividend_amounts(str(d.get("subject", "") or ""))
                     div_amt = round(sum(parts), 4)
-                    key = (sym, ex_raw, div_amt)
+                    # Key only on (symbol, ex_date) — not div_amt — so that an NSE-CA
+                    # row with a confirmed amount can properly supersede an NSE-ANN
+                    # record-date-only row (which has div_amt=0 and different key otherwise).
+                    key = (sym, ex_raw)
                     try:
                         ltp = float(d.get("ltp") or 0)
                     except (ValueError, TypeError):
@@ -2265,11 +2268,9 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     # Skip row if we have no useful data at all
                     if not sym or not ex_date:
                         continue
-                    # Skip amount-less rows to avoid noisy entries with no yield context.
-                    if div_amt == 0:
-                        continue
 
                     # Build display strings (never show "—" for zero values — skip the field)
+                    tba_amount   = div_amt == 0   # record-date confirmed, amount not yet published
                     ltp_str      = f"₹{ltp_val:,.2f}" if ltp_val else None
                     pe_str       = f"PE:{pe_val:.1f}" if pe_val > 0 else None
                     div_str      = f"₹{div_amt:.2f}" if div_amt else None
@@ -2290,19 +2291,23 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                         line1_parts.append(pe_str)
                     lines.append(" | ".join(line1_parts))
 
-                    # Line 2: dividend amount, yield (or N/A if no LTP), per-1000 metric
+                    # Line 2: dividend amount, yield (or TBA if amount not yet published)
                     line2_parts = []
-                    if div_str:
-                        if len(div_parts) > 1:
-                            pieces = "+".join(f"{x:g}" for x in div_parts)
-                            line2_parts.append(f"{div_type}: <b>{div_str}</b> (₹{pieces})")
-                        else:
-                            line2_parts.append(f"{div_type}: <b>{div_str}</b>")
-                    if yield_str:
-                        yield_display = f"Yield: <b>{yield_str}{yind}</b>" if yield_str != "N/A" else "Yield: <i>N/A (no LTP)</i>"
-                        line2_parts.append(yield_display)
-                    if per1k_str:
-                        line2_parts.append(per1k_str)
+                    if tba_amount:
+                        # Amount pending — show record date confirmed notice
+                        line2_parts.append(f"{div_type}: <i>TBA (record date confirmed)</i>")
+                    else:
+                        if div_str:
+                            if len(div_parts) > 1:
+                                pieces = "+".join(f"{x:g}" for x in div_parts)
+                                line2_parts.append(f"{div_type}: <b>{div_str}</b> (₹{pieces})")
+                            else:
+                                line2_parts.append(f"{div_type}: <b>{div_str}</b>")
+                        if yield_str:
+                            yield_display = f"Yield: <b>{yield_str}{yind}</b>" if yield_str != "N/A" else "Yield: <i>N/A (no LTP)</i>"
+                            line2_parts.append(yield_display)
+                        if per1k_str:
+                            line2_parts.append(per1k_str)
                     if line2_parts:
                         lines.append("  " + " | ".join(line2_parts))
 
@@ -2588,7 +2593,8 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
         return 0
 
     # Build unique dividend events and prefer rows with richer price data.
-    # Announcement-only rows often lack amounts and can create noisy "-" values.
+    # Use (sym, ex_date) key so that an NSE-CA row with a confirmed amount can
+    # properly supersede an NSE-ANN record-date-only row (div=0) for the same event.
     by_event: Dict[tuple, Dict[str, Any]] = {}
     for a in actions:
         subject = str(a.get("subject", "") or "")
@@ -2600,9 +2606,7 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
 
         div_parts = _extract_dividend_amounts(subject)
         div = round(sum(div_parts), 4)
-        if div <= 0:
-            # Hide amount-less rows to avoid confusing dashes in the all-dividends table.
-            continue
+        # Keep amount-less rows: they are valid record-date announcements (amount TBA).
 
         sym = (a.get("symbol") or "").strip().upper()
         if not sym:
@@ -2614,7 +2618,9 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
             ltp = 0.0
         yld = (div / ltp * 100) if (div > 0 and ltp > 0) else None
 
-        evt_key = (sym, exd.isoformat(), round(div, 4))
+        # Key on (sym, ex_date) only — div is NOT part of key so NSE-CA with amount
+        # can replace NSE-ANN with no amount for the same event.
+        evt_key = (sym, exd.isoformat())
         cur = by_event.get(evt_key)
         candidate = {
             "sym": sym,
@@ -2646,7 +2652,7 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
     if not events:
         return (
             "<b>📄 All Upcoming Dividends (0)</b>\n"
-            "<i>No dividend actions with amount details available for the next 21 days.</i>"
+            "<i>No dividend actions found for the next 21 days.</i>"
         )
 
     events.sort(
@@ -2659,14 +2665,19 @@ def format_corporate_dividends_table_msg(snapshot: Dict) -> Optional[str]:
 
     rows: List[List[str]] = []
     for e in events:
-        div_str = f"₹{e['div']:.2f}"
-        if len(e.get("div_parts") or []) > 1:
-            div_str = f"₹{e['div']:.2f}({len(e['div_parts'])}x)"
+        if e["div"] > 0:
+            div_str = f"₹{e['div']:.2f}"
+            if len(e.get("div_parts") or []) > 1:
+                div_str = f"₹{e['div']:.2f}({len(e['div_parts'])}x)"
+            yld_str = f"{e['yield']:.2f}" if e["yield"] is not None else "NA"
+        else:
+            div_str = "TBA"
+            yld_str = "-"
         rows.append([
             e["sym"][:12],
             e["exd"].strftime("%d-%b"),
             div_str,
-            f"{e['yield']:.2f}" if e["yield"] is not None else "NA",
+            yld_str,
         ])
 
     # Keep message under Telegram's 4096-char hard limit while preserving valid HTML.
