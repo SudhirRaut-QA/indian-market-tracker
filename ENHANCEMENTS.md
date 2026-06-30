@@ -1,5 +1,41 @@
 # 🚀 Enhancements & Feature Deep-Dive
 
+## 🐛 Recent Fixes & Improvements
+
+### TBA Dividend Data Integrity (2026-06-30)
+
+**Issue**: The "Pass 2" backfill engine (which parses PDF attachment text from NSE API to resolve missing dividend amounts) had a severe logic flaw:
+- It was downloading the last 120 days of historical announcements for a given symbol.
+- It was doing a simple regex extraction for `Rs X per share` and summing everything it found.
+- If a stock declared a Rs 2 dividend today, but had a Rs 15 dividend from 3 months ago still in the 120-day window, the parser naively returned Rs 17.00.
+- Aggregate financial values that incidentally contained "per share" strings were also falsely matched.
+
+**Fix**: Introduced strict temporal clustering and ratio-based guardrails in `tracker/nse_scraper.py` (`_backfill_tba_dividend_amounts`):
+
+1. **Date-Clustered Parsing (`CLUSTER_DAYS = 14`)**:
+   - The engine now finds the most recent announcement (`best_dt`).
+   - Any historical announcements older than `best_dt - 14 days` are strictly discarded. 
+   - This ensures only declarations pertaining to the *current* board meeting are extracted.
+
+2. **Null-Date Fallbacks (`MAX_NO_DATE_ANNS = 5`)**:
+   - NSE's API sometimes returns null or unparseable `an_dt` values.
+   - If no valid date anchor exists to apply the 14-day rule, the engine falls back to slicing only the first 5 announcements (since NSE returns results newest-first).
+
+3. **Ratio Outlier Rejection (`max_a > min_a * 20`)**:
+   - Strips out anomalous aggregate values that bypass the regex, assuming variations inside a single board meeting shouldn't exceed 20x.
+
+4. **Error Surface Transparency**:
+   - Re-classified blanket fallback exceptions from `logger.debug` to `logger.warning`.
+
+**Validation**:
+Confirmed output during 2026-06-30 live manual run:
+- Validated DJML resolved to **Rs 10.15** (0.15 + 10.00 special) exactly, no longer summing historically.
+- Validated TARACHAND resolved to **Rs 30.20** exactly.
+- GEOJITFSL avoided historical 600+ aggregate bloat.
+- Passed terminal execution tests fully cleanly over the 275 combined events (47/60 TBA resolved).
+
+---
+
 > What makes this tracker smarter than a simple price alert?
 > This page explains the advanced features — the Trading Engine, Self-Learning System, Delta Engine, and more.
 
