@@ -851,11 +851,20 @@ class MarketScraper:
                             if dt_chk and (best_dt is None or dt_chk > best_dt):
                                 best_dt = dt_chk
 
+                        # Fallback: if no parseable dates found, NSE returns newest-first,
+                        # so limit to the first MAX_NO_DATE_ANNS announcements to avoid
+                        # summing historical dividends into the current period's total.
+                        MAX_NO_DATE_ANNS = 5
+                        anns_to_scan = (
+                            ann_raw if best_dt is not None
+                            else ann_raw[:MAX_NO_DATE_ANNS]
+                        )
+
                         CLUSTER_DAYS = 14
                         collected: List[float] = []
                         label_parts: List[str] = []
                         seen_amts: set = set()
-                        for ann in ann_raw:
+                        for ann in anns_to_scan:
                             att = str(ann.get("attchmntText", "") or "")
                             if not att:
                                 continue
@@ -908,9 +917,14 @@ class MarketScraper:
 
                 time.sleep(0.3)  # polite delay between per-symbol calls
             except Exception as e:
-                logger.debug(f"TBA backfill failed for {sym}: {e}")
+                logger.warning(f"TBA backfill error for {sym}: {type(e).__name__}: {e}")
                 continue
 
+        if patched == 0 and len(need) > 0:
+            logger.warning(
+                f"TBA dividend backfill: 0/{len(need)} resolved — NSE may be rate-limiting "
+                f"per-symbol calls; data will be retried on next scheduled run"
+            )
         logger.info(f"TBA dividend backfill complete: {patched}/{len(need)} symbols resolved")
 
     def get_corporate_actions(self, days_ahead: int = 21) -> Optional[List[Dict]]:
