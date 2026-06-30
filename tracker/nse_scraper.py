@@ -826,6 +826,32 @@ class MarketScraper:
                     )
                     ann_raw = self.nse.api_get(ann_url)
                     if ann_raw and isinstance(ann_raw, list):
+
+                        def _ann_date_d(ann: dict):
+                            """Return the announcement date as a date, or None."""
+                            raw = str(ann.get("an_dt", "") or ann.get("exchdisstime", "") or "")
+                            raw = raw.split()[0] if raw else ""
+                            if not raw:
+                                return None
+                            parsed = self._parse_action_date(raw)
+                            if parsed is None:
+                                return None
+                            return parsed.date() if hasattr(parsed, "date") else parsed
+
+                        # Find the most recent announcement date with extractable amounts.
+                        # This anchors the 14-day cluster window to the current board
+                        # meeting, excluding older historical dividend announcements that
+                        # would otherwise inflate the total (e.g. GEOJITFSL Rs 676 + 1.50).
+                        best_dt = None
+                        for ann in ann_raw:
+                            att_chk = str(ann.get("attchmntText", "") or "")
+                            if not _extract_dividend_amounts(att_chk):
+                                continue
+                            dt_chk = _ann_date_d(ann)
+                            if dt_chk and (best_dt is None or dt_chk > best_dt):
+                                best_dt = dt_chk
+
+                        CLUSTER_DAYS = 14
                         collected: List[float] = []
                         label_parts: List[str] = []
                         seen_amts: set = set()
@@ -833,7 +859,23 @@ class MarketScraper:
                             att = str(ann.get("attchmntText", "") or "")
                             if not att:
                                 continue
+                            # Date-proximity guard: skip announcements that are older
+                            # than CLUSTER_DAYS relative to the most recent dividend
+                            # announcement for this symbol.
+                            if best_dt is not None:
+                                dt = _ann_date_d(ann)
+                                if dt is not None and (best_dt - dt).days > CLUSTER_DAYS:
+                                    continue
                             amts = _extract_dividend_amounts(att)
+                            if not amts:
+                                continue
+                            # Within-announcement outlier guard: if a single attachment
+                            # text yields amounts spanning >20x range (e.g. aggregate
+                            # payout figure vs per-share amount both matching the regex),
+                            # drop the outlier high values.
+                            if len(amts) > 1:
+                                min_a = min(amts)
+                                amts = [a for a in amts if a <= min_a * 20]
                             if not amts:
                                 continue
                             # De-duplicate amounts from multiple announcements
