@@ -1400,6 +1400,12 @@ class MarketScraper:
         if not actions:
             return actions
 
+        def _f(v: Any) -> float:
+            try:
+                return float(v or 0)
+            except (TypeError, ValueError):
+                return 0.0
+
         # Step 1: use pre-built lookup (fastest — no API calls)
         if prebuilt_lookup:
             sector_lookup = prebuilt_lookup
@@ -1409,33 +1415,41 @@ class MarketScraper:
             logger.info(f"Sector lookup: {len(sector_lookup)} symbols available for enrichment")
 
         for a in actions:
-            sym = a.get("symbol", "")
+            sym = str(a.get("symbol", "") or "").strip().upper()
+            if sym and a.get("symbol") != sym:
+                a["symbol"] = sym
             if sym and sym in sector_lookup:
                 q = sector_lookup[sym]
-                a.setdefault("ltp",          q["last"])
-                a.setdefault("pct",          q["pct"])
-                a.setdefault("week52_high",  q["week52_high"])
-                a.setdefault("week52_low",   q["week52_low"])
+                if _f(a.get("ltp")) <= 0 and _f(q.get("last")) > 0:
+                    a["ltp"] = q["last"]
+                if _f(a.get("pct")) == 0 and _f(q.get("pct")) != 0:
+                    a["pct"] = q["pct"]
+                if _f(a.get("week52_high")) <= 0 and _f(q.get("week52_high")) > 0:
+                    a["week52_high"] = q["week52_high"]
+                if _f(a.get("week52_low")) <= 0 and _f(q.get("week52_low")) > 0:
+                    a["week52_low"] = q["week52_low"]
 
         # Step 2: fetch PE via fast quote API — ONLY if session is healthy
         # and prebuilt_lookup doesn't already cover most symbols.
-        corp_syms = {a.get("symbol", "") for a in actions}
+        corp_syms = {
+            str(a.get("symbol", "") or "").strip().upper()
+            for a in actions
+            if str(a.get("symbol", "") or "").strip()
+        }
         covered_by_lookup = corp_syms & set(sector_lookup.keys())
-        # Skip API calls entirely when prebuilt lookup covers ≥50% of symbols
-        # (avoids 403 retry storm when NSE session is in bad state)
-        effective_max = 0 if (prebuilt_lookup and len(covered_by_lookup) >= len(corp_syms) * 0.5) else max_api_calls
-        if effective_max == 0:
-            logger.info("Skipping PE API calls — prebuilt lookup has sufficient coverage")
+        # Keep a bounded number of quote calls even when lookup coverage is high,
+        # because missing symbols in the remaining set can still cause Yield=N/A.
+        effective_max = max_api_calls
 
-        # Prioritise dividend actions that still have pe=0
+        # Prioritise dividend actions that still miss LTP or PE.
         need_pe = [
             a for a in actions
-            if a.get("symbol") and not a.get("pe") and
+            if a.get("symbol") and (_f(a.get("ltp")) <= 0 or _f(a.get("pe")) <= 0) and
                "dividend" in a.get("subject", "").lower()
         ]
         other_need = [
             a for a in actions
-            if a.get("symbol") and not a.get("pe") and
+            if a.get("symbol") and (_f(a.get("ltp")) <= 0 or _f(a.get("pe")) <= 0) and
                a not in need_pe
         ]
         candidates = need_pe + other_need
@@ -1444,7 +1458,9 @@ class MarketScraper:
         seen: set = set()
         cache: Dict[str, Dict] = {}
         for a in candidates:
-            sym = a.get("symbol", "")
+            sym = str(a.get("symbol", "") or "").strip().upper()
+            if sym and a.get("symbol") != sym:
+                a["symbol"] = sym
             if not sym:
                 continue
             if sym in cache:
@@ -2079,6 +2095,11 @@ class MarketScraper:
                         existing["source"] = "+".join(sorted(src_parts))
                 snapshot["corporate_actions"] = merged if merged else None
                 snapshot["earnings_calendar"] = nse_earnings
+
+                # Normalize symbols early to avoid lookup misses caused by
+                # whitespace/case variations from mixed source feeds.
+                for row in merged:
+                    row["symbol"] = str(row.get("symbol", "") or "").strip().upper()
 
                 # Live feed safeguard: fill upcoming dividend/buyback gaps from
                 # last recent snapshot when exchanges temporarily miss rows.

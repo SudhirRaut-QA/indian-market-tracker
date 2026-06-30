@@ -2158,9 +2158,65 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
 
                 # For symbols shown in this message, backfill missing FY totals from internet.
                 # Local snapshot data remains the source of truth when available.
-                preview_divs = sorted(dividends, key=lambda x: _parse_action_date(x.get('ex_date','')) or today)
+                def _src_rank(src: str) -> int:
+                    s = str(src or "").upper()
+                    if "NSE" in s and "ANN" not in s:
+                        return 4
+                    if "BSE" in s:
+                        return 3
+                    if "ANN" in s:
+                        return 2
+                    if "CSV" in s:
+                        return 1
+                    return 0
+
+                # De-duplicate same dividend event across NSE/BSE/ANN rows and
+                # prefer entries with amount+LTP to keep Yield values usable.
+                dedup: Dict[tuple, Dict[str, Any]] = {}
+                for d in dividends:
+                    sym = str(d.get("symbol", "") or "").strip().upper()
+                    ex_raw = str(d.get("ex_date", "") or "").strip()
+                    if not sym or not ex_raw:
+                        continue
+                    parts = _extract_dividend_amounts(str(d.get("subject", "") or ""))
+                    div_amt = round(sum(parts), 4)
+                    key = (sym, ex_raw, div_amt)
+                    try:
+                        ltp = float(d.get("ltp") or 0)
+                    except (ValueError, TypeError):
+                        ltp = 0.0
+                    cur = dedup.get(key)
+                    if not cur:
+                        dedup[key] = d
+                        continue
+                    cur_parts = _extract_dividend_amounts(str(cur.get("subject", "") or ""))
+                    cur_div = round(sum(cur_parts), 4)
+                    try:
+                        cur_ltp = float(cur.get("ltp") or 0)
+                    except (ValueError, TypeError):
+                        cur_ltp = 0.0
+                    cur_score = (1 if cur_div > 0 else 0, 1 if cur_ltp > 0 else 0, _src_rank(cur.get("source", "")))
+                    new_score = (1 if div_amt > 0 else 0, 1 if ltp > 0 else 0, _src_rank(d.get("source", "")))
+                    if new_score > cur_score:
+                        dedup[key] = d
+
+                preview_divs = list(dedup.values())
+
+                def _div_sort_key(x: Dict[str, Any]):
+                    exd = _parse_action_date(x.get('ex_date', '')) or today
+                    parts = _extract_dividend_amounts(str(x.get("subject", "") or ""))
+                    div_amt = round(sum(parts), 4)
+                    try:
+                        ltp = float(x.get("ltp") or 0)
+                    except (ValueError, TypeError):
+                        ltp = 0.0
+                    y = (div_amt / ltp * 100) if (div_amt > 0 and ltp > 0) else -1.0
+                    return (exd, -y, str(x.get("symbol", "")))
+
+                preview_divs.sort(key=_div_sort_key)
+
                 fallback_symbols = [
-                    d.get("symbol", "") for d in preview_divs[:10] if d.get("symbol", "")
+                    d.get("symbol", "") for d in preview_divs[:25] if d.get("symbol", "")
                 ]
                 if fallback_symbols:
                     try:
@@ -2209,7 +2265,8 @@ def format_corporate_msg(snapshot: Dict, data_dir: str = None) -> str:
                     # Skip row if we have no useful data at all
                     if not sym or not ex_date:
                         continue
-                    if ltp_val == 0 and div_amt == 0:
+                    # Skip amount-less rows to avoid noisy entries with no yield context.
+                    if div_amt == 0:
                         continue
 
                     # Build display strings (never show "—" for zero values — skip the field)
