@@ -845,7 +845,7 @@ class MarketScraper:
                         best_dt = None
                         for ann in ann_raw:
                             att_chk = str(ann.get("attchmntText", "") or "")
-                            if not _extract_dividend_amounts(att_chk):
+                            if not _extract_dividend_amounts(att_chk, strict_only=True):
                                 continue
                             dt_chk = _ann_date_d(ann)
                             if dt_chk and (best_dt is None or dt_chk > best_dt):
@@ -875,7 +875,9 @@ class MarketScraper:
                                 dt = _ann_date_d(ann)
                                 if dt is not None and (best_dt - dt).days > CLUSTER_DAYS:
                                     continue
-                            amts = _extract_dividend_amounts(att)
+                            # Use strict_only=True so we don't extract "Rs 676" revenue figures
+                            # from immense announcement text blocks via generic fallback regex.
+                            amts = _extract_dividend_amounts(att, strict_only=True)
                             if not amts:
                                 continue
                             # Within-announcement outlier guard: if a single attachment

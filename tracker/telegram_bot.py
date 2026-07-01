@@ -66,7 +66,7 @@ def _extract_dividend_amount(subject: str) -> float:
     return round(sum(amounts), 4)
 
 
-def _extract_dividend_amounts(subject: str) -> List[float]:
+def _extract_dividend_amounts(subject: str, strict_only: bool = False) -> List[float]:
     """Extract one or more dividend amounts from subject text.
 
     Supports multi-dividend lines such as:
@@ -78,10 +78,11 @@ def _extract_dividend_amounts(subject: str) -> List[float]:
 
     # Prefer strict "per share" patterns first to avoid unrelated numbers.
     strict_patterns = [
-        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)\s*(?:/-)?\s*per\s+(?:equity\s+)?share',
-        r'\u20b9\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
-        r'INR\s*([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
-        r'@\s*(?:Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*per\s+(?:equity\s+)?share',
+        r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)\s*(?:/-)?\s*(?:\([^)]+\)\s*)?per\s+(?:equity\s+)?share',
+        r'\u20b9\s*([\d,]+(?:\.\d+)?)\s*(?:\([^)]+\)\s*)?per\s+(?:equity\s+)?share',
+        r'INR\s*([\d,]+(?:\.\d+)?)\s*(?:\([^)]+\)\s*)?per\s+(?:equity\s+)?share',
+        r'@\s*(?:Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:\([^)]+\)\s*)?per\s+(?:equity\s+)?share',
+        r'dividend(?: payout)?(?: of)?\s+(?:Rs|Re|INR|\u20b9)\.?\s*([\d,]+(?:\.\d+)?)',
     ]
 
     out: List[float] = []
@@ -94,7 +95,15 @@ def _extract_dividend_amounts(subject: str) -> List[float]:
             if 0 < v < 100_000:
                 out.append(v)
 
-    # Fallback: no strict match → retain legacy single-value behavior.
+    if strict_only:
+        # Avoid generic currency matches on large documents
+        unique_out: List[float] = []
+        for v in out:
+            if v not in unique_out:
+                unique_out.append(v)
+        return unique_out
+
+    # Fallback: no strict match → retain legacy single-value behavior for short texts.
     if not out:
         fallback_patterns = [
             r'(?:Rs|Re)\.?\s*([\d,]+(?:\.\d+)?)',
