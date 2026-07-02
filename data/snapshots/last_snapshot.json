@@ -1,288 +1,288 @@
 {
-  "timestamp": "2026-06-30 21:00:03 IST",
+  "timestamp": "2026-07-01 21:00:04 IST",
   "fii_dii": {
-    "timestamp": "2026-06-30T21:00:06.055817",
-    "date": "30-Jun-2026",
+    "timestamp": "2026-07-01T21:00:07.356649",
+    "date": "01-Jul-2026",
     "fii": {
-      "buy": 23273.71,
-      "sell": 25830.46,
-      "net": -2556.75
+      "buy": 11623.31,
+      "sell": 12763.81,
+      "net": -1140.5
     },
     "dii": {
-      "buy": 23432.58,
-      "sell": 16590.24,
-      "net": 6842.34
+      "buy": 17136.57,
+      "sell": 13977.33,
+      "net": 3159.24
     },
-    "total_net": 4285.59,
+    "total_net": 2018.7399999999998,
     "signal": "DII Defensive",
     "interpretation": "FII selling, DII buying — DII supporting"
   },
   "indices": {
     "NIFTY 50": {
-      "last": 23865.75,
-      "change": -80.5,
-      "pct": -0.34,
-      "open": 24032.05,
-      "high": 24035.55,
-      "low": 23829.2,
-      "prev_close": 23946.25,
-      "advances": "25",
-      "declines": "25",
+      "last": 24005.85,
+      "change": 140.1,
+      "pct": 0.59,
+      "open": 23897.65,
+      "high": 24049.9,
+      "low": 23895.1,
+      "prev_close": 23865.75,
+      "advances": "33",
+      "declines": "17",
       "unchanged": "0"
     },
     "NIFTY NEXT 50": {
-      "last": 71629.45,
-      "change": 119.15,
-      "pct": 0.17,
-      "open": 71716.9,
-      "high": 71970.05,
-      "low": 71358.45,
-      "prev_close": 71510.3,
+      "last": 72100.65,
+      "change": 471.2,
+      "pct": 0.66,
+      "open": 71792.9,
+      "high": 72166.85,
+      "low": 71590.6,
+      "prev_close": 71629.45,
       "advances": "32",
       "declines": "18",
       "unchanged": "0"
     },
     "NIFTY BANK": {
-      "last": 57542.9,
-      "change": -184.45,
-      "pct": -0.32,
-      "open": 58011.95,
-      "high": 58011.95,
-      "low": 57456.65,
-      "prev_close": 57727.35,
-      "advances": "8",
-      "declines": "6",
+      "last": 58033.05,
+      "change": 490.15,
+      "pct": 0.85,
+      "open": 57573.35,
+      "high": 58134.15,
+      "low": 57487.85,
+      "prev_close": 57542.9,
+      "advances": "11",
+      "declines": "3",
       "unchanged": "0"
     },
     "NIFTY FINANCIAL SERVICES": {
-      "last": 26554.55,
-      "change": -43.8,
-      "pct": -0.16,
-      "open": 26724.85,
-      "high": 26729.7,
-      "low": 26505.75,
-      "prev_close": 26598.35,
-      "advances": "11",
-      "declines": "9",
+      "last": 26797.75,
+      "change": 243.2,
+      "pct": 0.92,
+      "open": 26553.75,
+      "high": 26848.7,
+      "low": 26527.9,
+      "prev_close": 26554.55,
+      "advances": "16",
+      "declines": "4",
       "unchanged": "0"
     },
     "NIFTY MIDCAP 50": {
-      "last": 17594.9,
-      "change": 73.9,
-      "pct": 0.42,
-      "open": 17568.2,
-      "high": 17669,
-      "low": 17475.55,
-      "prev_close": 17521,
-      "advances": "33",
-      "declines": "16",
-      "unchanged": "1"
+      "last": 17716.1,
+      "change": 121.2,
+      "pct": 0.69,
+      "open": 17643.55,
+      "high": 17730.8,
+      "low": 17636.2,
+      "prev_close": 17594.9,
+      "advances": "28",
+      "declines": "22",
+      "unchanged": "0"
     },
     "INDIA VIX": {
-      "last": 13.6,
-      "change": -0.01,
-      "pct": -0.07,
-      "open": 13.61,
-      "high": 13.97,
+      "last": 13.24,
+      "change": -0.36,
+      "pct": -2.62,
+      "open": 13.6,
+      "high": 14.07,
       "low": 13.15,
-      "prev_close": 13.61,
+      "prev_close": 13.6,
       "advances": 0,
       "declines": 0,
       "unchanged": 0
     },
     "NIFTY SMALLCAP 50": {
-      "last": 9332.55,
-      "change": 97.5,
-      "pct": 1.06,
-      "open": 9264.15,
-      "high": 9355.25,
-      "low": 9251.5,
-      "prev_close": 9235.05,
-      "advances": "39",
-      "declines": "11",
+      "last": 9354.15,
+      "change": 21.6,
+      "pct": 0.23,
+      "open": 9346.6,
+      "high": 9406.3,
+      "low": 9322.9,
+      "prev_close": 9332.55,
+      "advances": "21",
+      "declines": "29",
       "unchanged": "0"
     },
     "NIFTY AUTO": {
-      "last": 26479.8,
-      "change": 62.2,
-      "pct": 0.24,
-      "open": 26537,
-      "high": 26664.3,
-      "low": 26067.7,
-      "prev_close": 26417.6,
-      "advances": "9",
-      "declines": "5",
-      "unchanged": "1"
-    },
-    "NIFTY FMCG": {
-      "last": 48794.2,
-      "change": -333.45,
-      "pct": -0.68,
-      "open": 49119.8,
-      "high": 49159.4,
-      "low": 48712.7,
-      "prev_close": 49127.65,
-      "advances": "7",
-      "declines": "8",
-      "unchanged": "0"
-    },
-    "NIFTY IT": {
-      "last": 26299.05,
-      "change": -739.45,
-      "pct": -2.73,
-      "open": 26989.95,
-      "high": 27032.2,
-      "low": 26208.5,
-      "prev_close": 27038.5,
-      "advances": "1",
-      "declines": "9",
-      "unchanged": "0"
-    },
-    "NIFTY METAL": {
-      "last": 12519.15,
-      "change": -25.85,
-      "pct": -0.21,
-      "open": 12529.25,
-      "high": 12573.05,
-      "low": 12442.1,
-      "prev_close": 12545,
-      "advances": "7",
-      "declines": "8",
-      "unchanged": "0"
-    },
-    "NIFTY PHARMA": {
-      "last": 25326.4,
-      "change": 98.5,
-      "pct": 0.39,
-      "open": 25274.75,
-      "high": 25476.55,
-      "low": 25173.05,
-      "prev_close": 25227.9,
-      "advances": "16",
+      "last": 26783.2,
+      "change": 303.4,
+      "pct": 1.15,
+      "open": 26585.15,
+      "high": 26965.45,
+      "low": 26585.15,
+      "prev_close": 26479.8,
+      "advances": "11",
       "declines": "4",
       "unchanged": "0"
     },
-    "NIFTY PSU BANK": {
-      "last": 8492.65,
-      "change": -61.2,
-      "pct": -0.72,
-      "open": 8583.15,
-      "high": 8598.7,
-      "low": 8481.4,
-      "prev_close": 8553.85,
+    "NIFTY FMCG": {
+      "last": 49806.8,
+      "change": 1012.6,
+      "pct": 2.08,
+      "open": 48981.9,
+      "high": 49880.5,
+      "low": 48881.6,
+      "prev_close": 48794.2,
+      "advances": "15",
+      "declines": "0",
+      "unchanged": "0"
+    },
+    "NIFTY IT": {
+      "last": 25769.8,
+      "change": -529.25,
+      "pct": -2.01,
+      "open": 26381,
+      "high": 26505.75,
+      "low": 25699.1,
+      "prev_close": 26299.05,
+      "advances": "2",
+      "declines": "8",
+      "unchanged": "0"
+    },
+    "NIFTY METAL": {
+      "last": 12394.75,
+      "change": -124.4,
+      "pct": -0.99,
+      "open": 12515.3,
+      "high": 12522.9,
+      "low": 12375.05,
+      "prev_close": 12519.15,
+      "advances": "1",
+      "declines": "14",
+      "unchanged": "0"
+    },
+    "NIFTY PHARMA": {
+      "last": 25182.7,
+      "change": -143.7,
+      "pct": -0.57,
+      "open": 25416.9,
+      "high": 25591.3,
+      "low": 25133.25,
+      "prev_close": 25326.4,
       "advances": "5",
-      "declines": "7",
+      "declines": "15",
+      "unchanged": "0"
+    },
+    "NIFTY PSU BANK": {
+      "last": 8576.6,
+      "change": 83.95,
+      "pct": 0.99,
+      "open": 8525.2,
+      "high": 8596.45,
+      "low": 8476.7,
+      "prev_close": 8492.65,
+      "advances": "9",
+      "declines": "3",
       "unchanged": "0"
     },
     "NIFTY REALTY": {
-      "last": 829.55,
-      "change": 10.7,
-      "pct": 1.31,
-      "open": 823.25,
-      "high": 835.3,
-      "low": 818.55,
-      "prev_close": 818.85,
+      "last": 859.25,
+      "change": 29.7,
+      "pct": 3.58,
+      "open": 834.6,
+      "high": 860.65,
+      "low": 832.15,
+      "prev_close": 829.55,
       "advances": "8",
       "declines": "2",
       "unchanged": "0"
     },
     "NIFTY OIL & GAS": {
-      "last": 11030.25,
-      "change": 18.2,
-      "pct": 0.17,
-      "open": 11040.85,
-      "high": 11069.2,
-      "low": 10952.25,
-      "prev_close": 11012.05,
-      "advances": "10",
-      "declines": "5",
+      "last": 11084.15,
+      "change": 53.9,
+      "pct": 0.49,
+      "open": 11058.45,
+      "high": 11097.8,
+      "low": 11011.95,
+      "prev_close": 11030.25,
+      "advances": "8",
+      "declines": "7",
       "unchanged": "0"
     },
     "NIFTY100 LOW VOLATILITY 30": {
-      "last": 19683.1,
-      "change": -50.35,
-      "pct": -0.26,
-      "open": 19779.15,
-      "high": 19786.4,
-      "low": 19638.75,
-      "prev_close": 19733.45,
-      "advances": "14",
-      "declines": "16",
+      "last": 19811.5,
+      "change": 128.4,
+      "pct": 0.65,
+      "open": 19742.9,
+      "high": 19848.8,
+      "low": 19723.55,
+      "prev_close": 19683.1,
+      "advances": "19",
+      "declines": "11",
       "unchanged": "0"
     },
     "NIFTY200 MOMENTUM 30": {
-      "last": 30912.9,
-      "change": -25.05,
-      "pct": -0.08,
-      "open": 30909.9,
-      "high": 31047.6,
-      "low": 30704.8,
-      "prev_close": 30937.95,
-      "advances": "16",
-      "declines": "14",
+      "last": 30893.75,
+      "change": -19.15,
+      "pct": -0.06,
+      "open": 30987,
+      "high": 31087.7,
+      "low": 30824.8,
+      "prev_close": 30912.9,
+      "advances": "13",
+      "declines": "17",
       "unchanged": "0"
     },
     "NIFTY HIGH BETA 50": {
-      "last": 4296,
-      "change": 25.5,
-      "pct": 0.6,
-      "open": 4284.35,
-      "high": 4316.9,
-      "low": 4271.05,
-      "prev_close": 4270.5,
-      "advances": "37",
-      "declines": "13",
+      "last": 4352.5,
+      "change": 56.5,
+      "pct": 1.32,
+      "open": 4309.9,
+      "high": 4356.2,
+      "low": 4300.45,
+      "prev_close": 4296,
+      "advances": "38",
+      "declines": "12",
       "unchanged": "0"
     },
     "NIFTY COMMODITIES": {
-      "last": 9792.95,
-      "change": -26.95,
-      "pct": -0.27,
-      "open": 9825.55,
-      "high": 9837.75,
-      "low": 9756.9,
-      "prev_close": 9819.9,
-      "advances": "14",
-      "declines": "16",
+      "last": 9785.45,
+      "change": -7.5,
+      "pct": -0.08,
+      "open": 9812.8,
+      "high": 9821.45,
+      "low": 9761.6,
+      "prev_close": 9792.95,
+      "advances": "13",
+      "declines": "17",
       "unchanged": "0"
     },
     "NIFTY ENERGY": {
-      "last": 39740.5,
-      "change": 22.5,
+      "last": 39764.85,
+      "change": 24.35,
       "pct": 0.06,
-      "open": 39784.75,
-      "high": 39848.05,
-      "low": 39521.2,
-      "prev_close": 39718,
-      "advances": "25",
-      "declines": "15",
+      "open": 39827.35,
+      "high": 39936.7,
+      "low": 39674.55,
+      "prev_close": 39740.5,
+      "advances": "18",
+      "declines": "22",
       "unchanged": "0"
     },
     "NIFTY INDIA DEFENCE": {
-      "last": 9519.4,
-      "change": 128.4,
-      "pct": 1.37,
-      "open": 9368.9,
-      "high": 9575.95,
-      "low": 9307.95,
-      "prev_close": 9391,
-      "advances": "17",
-      "declines": "2",
+      "last": 9555.45,
+      "change": 36.05,
+      "pct": 0.38,
+      "open": 9552.8,
+      "high": 9597.05,
+      "low": 9513.15,
+      "prev_close": 9519.4,
+      "advances": "11",
+      "declines": "8",
       "unchanged": "0"
     }
   },
   "market_status": {
     "Capital Market": {
       "status": "Closed",
-      "trade_date": "30-Jun-2026 15:30",
+      "trade_date": "01-Jul-2026 15:30",
       "index": "NIFTY 50",
-      "last": 23865.75,
-      "variation": -80.5,
-      "pct": -0.34
+      "last": 24005.85,
+      "variation": 140.09999999999854,
+      "pct": 0.59
     },
     "Currency": {
       "status": "Closed",
-      "trade_date": "30-Jun-2026",
+      "trade_date": "01-Jul-2026",
       "index": "",
       "last": "",
       "variation": "",
@@ -290,7 +290,7 @@
     },
     "Commodity": {
       "status": "Open",
-      "trade_date": "30-Jun-2026",
+      "trade_date": "01-Jul-2026",
       "index": "",
       "last": "",
       "variation": "",
@@ -298,7 +298,7 @@
     },
     "Debt": {
       "status": "Closed",
-      "trade_date": "30-Jun-2026",
+      "trade_date": "01-Jul-2026",
       "index": "",
       "last": "",
       "variation": "",
@@ -306,63 +306,63 @@
     },
     "currencyfuture": {
       "status": "Closed",
-      "trade_date": "30-Jun-2026",
+      "trade_date": "01-Jul-2026",
       "index": "",
-      "last": "94.9025",
+      "last": "95.4000",
       "variation": "",
       "pct": ""
     }
   },
   "forex": {
-    "usdinr": 94.5644,
-    "usdeur": 0.8773,
+    "usdinr": 94.7166,
+    "usdeur": 0.8769,
     "usdgbp": 0.7556,
-    "usdjpy": 162.1795,
-    "date": "2026-06-30"
+    "usdjpy": 162.7889,
+    "date": "2026-07-01"
   },
   "commodities": {},
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4038.9,
-      "pct": 0.21
+      "last": 4102.6,
+      "pct": 0.59
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 3.319,
-      "pct": -0.72
+      "last": 3.217,
+      "pct": -0.43
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 60.02,
-      "pct": 2.87
+      "last": 60.675,
+      "pct": 2.46
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 70.26,
-      "pct": -2.31
+      "last": 68.34,
+      "pct": -1.29
     }
   },
   "global_indices": {
     "S&P 500": {
       "symbol": "^GSPC",
-      "last": 7479.92,
-      "pct": 1.55
+      "last": 7519.45,
+      "pct": 2.19
     },
     "NASDAQ": {
       "symbol": "^IXIC",
-      "last": 26100.012,
-      "pct": 2.0
+      "last": 26233.553,
+      "pct": 2.97
     },
     "DOW": {
       "symbol": "^DJI",
-      "last": 52328.25,
-      "pct": 1.28
+      "last": 52536.61,
+      "pct": 1.33
     },
     "NIKKEI": {
       "symbol": "^N225",
-      "last": 69468.11,
-      "pct": 0.42
+      "last": 70062.32,
+      "pct": -3.18
     },
     "HANG SENG": {
       "symbol": "^HSI",
@@ -371,27 +371,27 @@
     },
     "FTSE": {
       "symbol": "^FTSE",
-      "last": 10522.32,
-      "pct": 0.9
+      "last": 10460.82,
+      "pct": -0.01
     }
   },
   "global_sentiment": {
     "fear_greed": {
-      "score": 29.46,
+      "score": 33.66,
       "rating": "fear",
-      "previous_close": 27.0285714285714,
-      "timestamp": "2026-06-30T15:28:49+00:00"
+      "previous_close": 31.2285714285714,
+      "timestamp": "2026-07-01T15:27:22+00:00"
     },
     "macro": {
       "DXY": {
         "symbol": "DX-Y.NYB",
-        "last": 101.139,
-        "pct": -0.29
+        "last": 101.353,
+        "pct": -0.01
       },
       "BRENT": {
         "symbol": "BZ=F",
-        "last": 73.81,
-        "pct": -1.93
+        "last": 71.49,
+        "pct": -0.69
       }
     }
   },
@@ -400,84 +400,6 @@
   "option_chain": {},
   "preopen": null,
   "corporate_actions": [
-    {
-      "symbol": "BAJAJHLDNG",
-      "company": "Bajaj Holdings & Investment Limited",
-      "subject": "Dividend - Rs 130 Per Share",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 10603.0,
-      "pct": 0.1
-    },
-    {
-      "symbol": "MAHSCOOTER",
-      "company": "Maharashtra Scooters Limited",
-      "subject": "Dividend - Rs 60 Per Share",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 12501.0,
-      "pct": 0.94
-    },
-    {
-      "symbol": "BAJAJFINSV",
-      "company": "Bajaj Finserv Limited",
-      "subject": "Dividend - Rs 1.50 Per Share",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1780.2,
-      "pct": 1.19
-    },
-    {
-      "symbol": "WELCORP",
-      "company": "Welspun Corp Limited",
-      "subject": "Dividend - Rs 5 Per Share",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1521.9,
-      "pct": 0.73
-    },
-    {
-      "symbol": "PATINTLOG",
-      "company": "Patel Integrated Logistics Limited",
-      "subject": "Buy Back",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 15.38,
-      "pct": -4.94
-    },
-    {
-      "symbol": "BAJFINANCE",
-      "company": "Bajaj Finance Limited",
-      "subject": "Dividend - Rs 6 Per Share",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1004.75,
-      "pct": 2.31
-    },
     {
       "symbol": "DSFCL",
       "company": "DCM Shriram Fine Chemicals Limited",
@@ -488,12 +410,25 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 24.0,
-      "pct": 0.13
+      "ltp": 24.62,
+      "pct": 2.58
     },
     {
-      "symbol": "GUJGASLTD",
-      "company": "Gujarat Gas Limited",
+      "symbol": "GANGAFORGE",
+      "company": "Ganga Forging Limited",
+      "subject": "Rights 3:2 @ Premium Re. 0.63/-",
+      "ex_date": "02-Jul-2026",
+      "record_date": "02-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2.48,
+      "pct": 1.22
+    },
+    {
+      "symbol": "GUJENERGY",
+      "company": "GUJARAT ENERGY LIMITED",
       "subject": "Demerger",
       "ex_date": "02-Jul-2026",
       "record_date": "02-Jul-2026",
@@ -501,21 +436,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 327.05,
-      "pct": -2.46
-    },
-    {
-      "symbol": "LLOYDSENT",
-      "company": "Lloyds Enterprises Limited",
-      "subject": "Dividend - Re 0.05 Per Share",
-      "ex_date": "02-Jul-2026",
-      "record_date": "02-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 73.82,
-      "pct": -1.9
+      "ltp": 340.0,
+      "pct": 3.96
     },
     {
       "symbol": "CHEMBOND",
@@ -527,281 +449,21 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 188.97,
-      "pct": 1.59
+      "ltp": 187.18,
+      "pct": -0.95
     },
     {
-      "symbol": "BALAMINES",
-      "company": "Balaji Amines Limited",
-      "subject": "Dividend - Rs 11 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
+      "symbol": "LLOYDSENT",
+      "company": "Lloyds Enterprises Limited",
+      "subject": "Dividend - Re 0.05 Per Share",
+      "ex_date": "02-Jul-2026",
+      "record_date": "02-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2035.9,
-      "pct": 7.59
-    },
-    {
-      "symbol": "BHARATFORG",
-      "company": "Bharat Forge Limited",
-      "subject": "Dividend - Rs 6.50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 2144.1,
-      "pct": -1.23
-    },
-    {
-      "symbol": "BIOCON",
-      "company": "Biocon Limited",
-      "subject": "Dividend - Re 0.50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 418.3,
-      "pct": 0.73
-    },
-    {
-      "symbol": "M&M",
-      "company": "Mahindra & Mahindra Limited",
-      "subject": "Dividend - Rs 33 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 3068.8,
-      "pct": -0.78
-    },
-    {
-      "symbol": "MAHLIFE",
-      "company": "Mahindra Lifespace Developers Limited",
-      "subject": "Dividend - Rs 3.50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 366.45,
-      "pct": -0.16
-    },
-    {
-      "symbol": "THERMAX",
-      "company": "Thermax Limited",
-      "subject": "Dividend - Rs 14 Per Share/Special Dividend - Rs 6 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 5159.5,
-      "pct": 0.67
-    },
-    {
-      "symbol": "TECHM",
-      "company": "Tech Mahindra Limited",
-      "subject": "Dividend - Rs 36 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1404.7,
-      "pct": -2.03
-    },
-    {
-      "symbol": "TEAMLEASE",
-      "company": "Teamlease Services Limited",
-      "subject": "Buy Back",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1445.1,
-      "pct": -0.15
-    },
-    {
-      "symbol": "KRISHANA",
-      "company": "Krishana Phoschem Limited",
-      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 688.0,
-      "pct": 0.86
-    },
-    {
-      "symbol": "KIRLPNU",
-      "company": "Kirloskar Pneumatic Company Limited",
-      "subject": "Dividend - Rs 8.50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1953.0,
-      "pct": 2.48
-    },
-    {
-      "symbol": "AKUMS",
-      "company": "Akums Drugs and Pharmaceuticals Limited",
-      "subject": "Dividend - Re 1 Per Share/Special Dividend - Rs 2 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 623.15,
-      "pct": -0.24
-    },
-    {
-      "symbol": "SWARAJENG",
-      "company": "Swaraj Engines Limited",
-      "subject": "Dividend - Rs 110 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 3997.6,
-      "pct": 0.92
-    },
-    {
-      "symbol": "SMLMAH",
-      "company": "SML Mahindra Limited",
-      "subject": "Dividend - Rs 23.50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 4098.0,
-      "pct": 1.76
-    },
-    {
-      "symbol": "JSWDULUX",
-      "company": "JSW Dulux Limited",
-      "subject": "Dividend - Rs 50 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 3228.1,
-      "pct": -1.07
-    },
-    {
-      "symbol": "SKFINDIA",
-      "company": "SKF India Limited",
-      "subject": "Dividend - Rs 40 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1672.5,
-      "pct": 1.01
-    },
-    {
-      "symbol": "SHRIRAMFIN",
-      "company": "Shriram Finance Limited",
-      "subject": "Dividend - Rs 6 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1042.15,
-      "pct": 0.92
-    },
-    {
-      "symbol": "REDINGTON",
-      "company": "Redington Limited",
-      "subject": "Dividend - Rs 6 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 276.18,
-      "pct": 0.24
-    },
-    {
-      "symbol": "RAYMONDREL",
-      "company": "Raymond Realty Limited",
-      "subject": "Dividend - Rs 2 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 619.2,
-      "pct": -0.76
-    },
-    {
-      "symbol": "EXIDEIND",
-      "company": "Exide Industries Limited",
-      "subject": "Dividend - Rs 2 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 387.6,
-      "pct": 0.27
-    },
-    {
-      "symbol": "ESCORTS",
-      "company": "Escorts Kubota Limited",
-      "subject": "Dividend - Rs 33 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 2935.9,
-      "pct": 1.34
-    },
-    {
-      "symbol": "WELENT",
-      "company": "Welspun Enterprises Limited",
-      "subject": "Dividend - Rs 3 Per Share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 601.45,
-      "pct": 4.75
+      "ltp": 73.69,
+      "pct": -0.18
     },
     {
       "symbol": "MBAPL",
@@ -813,12 +475,38 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 562.0,
-      "pct": -0.04
+      "ltp": 593.25,
+      "pct": 5.56
     },
     {
-      "symbol": "MAXHEALTH",
-      "company": "Max Healthcare Institute Limited",
+      "symbol": "GREENLAM",
+      "company": "Greenlam Industries Limited",
+      "subject": "Dividend - Re 0.40 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 255.4,
+      "pct": -1.1
+    },
+    {
+      "symbol": "ONWARDTEC",
+      "company": "Onward Technologies Limited",
+      "subject": "Dividend - Rs 8 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 289.15,
+      "pct": 1.01
+    },
+    {
+      "symbol": "RAYMONDREL",
+      "company": "Raymond Realty Limited",
       "subject": "Dividend - Rs 2 Per Share",
       "ex_date": "03-Jul-2026",
       "record_date": "03-Jul-2026",
@@ -826,8 +514,138 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1129.25,
-      "pct": -1.8
+      "ltp": 639.1,
+      "pct": 3.21
+    },
+    {
+      "symbol": "WELENT",
+      "company": "Welspun Enterprises Limited",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 610.35,
+      "pct": 1.48
+    },
+    {
+      "symbol": "JSWDULUX",
+      "company": "JSW Dulux Limited",
+      "subject": "Dividend - Rs 50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 3224.0,
+      "pct": -0.13
+    },
+    {
+      "symbol": "REDINGTON",
+      "company": "Redington Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 273.65,
+      "pct": -0.92
+    },
+    {
+      "symbol": "ROLEXRINGS",
+      "company": "Rolex Rings Limited",
+      "subject": "Buy Back",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 149.78,
+      "pct": 0.13
+    },
+    {
+      "symbol": "KIRLPNU",
+      "company": "Kirloskar Pneumatic Company Limited",
+      "subject": "Dividend - Rs 8.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2000.9,
+      "pct": 2.45
+    },
+    {
+      "symbol": "KRISHANA",
+      "company": "Krishana Phoschem Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 697.65,
+      "pct": 1.4
+    },
+    {
+      "symbol": "BALAMINES",
+      "company": "Balaji Amines Limited",
+      "subject": "Dividend - Rs 11 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2090.2,
+      "pct": 2.67
+    },
+    {
+      "symbol": "BFINVEST",
+      "company": "BF Investment Limited",
+      "subject": "Dividend - Rs 10 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 446.8,
+      "pct": 0.02
+    },
+    {
+      "symbol": "BHARATFORG",
+      "company": "Bharat Forge Limited",
+      "subject": "Dividend - Rs 6.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2108.8,
+      "pct": -1.65
+    },
+    {
+      "symbol": "BIOCON",
+      "company": "Biocon Limited",
+      "subject": "Dividend - Re 0.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 418.2,
+      "pct": -0.02
     },
     {
       "symbol": "CANFINHOME",
@@ -839,8 +657,73 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 867.95,
-      "pct": 3.66
+      "ltp": 882.35,
+      "pct": 1.66
+    },
+    {
+      "symbol": "M&M",
+      "company": "Mahindra & Mahindra Limited",
+      "subject": "Dividend - Rs 33 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 3130.0,
+      "pct": 1.99
+    },
+    {
+      "symbol": "MAHLIFE",
+      "company": "Mahindra Lifespace Developers Limited",
+      "subject": "Dividend - Rs 3.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 372.7,
+      "pct": 1.71
+    },
+    {
+      "symbol": "SHRIRAMFIN",
+      "company": "Shriram Finance Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1048.1,
+      "pct": 0.57
+    },
+    {
+      "symbol": "MAXHEALTH",
+      "company": "Max Healthcare Institute Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1139.9,
+      "pct": 0.94
+    },
+    {
+      "symbol": "GLOSTERLTD",
+      "company": "Gloster Limited",
+      "subject": "Dividend - Rs 20 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 741.75,
+      "pct": 1.35
     },
     {
       "symbol": "UNIONBANK",
@@ -852,21 +735,190 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 172.43,
-      "pct": -1.22
+      "ltp": 174.88,
+      "pct": 1.42
     },
     {
-      "symbol": "PILANIINVS",
-      "company": "Pilani Investment and Industries Corporation Limited",
-      "subject": "Dividend - Rs 9 Per Share",
+      "symbol": "EXIDEIND",
+      "company": "Exide Industries Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 390.35,
+      "pct": 0.71
+    },
+    {
+      "symbol": "THERMAX",
+      "company": "Thermax Limited",
+      "subject": "Dividend - Rs 14 Per Share/Special Dividend - Rs 6 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 5120.5,
+      "pct": -0.76
+    },
+    {
+      "symbol": "ESCORTS",
+      "company": "Escorts Kubota Limited",
+      "subject": "Dividend - Rs 33 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2945.3,
+      "pct": 0.32
+    },
+    {
+      "symbol": "TECHM",
+      "company": "Tech Mahindra Limited",
+      "subject": "Dividend - Rs 36 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1362.2,
+      "pct": -3.03
+    },
+    {
+      "symbol": "TEAMLEASE",
+      "company": "Teamlease Services Limited",
+      "subject": "Buy Back",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1450.4,
+      "pct": 0.37
+    },
+    {
+      "symbol": "AKUMS",
+      "company": "Akums Drugs and Pharmaceuticals Limited",
+      "subject": "Dividend - Re 1 Per Share/Special Dividend - Rs 2 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 630.85,
+      "pct": 1.24
+    },
+    {
+      "symbol": "SKFINDIA",
+      "company": "SKF India Limited",
+      "subject": "Dividend - Rs 40 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1667.9,
+      "pct": -0.28
+    },
+    {
+      "symbol": "SKFINDUS",
+      "company": "SKF India (Industrial) Limited",
+      "subject": "Dividend - Rs 10 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2867.7,
+      "pct": -0.83
+    },
+    {
+      "symbol": "SMLMAH",
+      "company": "SML Mahindra Limited",
+      "subject": "Dividend - Rs 23.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 3960.5,
+      "pct": -3.36
+    },
+    {
+      "symbol": "SWARAJENG",
+      "company": "Swaraj Engines Limited",
+      "subject": "Dividend - Rs 110 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 4038.7,
+      "pct": 1.03
+    },
+    {
+      "symbol": "DALMIASUG",
+      "company": "Dalmia Bharat Sugar and Industries Limited",
+      "subject": "Dividend - Rs 1.50 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 335.6,
+      "pct": 3.02
+    },
+    {
+      "symbol": "DCMSRIND",
+      "company": "DCM Shriram Industries Limited",
+      "subject": "Dividend - Re 0.40 Per Share",
+      "ex_date": "03-Jul-2026",
+      "record_date": "03-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 38.09,
+      "pct": 0.98
+    },
+    {
+      "symbol": "DJML",
+      "company": "DJ Mediaprint & Logistics Limited",
+      "subject": "Dividend - Re 0.15 Per Share",
       "ex_date": "06-Jul-2026",
       "record_date": "06-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4349.0,
-      "pct": 0.02
+      "ltp": 113.32,
+      "pct": -1.68
+    },
+    {
+      "symbol": "DCMSIL",
+      "company": "DCM Shriram International Limited",
+      "subject": "Dividend - Re 0.40 Per Share",
+      "ex_date": "06-Jul-2026",
+      "record_date": "06-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 72.51,
+      "pct": -1.99
     },
     {
       "symbol": "SUNDARMFIN",
@@ -878,34 +930,21 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 4506.7,
-      "pct": -0.9
+      "ltp": 4568.9,
+      "pct": 1.38
     },
     {
-      "symbol": "SUNPHARMA",
-      "company": "Sun Pharmaceutical Industries Limited",
-      "subject": "Dividend - Rs 5 Per Share",
-      "ex_date": "07-Jul-2026",
-      "record_date": "07-Jul-2026",
+      "symbol": "PILANIINVS",
+      "company": "Pilani Investment and Industries Corporation Limited",
+      "subject": "Dividend - Rs 9 Per Share",
+      "ex_date": "06-Jul-2026",
+      "record_date": "06-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1862.5,
-      "pct": -0.66
-    },
-    {
-      "symbol": "CERA",
-      "company": "Cera Sanitaryware Limited",
-      "subject": "Dividend - Rs 75 Per Share",
-      "ex_date": "07-Jul-2026",
-      "record_date": "07-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 6451.5,
-      "pct": -0.19
+      "ltp": 4402.3,
+      "pct": 1.23
     },
     {
       "symbol": "TSFINV",
@@ -917,21 +956,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 440.15,
-      "pct": -0.86
-    },
-    {
-      "symbol": "DODLA",
-      "company": "Dodla Dairy Limited",
-      "subject": "Dividend - Rs 5 Per Share",
-      "ex_date": "07-Jul-2026",
-      "record_date": "07-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1122.7,
-      "pct": 0.12
+      "ltp": 451.0,
+      "pct": 2.47
     },
     {
       "symbol": "JSWSTEEL",
@@ -943,21 +969,47 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1226.4,
-      "pct": -0.49
+      "ltp": 1216.2,
+      "pct": -0.83
     },
     {
-      "symbol": "UNITDSPR",
-      "company": "United Spirits Limited",
-      "subject": "Dividend - Rs 11 Per Share",
-      "ex_date": "08-Jul-2026",
-      "record_date": "08-Jul-2026",
+      "symbol": "CERA",
+      "company": "Cera Sanitaryware Limited",
+      "subject": "Dividend - Rs 75 Per Share",
+      "ex_date": "07-Jul-2026",
+      "record_date": "07-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1350.4,
-      "pct": 0.66
+      "ltp": 6441.0,
+      "pct": -0.16
+    },
+    {
+      "symbol": "SUNPHARMA",
+      "company": "Sun Pharmaceutical Industries Limited",
+      "subject": "Dividend - Rs 5 Per Share",
+      "ex_date": "07-Jul-2026",
+      "record_date": "07-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1866.2,
+      "pct": 0.2
+    },
+    {
+      "symbol": "DODLA",
+      "company": "Dodla Dairy Limited",
+      "subject": "Dividend - Rs 5 Per Share",
+      "ex_date": "07-Jul-2026",
+      "record_date": "07-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1117.3,
+      "pct": -0.48
     },
     {
       "symbol": "MPHASIS",
@@ -969,8 +1021,34 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2161.6,
-      "pct": -2.09
+      "ltp": 2126.8,
+      "pct": -1.61
+    },
+    {
+      "symbol": "UNITDSPR",
+      "company": "United Spirits Limited",
+      "subject": "Dividend - Rs 11 Per Share",
+      "ex_date": "08-Jul-2026",
+      "record_date": "08-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1352.4,
+      "pct": 0.15
+    },
+    {
+      "symbol": "TITAN",
+      "company": "Titan Company Limited",
+      "subject": "Dividend - Rs 15 Per Share",
+      "ex_date": "09-Jul-2026",
+      "record_date": "09-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 4398.6,
+      "pct": -0.12
     },
     {
       "symbol": "SFL",
@@ -982,34 +1060,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 746.9,
-      "pct": 0.57
-    },
-    {
-      "symbol": "JKCEMENT",
-      "company": "JK Cement Limited",
-      "subject": "Dividend - Rs 20 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 5444.5,
-      "pct": 2.35
-    },
-    {
-      "symbol": "APOLLOTYRE",
-      "company": "Apollo Tyres Limited",
-      "subject": "Dividend - Rs2.50 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 430.2,
-      "pct": 2.27
+      "ltp": 736.9,
+      "pct": -1.34
     },
     {
       "symbol": "AXISBANK",
@@ -1021,125 +1073,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1345.7,
-      "pct": -0.82
-    },
-    {
-      "symbol": "MAHLOG",
-      "company": "Mahindra Logistics Limited",
-      "subject": "Dividend - Rs 2.50 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 373.9,
-      "pct": 0.4
-    },
-    {
-      "symbol": "BSE",
-      "company": "BSE Limited",
-      "subject": "Dividend - Rs 10 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 3865.6,
-      "pct": 0.15
-    },
-    {
-      "symbol": "BSOFT",
-      "company": "BIRLASOFT LIMITED",
-      "subject": "Dividend - Rs 4 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 286.3,
-      "pct": -4.28
-    },
-    {
-      "symbol": "CAMS",
-      "company": "Computer Age Management Services Limited",
-      "subject": "Dividend - Rs 4 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 796.85,
-      "pct": 1.04
-    },
-    {
-      "symbol": "VSTIND",
-      "company": "VST Industries Limited",
-      "subject": "Dividend - Rs 12 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 260.3,
-      "pct": -0.08
-    },
-    {
-      "symbol": "WELSPUNLIV",
-      "company": "Welspun Living Limited",
-      "subject": "Dividend - Re 0.10 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 158.84,
-      "pct": -1.97
-    },
-    {
-      "symbol": "ZFCVINDIA",
-      "company": "ZF Commercial Vehicle Control Systems India Limited",
-      "subject": "Dividend - Rs 4 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 2566.0,
-      "pct": -4.47
-    },
-    {
-      "symbol": "NESTLEIND",
-      "company": "Nestle India Limited",
-      "subject": "Dividend - Rs 5 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1405.2,
-      "pct": 1.29
-    },
-    {
-      "symbol": "ORIENTELEC",
-      "company": "Orient Electric Limited",
-      "subject": "Dividend - Rs 0.75 Per Share",
-      "ex_date": "10-Jul-2026",
-      "record_date": "10-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 175.46,
-      "pct": 0.03
+      "ltp": 1368.7,
+      "pct": 1.71
     },
     {
       "symbol": "GRINDWELL",
@@ -1151,8 +1086,150 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2166.1,
-      "pct": 0.9
+      "ltp": 2153.8,
+      "pct": -0.57
+    },
+    {
+      "symbol": "APOLLOTYRE",
+      "company": "Apollo Tyres Limited",
+      "subject": "Dividend - Rs2.50 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 431.65,
+      "pct": 0.34
+    },
+    {
+      "symbol": "MWL",
+      "company": "Mangalam Worldwide Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 377.85,
+      "pct": 0.56
+    },
+    {
+      "symbol": "BSE",
+      "company": "BSE Limited",
+      "subject": "Dividend - Rs 10 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 3944.1,
+      "pct": 2.03
+    },
+    {
+      "symbol": "DRREDDY",
+      "company": "Dr. Reddy's Laboratories Limited",
+      "subject": "Dividend - Rs 8 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1339.9,
+      "pct": -1.27
+    },
+    {
+      "symbol": "CAMS",
+      "company": "Computer Age Management Services Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 792.2,
+      "pct": -0.58
+    },
+    {
+      "symbol": "BSOFT",
+      "company": "BIRLASOFT LIMITED",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 275.7,
+      "pct": -3.7
+    },
+    {
+      "symbol": "VSTIND",
+      "company": "VST Industries Limited",
+      "subject": "Dividend - Rs 12 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 260.3
+    },
+    {
+      "symbol": "MAHLOG",
+      "company": "Mahindra Logistics Limited",
+      "subject": "Dividend - Rs 2.50 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 371.4,
+      "pct": -0.67
+    },
+    {
+      "symbol": "ORIENTELEC",
+      "company": "Orient Electric Limited",
+      "subject": "Dividend - Rs 0.75 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 180.03,
+      "pct": 2.6
+    },
+    {
+      "symbol": "NIACL",
+      "company": "The New India Assurance Company Limited",
+      "subject": "Dividend - Rs 1.50 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 183.11,
+      "pct": 2.87
+    },
+    {
+      "symbol": "NESTLEIND",
+      "company": "Nestle India Limited",
+      "subject": "Dividend - Rs 5 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1453.8,
+      "pct": 3.46
     },
     {
       "symbol": "HINDALCO",
@@ -1164,8 +1241,47 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 956.6,
-      "pct": -0.75
+      "ltp": 939.7,
+      "pct": -1.77
+    },
+    {
+      "symbol": "WELSPUNLIV",
+      "company": "Welspun Living Limited",
+      "subject": "Dividend - Re 0.10 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 165.26,
+      "pct": 4.04
+    },
+    {
+      "symbol": "ZFCVINDIA",
+      "company": "ZF Commercial Vehicle Control Systems India Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2485.6,
+      "pct": -3.13
+    },
+    {
+      "symbol": "JKCEMENT",
+      "company": "JK Cement Limited",
+      "subject": "Dividend - Rs 20 Per Share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 5413.0,
+      "pct": -0.58
     },
     {
       "symbol": "M&MFIN",
@@ -1177,8 +1293,34 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 315.8,
-      "pct": 0.13
+      "ltp": 315.15,
+      "pct": -0.21
+    },
+    {
+      "symbol": "UTIAMC",
+      "company": "UTI Asset Management Company Limited",
+      "subject": "Dividend - Rs 40 Per Share",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 944.65,
+      "pct": 1.02
+    },
+    {
+      "symbol": "ABREL",
+      "company": "Aditya Birla Real Estate Limited",
+      "subject": "Dividend - Rs 2.50 Per Share",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1396.0,
+      "pct": 5.47
     },
     {
       "symbol": "SPLPETRO",
@@ -1190,8 +1332,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 713.95,
-      "pct": -2.34
+      "ltp": 725.05,
+      "pct": 1.55
     },
     {
       "symbol": "MOTHERSON",
@@ -1203,21 +1345,21 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 148.11,
-      "pct": -1.63
+      "ltp": 147.51,
+      "pct": -0.41
     },
     {
-      "symbol": "HERITGFOOD",
-      "company": "Heritage Foods Limited",
-      "subject": "Dividend - Rs 2.50 Per Share",
-      "ex_date": "15-Jul-2026",
-      "record_date": "15-Jul-2026",
+      "symbol": "KHAICHEM",
+      "company": "Khaitan Chemicals & Fertilizers Limited",
+      "subject": "Dividend - Rs 0.05 Per Share",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 328.25,
-      "pct": -0.62
+      "ltp": 52.9,
+      "pct": -1.2
     },
     {
       "symbol": "BBL",
@@ -1229,8 +1371,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2884.9,
-      "pct": 3.61
+      "ltp": 2825.0,
+      "pct": -2.08
     },
     {
       "symbol": "KFINTECH",
@@ -1242,8 +1384,21 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 879.8,
-      "pct": 1.21
+      "ltp": 881.65,
+      "pct": 0.21
+    },
+    {
+      "symbol": "HERITGFOOD",
+      "company": "Heritage Foods Limited",
+      "subject": "Dividend - Rs 2.50 Per Share",
+      "ex_date": "15-Jul-2026",
+      "record_date": "15-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 333.2,
+      "pct": 1.51
     },
     {
       "symbol": "COROMANDEL",
@@ -1255,8 +1410,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 2005.0,
-      "pct": 4.76
+      "ltp": 1993.2,
+      "pct": -0.59
     },
     {
       "symbol": "CRAFTSMAN",
@@ -1268,21 +1423,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 9460.0,
-      "pct": 0.77
-    },
-    {
-      "symbol": "VMART",
-      "company": "V-Mart Retail Limited",
-      "subject": "Dividend - Re 1 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 779.05,
-      "pct": 3.13
+      "ltp": 9305.0,
+      "pct": -1.64
     },
     {
       "symbol": "BLUESTARCO",
@@ -1294,34 +1436,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1628.3,
-      "pct": -0.44
-    },
-    {
-      "symbol": "BIKAJI",
-      "company": "Bikaji Foods International Limited",
-      "subject": "Dividend - Rs 1.25 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 650.75,
-      "pct": 1.27
-    },
-    {
-      "symbol": "BALKRISIND",
-      "company": "Balkrishna Industries Limited",
-      "subject": "Dividend - Rs 4 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 2180.4,
-      "pct": 0.59
+      "ltp": 1606.4,
+      "pct": -1.34
     },
     {
       "symbol": "LMW",
@@ -1333,21 +1449,112 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 15720.0,
-      "pct": -1.58
+      "ltp": 15894.0,
+      "pct": 1.11
     },
     {
-      "symbol": "ATUL",
-      "company": "Atul Limited",
-      "subject": "Dividend - Rs 30 Per Share",
+      "symbol": "BIKAJI",
+      "company": "Bikaji Foods International Limited",
+      "subject": "Dividend - Rs 1.25 Per Share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 6464.5,
-      "pct": -2.18
+      "ltp": 648.1,
+      "pct": -0.41
+    },
+    {
+      "symbol": "BALKRISIND",
+      "company": "Balkrishna Industries Limited",
+      "subject": "Dividend - Rs 4 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2169.3,
+      "pct": -0.51
+    },
+    {
+      "symbol": "SAFARI",
+      "company": "Safari Industries (India) Limited",
+      "subject": "Dividend - Rs 2 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1619.7,
+      "pct": 1.61
+    },
+    {
+      "symbol": "ZYDUSWELL",
+      "company": "Zydus Wellness Limited",
+      "subject": "Dividend - Re 1.20 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 568.5,
+      "pct": -1.2
+    },
+    {
+      "symbol": "VMART",
+      "company": "V-Mart Retail Limited",
+      "subject": "Dividend - Re 1 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 796.55,
+      "pct": 2.25
+    },
+    {
+      "symbol": "PFIZER",
+      "company": "Pfizer Limited",
+      "subject": "Dividend - Rs 75 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 4473.6,
+      "pct": 0.77
+    },
+    {
+      "symbol": "NH",
+      "company": "Narayana Hrudayalaya Ltd.",
+      "subject": "Dividend - Rs 4.50 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1959.6,
+      "pct": -0.61
+    },
+    {
+      "symbol": "NEWGEN",
+      "company": "Newgen Software Technologies Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 473.7,
+      "pct": 0.46
     },
     {
       "symbol": "HONAUT",
@@ -1359,8 +1566,125 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 39735.0,
-      "pct": 1.83
+      "ltp": 39655.0,
+      "pct": -0.2
+    },
+    {
+      "symbol": "HAPPSTMNDS",
+      "company": "Happiest Minds Technologies Limited",
+      "subject": "Dividend - Rs 3.65 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 336.9,
+      "pct": -1.22
+    },
+    {
+      "symbol": "MRF",
+      "company": "MRF Limited",
+      "subject": "Dividend - Rs 229 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 129430.0,
+      "pct": 1.26
+    },
+    {
+      "symbol": "UPL",
+      "company": "UPL Limited",
+      "subject": "Dividend - Rs 6 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 565.05,
+      "pct": -1.08
+    },
+    {
+      "symbol": "BAJAJELEC",
+      "company": "Bajaj Electricals Limited",
+      "subject": "Dividend - Rs 3 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 319.8,
+      "pct": 0.09
+    },
+    {
+      "symbol": "ATUL",
+      "company": "Atul Limited",
+      "subject": "Dividend - Rs 30 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 6541.0,
+      "pct": 1.18
+    },
+    {
+      "symbol": "WABAG",
+      "company": "VA Tech Wabag Limited",
+      "subject": "Dividend - Rs 5 Per Sh",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 2082.8,
+      "pct": 3.67
+    },
+    {
+      "symbol": "DABUR",
+      "company": "Dabur India Limited",
+      "subject": "Dividend - Rs 5.50 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 444.75,
+      "pct": 5.34
+    },
+    {
+      "symbol": "CUMMINSIND",
+      "company": "Cummins India Limited",
+      "subject": "Dividend - Rs 46 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 5663.0,
+      "pct": 0.06
+    },
+    {
+      "symbol": "SURYODAY",
+      "company": "Suryoday Small Finance Bank Limited",
+      "subject": "Dividend - Rs 1.50 Per Share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 178.51,
+      "pct": 1.65
     },
     {
       "symbol": "3MINDIA",
@@ -1374,147 +1698,17 @@
       "offer_price": 0.0
     },
     {
-      "symbol": "SAFARI",
-      "company": "Safari Industries (India) Limited",
-      "subject": "Dividend - Rs 2 Per Share",
+      "symbol": "CDSL",
+      "company": "Central Depository Services (India) Limited",
+      "subject": "Dividend - Rs 12.75 Per Share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "-",
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1594.0,
-      "pct": 0.47
-    },
-    {
-      "symbol": "HAPPSTMNDS",
-      "company": "Happiest Minds Technologies Limited",
-      "subject": "Dividend - Rs 3.65 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 341.05,
-      "pct": 1.01
-    },
-    {
-      "symbol": "PFIZER",
-      "company": "Pfizer Limited",
-      "subject": "Dividend - Rs 75 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 4439.4,
-      "pct": 0.78
-    },
-    {
-      "symbol": "DABUR",
-      "company": "Dabur India Limited",
-      "subject": "Dividend - Rs 5.50 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 422.2,
-      "pct": -0.96
-    },
-    {
-      "symbol": "CUMMINSIND",
-      "company": "Cummins India Limited",
-      "subject": "Dividend - Rs 46 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 5659.5,
-      "pct": 2.13
-    },
-    {
-      "symbol": "NH",
-      "company": "Narayana Hrudayalaya Ltd.",
-      "subject": "Dividend - Rs 4.50 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1971.7,
-      "pct": 3.62
-    },
-    {
-      "symbol": "ZYDUSWELL",
-      "company": "Zydus Wellness Limited",
-      "subject": "Dividend - Re 1.20 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 575.4,
-      "pct": 1.04
-    },
-    {
-      "symbol": "NEWGEN",
-      "company": "Newgen Software Technologies Limited",
-      "subject": "Dividend - Rs 6 Per Share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 471.55,
-      "pct": 0.7
-    },
-    {
-      "symbol": "POKARNA",
-      "company": "Pokarna Limited",
-      "subject": "Dividend - Re 0.60 Per Share",
-      "ex_date": "20-Jul-2026",
-      "record_date": "20-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1037.2,
-      "pct": -2.4
-    },
-    {
-      "symbol": "SHRIPISTON",
-      "company": "Shriram Pistons & Rings Limited",
-      "subject": "Dividend - Rs 5 Per Share",
-      "ex_date": "20-Jul-2026",
-      "record_date": "20-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 4187.4,
-      "pct": 4.45
-    },
-    {
-      "symbol": "KPRMILL",
-      "company": "K.P.R. Mill Limited",
-      "subject": "Dividend - Rs 2.50 Per Share",
-      "ex_date": "20-Jul-2026",
-      "record_date": "20-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1177.3,
-      "pct": 4.05
+      "ltp": 1332.4,
+      "pct": 2.06
     },
     {
       "symbol": "GRAPHITE",
@@ -1526,8 +1720,47 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 613.4,
-      "pct": -0.19
+      "ltp": 611.6,
+      "pct": -0.29
+    },
+    {
+      "symbol": "POKARNA",
+      "company": "Pokarna Limited",
+      "subject": "Dividend - Re 0.60 Per Share",
+      "ex_date": "20-Jul-2026",
+      "record_date": "20-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1023.3,
+      "pct": -1.34
+    },
+    {
+      "symbol": "SHRIPISTON",
+      "company": "SPR Auto Technologies Limited",
+      "subject": "Dividend - Rs 5 Per Share",
+      "ex_date": "20-Jul-2026",
+      "record_date": "20-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 4380.2,
+      "pct": 4.6
+    },
+    {
+      "symbol": "KPRMILL",
+      "company": "K.P.R. Mill Limited",
+      "subject": "Dividend - Rs 2.50 Per Share",
+      "ex_date": "20-Jul-2026",
+      "record_date": "20-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1191.6,
+      "pct": 1.21
     },
     {
       "symbol": "NESCO",
@@ -1539,21 +1772,8 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1078.4,
-      "pct": -1.4
-    },
-    {
-      "symbol": "RAINBOW",
-      "company": "Rainbow Childrens Medicare Limited",
-      "subject": "Dividend - Rs 3.50 Per Share",
-      "ex_date": "21-Jul-2026",
-      "record_date": "21-Jul-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1414.2,
-      "pct": 0.62
+      "ltp": 1076.9,
+      "pct": -0.14
     },
     {
       "symbol": "CHOLAFIN",
@@ -1565,202 +1785,372 @@
       "bc_end": "-",
       "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 1789.8,
-      "pct": 0.89
+      "ltp": 1803.3,
+      "pct": 0.75
     },
     {
-      "symbol": "THYROCARE",
-      "company": "Thyrocare Technologies Limited",
-      "subject": "Announcement - Thyrocare Technologies Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on June 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with voti",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
+      "symbol": "RAINBOW",
+      "company": "Rainbow Childrens Medicare Limited",
+      "subject": "Dividend - Rs 3.50 Per Share",
+      "ex_date": "21-Jul-2026",
+      "record_date": "21-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 549.3,
-      "pct": 4.75
+      "ltp": 1422.3,
+      "pct": 0.57
     },
     {
-      "symbol": "MUTHOOTMF",
-      "company": "Muthoot Microfin Limited",
-      "subject": "Announcement - Muthoot Microfin Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
+      "symbol": "HEG",
+      "company": "HEG Limited",
+      "subject": "Dividend - Rs 3.40 Per Share",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 214.37,
-      "pct": 3.23
-    },
-    {
-      "symbol": "SUVIDHAA",
-      "company": "Suvidhaa Infoserve Limited",
-      "subject": "Announcement - Suvidhaa Infoserve Limited has informed the Exchange that Board of Directors at its meeting held on Jun 30, 2026, has decided to issue equity shares on rights basis.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2.69,
-      "pct": -1.47
-    },
-    {
-      "symbol": "HINDCOMPOS",
-      "company": "Hindustan Composites Limited",
-      "subject": "Announcement - Hindustan Composites Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 420.55,
-      "pct": 1.07
-    },
-    {
-      "symbol": "WEALTH",
-      "company": "Wealth First Portfolio Managers Limited",
-      "subject": "Announcement - Wealth First Portfolio Managers Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 962.1,
-      "pct": -2.63
-    },
-    {
-      "symbol": "MAHABANK",
-      "company": "Bank of Maharashtra",
-      "subject": "Announcement - Bank of Maharashtra has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 91.44,
-      "pct": -2.57
-    },
-    {
-      "symbol": "INDHOTEL",
-      "company": "The Indian Hotels Company Limited",
-      "subject": "Announcement - The Indian Hotels Company Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with vo",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 713.95,
-      "pct": 0.98
-    },
-    {
-      "symbol": "QPOWER",
-      "company": "Quality Power Electrical Equipments Limited",
-      "subject": "Announcement - Quality Power Electrical Equipments Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1223.4,
-      "pct": 1.33
-    },
-    {
-      "symbol": "GFSTEELS",
-      "company": "Grand Foundry Limited",
-      "subject": "Announcement - Grand Foundry Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 13.61
-    },
-    {
-      "symbol": "NDLVENTURE",
-      "company": "NDL Ventures Limited",
-      "subject": "Announcement - Outcome of Board Meeting held on June 30,2026 for further updaye on For Further Update On The Proposed Scheme Of Merger By Absorption Of Hinduja Leyland Finance Limited ('Transferor Company/HLFL/Company') Into NDL Ventur",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 131.59,
+      "ltp": 522.45,
       "pct": 1.11
     },
     {
-      "symbol": "POLYCAB",
-      "company": "Polycab India Limited",
-      "subject": "Announcement - Polycab India Limited has informed the Exchange regarding Proceedings of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
+      "symbol": "THANGAMAYL",
+      "company": "Thangamayil Jewellery Limited",
+      "subject": "Dividend - Rs 18 Per Share",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
       "offer_price": 0.0,
-      "ltp": 9961.0,
-      "pct": 1.86
+      "ltp": 5945.5,
+      "pct": -7.08
     },
     {
-      "symbol": "INSPIRISYS",
-      "company": "Inspirisys Solutions Limited",
-      "subject": "Announcement - Inspirisys Solutions Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
+      "symbol": "NETWEB",
+      "company": "Netweb Technologies India Limited",
+      "subject": "Announcement - Netweb Technologies India Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
       "record_date": "",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 104.13,
-      "pct": -1.38
+      "ltp": 4507.9,
+      "pct": -0.67
     },
     {
-      "symbol": "CINEVISTA",
-      "company": "Cinevista Limited",
-      "subject": "Announcement - Cinevista Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
+      "symbol": "CYIENT",
+      "company": "Cyient Limited",
+      "subject": "Announcement - Cyient Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on July 01, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "01-Jul-2026",
       "record_date": "",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 17.45,
-      "pct": -4.7
+      "ltp": 860.9,
+      "pct": -1.27
     },
     {
-      "symbol": "DEVIT",
-      "company": "Dev Information Technology Limited",
-      "subject": "Announcement - Dev Information Technology Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
+      "symbol": "WALCHANNAG",
+      "company": "Walchandnagar Industries Limited",
+      "subject": "Announcement - Walchandnagar Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
       "record_date": "",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 28.51,
-      "pct": 11.24
+      "ltp": 242.05,
+      "pct": -11.11
     },
     {
-      "symbol": "GLAXO",
-      "company": "GlaxoSmithKline Pharmaceuticals Limited",
-      "subject": "Announcement - GlaxoSmithKline Pharmaceuticals Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along w",
-      "ex_date": "30-Jun-2026",
+      "symbol": "GOLDIAM",
+      "company": "Goldiam International Limited",
+      "subject": "Announcement - Goldiam International Limited has informed the Exchange that Record date for the purpose of Bonus  is 10-Jul-2026.",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 446.6,
+      "pct": 0.55
+    },
+    {
+      "symbol": "TATAINVEST",
+      "company": "Tata Investment Corporation Limited",
+      "subject": "Announcement - TATAINVEST: Tata Investment Corporation Limited has informed the Exchange regarding Proceedings of Annual General Meeting held on July 1, 2026. Further, the company has submitted the Exchange a copy of Scrutinizers repor",
+      "ex_date": "01-Jul-2026",
       "record_date": "",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2450.3,
-      "pct": 4.07
+      "ltp": 664.65,
+      "pct": -0.32
+    },
+    {
+      "symbol": "HBLENGINE",
+      "company": "HBL Engineering Limited",
+      "subject": "Announcement - HBL Engineering Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 822.3,
+      "pct": 1.24
+    },
+    {
+      "symbol": "JSWCEMENT",
+      "company": "JSW Cement Limited",
+      "subject": "Announcement - JSW Cement Limited has informed the Exchange that Record date for the purpose of Dividend  is 10-Jul-2026.",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 136.7,
+      "pct": 1.32
+    },
+    {
+      "symbol": "OSWALGREEN",
+      "company": "Oswal Greentech Limited",
+      "subject": "Announcement - Oswal Greentech Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 22.95,
+      "pct": 0.75
+    },
+    {
+      "symbol": "MSUMI",
+      "company": "Motherson Sumi Wiring India Limited",
+      "subject": "Announcement - Motherson Sumi Wiring India Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Jul-2026.",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 41.12,
+      "pct": 2.49
+    },
+    {
+      "symbol": "GROBTEA",
+      "company": "The Grob Tea Company Limited",
+      "subject": "Announcement - The Grob Tea Company Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 913.0,
+      "pct": 0.78
+    },
+    {
+      "symbol": "JINDALPHOT",
+      "company": "Jindal Photo Limited",
+      "subject": "Announcement - Jindal Photo Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1194.6,
+      "pct": -1.34
+    },
+    {
+      "symbol": "ADANIENSOL",
+      "company": "Adani Energy Solutions Limited",
+      "subject": "Announcement - Adani Energy Solutions Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1521.4,
+      "pct": 2.01
+    },
+    {
+      "symbol": "UNIENTER",
+      "company": "Uniphos Enterprises Limited",
+      "subject": "Announcement - Uniphos Enterprises Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 106.29,
+      "pct": -1.55
+    },
+    {
+      "symbol": "JKLAKSHMI",
+      "company": "JK Lakshmi Cement Limited",
+      "subject": "Announcement - JK Lakshmi Cement Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 582.45,
+      "pct": -3.86
+    },
+    {
+      "symbol": "SALSTEEL",
+      "company": "S.A.L. Steel Limited",
+      "subject": "Announcement - S.A.L. Steel Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 57.03,
+      "pct": 4.99
+    },
+    {
+      "symbol": "WEIZMANIND",
+      "company": "Weizmann Limited",
+      "subject": "Announcement - Weizmann Limited has informed the Exchange that Record date for the purpose of Dividend  is 16-Jul-2026.",
+      "ex_date": "16-Jul-2026",
+      "record_date": "16-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 81.94,
+      "pct": -4.15
+    },
+    {
+      "symbol": "ASHIMASYN",
+      "company": "Ashima Limited",
+      "subject": "Announcement - Ashima Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 14.92,
+      "pct": 0.88
+    },
+    {
+      "symbol": "SARLAPOLY",
+      "company": "Sarla Performance Fibers Limited",
+      "subject": "Announcement - Sarla Performance Fibers Limited has informed the Exchange about Copy of Newspaper Publication of the advertisement on the Annual General Meeting of the members of the Company, Record Date for Dividend and other related ",
+      "ex_date": "01-Jul-2026",
+      "record_date": "01-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 99.31,
+      "pct": 1.19
+    },
+    {
+      "symbol": "WINDLAS",
+      "company": "Windlas Biotech Limited",
+      "subject": "Announcement - Windlas Biotech Limited has informed the Exchange that Record date for the purpose of Dividend  is 16-Jul-2026.",
+      "ex_date": "16-Jul-2026",
+      "record_date": "16-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 861.0,
+      "pct": 0.2
+    },
+    {
+      "symbol": "AHCL",
+      "company": "Anlon Healthcare Limited",
+      "subject": "Announcement - Anlon Healthcare Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 15.9,
+      "pct": -0.56
+    },
+    {
+      "symbol": "BHEL",
+      "company": "Bharat Heavy Electricals Limited",
+      "subject": "Announcement - Bharat Heavy Electricals Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 413.95,
+      "pct": -0.04
+    },
+    {
+      "symbol": "DJML",
+      "company": "DJ Mediaprint & Logistics Limited",
+      "subject": "Announcement - Dj Mediaprint & Logistics Limited has informed the Exchange regarding Outcome of Board Meeting held on July 01, 2026.-The Board Approved The Conversion Of 2,61,503 (Two Lakhs, Sixty-One Thousand, Five Hundred and Three O",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 113.32,
+      "pct": -1.68
+    },
+    {
+      "symbol": "RAMRAT",
+      "company": "Ram Ratna Wires Limited",
+      "subject": "Announcement - Ram Ratna Wires Limited has informed the Exchange that Record date for the purpose of Dividend  is 22-Jul-2026.",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 406.55,
+      "pct": -0.09
+    },
+    {
+      "symbol": "NIITLTD",
+      "company": "NIIT Limited",
+      "subject": "Announcement - Scheme of Amalgamation becoming effective from July 1, 2026",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 100.35,
+      "pct": -0.27
+    },
+    {
+      "symbol": "SALONA",
+      "company": "Salona Cotspin Limited",
+      "subject": "Announcement - Salona Cotspin Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026 regarding appointment of Mr Manoj Kumar Jhajharia as Managing Director and Mr Shyam Lal Agarwala as Chairman and Di",
+      "ex_date": "01-Jul-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 255.45,
+      "pct": -1.31
     },
     {
       "symbol": "PIXTRANS",
@@ -1772,8 +2162,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1835.6,
-      "pct": -1.82
+      "ltp": 1820.2,
+      "pct": -0.84
     },
     {
       "symbol": "ZENSARTECH",
@@ -1785,98 +2175,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 425.3,
-      "pct": -1.87
-    },
-    {
-      "symbol": "SRF",
-      "company": "SRF Limited",
-      "subject": "Announcement - SRF Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2739.0,
-      "pct": 2.79
-    },
-    {
-      "symbol": "SHRENIK",
-      "company": "Shrenik Limited",
-      "subject": "Announcement - Shrenik Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 0.4
-    },
-    {
-      "symbol": "HPIL",
-      "company": "Hindprakash Industries Limited",
-      "subject": "Announcement - Hindprakash Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 126.09,
-      "pct": 0.07
-    },
-    {
-      "symbol": "BHAGYANGR",
-      "company": "Bhagyanagar India Limited",
-      "subject": "Announcement - Bhagyanagar India Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 431.85,
-      "pct": 4.88
-    },
-    {
-      "symbol": "IDBI",
-      "company": "IDBI Bank Limited",
-      "subject": "Announcement - IDBI Bank Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 83.53,
-      "pct": -2.83
-    },
-    {
-      "symbol": "SHANTIGOLD",
-      "company": "Shanti Gold International Limited",
-      "subject": "Announcement - Shanti Gold International Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026 - Approval of fund raising by way of Rights Issue",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 223.69,
-      "pct": 0.46
-    },
-    {
-      "symbol": "MAPMYINDIA",
-      "company": "C.E. Info Systems Limited",
-      "subject": "Announcement - C.E. Info Systems Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 809.75,
-      "pct": -1.0
+      "ltp": 426.05,
+      "pct": 0.18
     },
     {
       "symbol": "PRUDENT",
@@ -1888,86 +2188,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2994.2,
-      "pct": 1.33
-    },
-    {
-      "symbol": "PRUDENT",
-      "company": "Prudent Corporate Advisory Services Limited",
-      "subject": "Announcement - Prudent Corporate Advisory Services Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2994.2,
-      "pct": 1.33
-    },
-    {
-      "symbol": "IRFC",
-      "company": "Indian Railway Finance Corporation Limited",
-      "subject": "Announcement - Indian Railway Finance Corporation Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 90.53,
-      "pct": -0.09
-    },
-    {
-      "symbol": "REFEX",
-      "company": "Refex Industries Limited",
-      "subject": "Announcement - Outcome of the meeting of Board of Directors of Refex Industries Limited held on June 30,2026",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 356.2,
-      "pct": 0.11
-    },
-    {
-      "symbol": "SHAH",
-      "company": "Shah Metacorp Limited",
-      "subject": "Announcement - Shah Metacorp Limited has informed the Exchange regarding allotment of 97163362 securities pursuant to Rights Issue at its meeting held on Jun 30, 2026",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 4.13,
-      "pct": 1.98
-    },
-    {
-      "symbol": "SMLMAH",
-      "company": "SML Mahindra Limited",
-      "subject": "Announcement - SML Mahindra Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 4098.0,
-      "pct": 1.76
-    },
-    {
-      "symbol": "APARINDS",
-      "company": "Apar Industries Limited",
-      "subject": "Announcement - Apar Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 15695.0,
-      "pct": -1.82
+      "ltp": 2975.0,
+      "pct": -0.64
     },
     {
       "symbol": "ASPINWALL",
@@ -1979,8 +2201,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 247.1,
-      "pct": -1.78
+      "ltp": 255.25,
+      "pct": 3.3
     },
     {
       "symbol": "CONTROLPR",
@@ -1992,8 +2214,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 621.7,
-      "pct": 0.7
+      "ltp": 632.55,
+      "pct": 1.75
+    },
+    {
+      "symbol": "ABSLAMC",
+      "company": "Aditya Birla Sun Life AMC Limited",
+      "subject": "Announcement - Aditya Birla Sun Life AMC Limited has informed the Exchange that Record date fixed for the purpose of Dividend is Wednesday, July 22, 2026.",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1144.6,
+      "pct": -0.87
     },
     {
       "symbol": "MRF",
@@ -2005,8 +2240,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 127820.0,
-      "pct": 3.04
+      "ltp": 129430.0,
+      "pct": 1.26
     },
     {
       "symbol": "ROLEXRINGS",
@@ -2018,8 +2253,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 149.58,
-      "pct": 1.27
+      "ltp": 149.78,
+      "pct": 0.13
     },
     {
       "symbol": "TITAN",
@@ -2031,8 +2266,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4404.0,
-      "pct": 2.96
+      "ltp": 4398.6,
+      "pct": -0.12
     },
     {
       "symbol": "AEROFLEX",
@@ -2044,8 +2279,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 471.6,
-      "pct": 0.55
+      "ltp": 488.5,
+      "pct": 3.58
     },
     {
       "symbol": "MGEL",
@@ -2057,8 +2292,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 15.91,
-      "pct": -0.56
+      "ltp": 16.52,
+      "pct": 3.83
     },
     {
       "symbol": "SOBHA",
@@ -2070,8 +2305,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1378.5,
-      "pct": -0.63
+      "ltp": 1410.4,
+      "pct": 2.31
     },
     {
       "symbol": "MWL",
@@ -2083,8 +2318,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 375.75,
-      "pct": 1.84
+      "ltp": 377.85,
+      "pct": 0.56
     },
     {
       "symbol": "SMARTLINK",
@@ -2096,21 +2331,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 180.02,
-      "pct": 4.86
-    },
-    {
-      "symbol": "FRACTAL",
-      "company": "Fractal Analytics Limited",
-      "subject": "Announcement - Pursuant to Regulation 30 read with Schedule III of the SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015 (as amended from time to time), we wish to inform you that a conference call (audio con-cal",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 887.2,
-      "pct": -0.4
+      "ltp": 179.14,
+      "pct": -0.49
     },
     {
       "symbol": "NIACL",
@@ -2122,8 +2344,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 178.01,
-      "pct": -1.86
+      "ltp": 183.11,
+      "pct": 2.87
     },
     {
       "symbol": "SURYODAY",
@@ -2135,8 +2357,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 175.61,
-      "pct": 1.19
+      "ltp": 178.51,
+      "pct": 1.65
     },
     {
       "symbol": "MODISONLTD",
@@ -2148,8 +2370,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 297.65,
-      "pct": -3.41
+      "ltp": 293.5,
+      "pct": -1.39
     },
     {
       "symbol": "GANGAFORGE",
@@ -2161,8 +2383,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2.45,
-      "pct": 2.08
+      "ltp": 2.48,
+      "pct": 1.22
     },
     {
       "symbol": "CDSL",
@@ -2174,8 +2396,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1305.5,
-      "pct": 0.59
+      "ltp": 1332.4,
+      "pct": 2.06
     },
     {
       "symbol": "UPL",
@@ -2187,8 +2409,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 571.2,
-      "pct": 0.49
+      "ltp": 565.05,
+      "pct": -1.08
     },
     {
       "symbol": "UTIAMC",
@@ -2200,21 +2422,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 935.1,
-      "pct": 0.88
+      "ltp": 944.65,
+      "pct": 1.02
     },
     {
       "symbol": "UTIAMC",
       "company": "UTI Asset Management Company Limited",
-      "subject": "Final Dividend - Rs 40.00 per equity share",
+      "subject": "Announcement - UTI Asset Management Company Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Jul-2026.",
       "ex_date": "14-Jul-2026",
       "record_date": "14-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 935.1,
-      "pct": 0.88
+      "ltp": 944.65,
+      "pct": 1.02
     },
     {
       "symbol": "ABREL",
@@ -2226,8 +2448,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1323.6,
-      "pct": 0.65
+      "ltp": 1396.0,
+      "pct": 5.47
     },
     {
       "symbol": "KRISHANA",
@@ -2239,8 +2461,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 688.0,
-      "pct": 0.86
+      "ltp": 697.65,
+      "pct": 1.4
     },
     {
       "symbol": "KHAICHEM",
@@ -2252,8 +2474,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 53.54,
-      "pct": -3.58
+      "ltp": 52.9,
+      "pct": -1.2
     },
     {
       "symbol": "MBAPL",
@@ -2265,8 +2487,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 562.0,
-      "pct": -0.04
+      "ltp": 593.25,
+      "pct": 5.56
     },
     {
       "symbol": "BFINVEST",
@@ -2278,21 +2500,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 446.7,
-      "pct": -0.03
+      "ltp": 446.8,
+      "pct": 0.02
     },
     {
-      "symbol": "PATINTLOG",
-      "company": "Patel Integrated Logistics Limited",
-      "subject": "Announcement - Patel Integrated Logistics Limited has informed the Exchange that Record date for the purpose of Buyback  is 30-Jun-2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
+      "symbol": "HEG",
+      "company": "HEG Limited",
+      "subject": "Announcement - HEG Limited has informed the Exchange that Record date for the purpose of Dividend  is 22-Jul-2026.",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 15.38,
-      "pct": -4.94
+      "ltp": 522.45,
+      "pct": 1.11
     },
     {
       "symbol": "MWL",
@@ -2304,8 +2526,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 375.75,
-      "pct": 1.84
+      "ltp": 377.85,
+      "pct": 0.56
     },
     {
       "symbol": "RPGLIFE",
@@ -2317,8 +2539,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2292.5,
-      "pct": 0.62
+      "ltp": 2352.6,
+      "pct": 2.62
     },
     {
       "symbol": "TCS",
@@ -2330,8 +2552,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2031.5,
-      "pct": -3.17
+      "ltp": 1982.6,
+      "pct": -2.41
     },
     {
       "symbol": "MAGADSUGAR",
@@ -2343,8 +2565,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 461.65,
-      "pct": 2.48
+      "ltp": 463.8,
+      "pct": 0.47
     },
     {
       "symbol": "AVADHSUGAR",
@@ -2356,8 +2578,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 463.6,
-      "pct": -0.69
+      "ltp": 481.35,
+      "pct": 3.83
     },
     {
       "symbol": "BSOFT",
@@ -2369,8 +2591,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 286.3,
-      "pct": -4.28
+      "ltp": 275.7,
+      "pct": -3.7
     },
     {
       "symbol": "ONWARDTEC",
@@ -2382,8 +2604,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 286.25,
-      "pct": -0.26
+      "ltp": 289.15,
+      "pct": 1.01
     },
     {
       "symbol": "DSFCL",
@@ -2395,8 +2617,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 24.0,
-      "pct": 0.13
+      "ltp": 24.62,
+      "pct": 2.58
     },
     {
       "symbol": "SFL",
@@ -2408,8 +2630,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 746.9,
-      "pct": 0.57
+      "ltp": 736.9,
+      "pct": -1.34
     },
     {
       "symbol": "KRISHNADEF",
@@ -2421,8 +2643,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1207.4,
-      "pct": -3.18
+      "ltp": 1192.3,
+      "pct": -1.25
     },
     {
       "symbol": "DJML",
@@ -2434,8 +2656,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 115.26,
-      "pct": -0.11
+      "ltp": 113.32,
+      "pct": -1.68
     },
     {
       "symbol": "DJML",
@@ -2447,8 +2669,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 115.26,
-      "pct": -0.11
+      "ltp": 113.32,
+      "pct": -1.68
     },
     {
       "symbol": "KPRMILL",
@@ -2460,8 +2682,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1177.3,
-      "pct": 4.05
+      "ltp": 1191.6,
+      "pct": 1.21
     },
     {
       "symbol": "MAXHEALTH",
@@ -2473,8 +2695,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1129.25,
-      "pct": -1.8
+      "ltp": 1139.9,
+      "pct": 0.94
     },
     {
       "symbol": "NESTLEIND",
@@ -2486,21 +2708,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1405.2,
-      "pct": 1.29
-    },
-    {
-      "symbol": "WELCORP",
-      "company": "Welspun Corp Limited",
-      "subject": "Announcement - Welspun Corp Limited has informed the Exchange that Record date for the purpose of Dividend  is 30-Jun-2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1521.9,
-      "pct": 0.73
+      "ltp": 1453.8,
+      "pct": 3.46
     },
     {
       "symbol": "PTL",
@@ -2512,8 +2721,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 42.44,
-      "pct": 0.47
+      "ltp": 42.35,
+      "pct": -0.21
     },
     {
       "symbol": "KIRLPNU",
@@ -2525,8 +2734,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1953.0,
-      "pct": 2.48
+      "ltp": 2000.9,
+      "pct": 2.45
     },
     {
       "symbol": "APOLLOTYRE",
@@ -2538,8 +2747,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 430.2,
-      "pct": 2.27
+      "ltp": 431.65,
+      "pct": 0.34
     },
     {
       "symbol": "ROSSARI",
@@ -2551,8 +2760,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 525.35,
-      "pct": 0.45
+      "ltp": 527.1,
+      "pct": 0.33
     },
     {
       "symbol": "BALKRISIND",
@@ -2564,8 +2773,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2180.4,
-      "pct": 0.59
+      "ltp": 2169.3,
+      "pct": -0.51
     },
     {
       "symbol": "HESTERBIO",
@@ -2577,8 +2786,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2165.9,
-      "pct": -1.49
+      "ltp": 2198.6,
+      "pct": 1.51
     },
     {
       "symbol": "RRKABEL",
@@ -2590,8 +2799,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2395.2,
-      "pct": -4.28
+      "ltp": 2381.7,
+      "pct": -0.56
     },
     {
       "symbol": "DCMSRIND",
@@ -2603,8 +2812,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 37.72,
-      "pct": 1.26
+      "ltp": 38.09,
+      "pct": 0.98
     },
     {
       "symbol": "SUNDRMBRAK",
@@ -2616,8 +2825,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 826.25,
-      "pct": 2.52
+      "ltp": 813.4,
+      "pct": -1.56
     },
     {
       "symbol": "DCMSIL",
@@ -2629,8 +2838,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 73.98,
-      "pct": 1.3
+      "ltp": 72.51,
+      "pct": -1.99
     },
     {
       "symbol": "SUMICHEM",
@@ -2642,8 +2851,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 420.85,
-      "pct": 0.23
+      "ltp": 435.1,
+      "pct": 3.39
     },
     {
       "symbol": "RAYMONDREL",
@@ -2655,8 +2864,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 619.2,
-      "pct": -0.76
+      "ltp": 639.1,
+      "pct": 3.21
     },
     {
       "symbol": "DYCL",
@@ -2668,8 +2877,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 367.75,
-      "pct": -0.5
+      "ltp": 364.7,
+      "pct": -0.83
     },
     {
       "symbol": "DYCL",
@@ -2681,8 +2890,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 367.75,
-      "pct": -0.5
+      "ltp": 364.7,
+      "pct": -0.83
     },
     {
       "symbol": "BALAMINES",
@@ -2694,8 +2903,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2035.9,
-      "pct": 7.59
+      "ltp": 2090.2,
+      "pct": 2.67
     },
     {
       "symbol": "JKCEMENT",
@@ -2707,8 +2916,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5444.5,
-      "pct": 2.35
+      "ltp": 5413.0,
+      "pct": -0.58
     },
     {
       "symbol": "KFINTECH",
@@ -2720,8 +2929,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 879.8,
-      "pct": 1.21
+      "ltp": 881.65,
+      "pct": 0.21
     },
     {
       "symbol": "LLOYDSENT",
@@ -2733,8 +2942,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 73.82,
-      "pct": -1.9
+      "ltp": 73.69,
+      "pct": -0.18
     },
     {
       "symbol": "PILANIINVS",
@@ -2746,8 +2955,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4349.0,
-      "pct": 0.02
+      "ltp": 4402.3,
+      "pct": 1.23
     },
     {
       "symbol": "SOMATEX",
@@ -2759,8 +2968,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 88.33,
-      "pct": -3.09
+      "ltp": 89.38,
+      "pct": 1.19
     },
     {
       "symbol": "ESCORTS",
@@ -2772,8 +2981,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2935.9,
-      "pct": 1.34
+      "ltp": 2945.3,
+      "pct": 0.32
     },
     {
       "symbol": "SUNPHARMA",
@@ -2785,8 +2994,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1862.5,
-      "pct": -0.66
+      "ltp": 1866.2,
+      "pct": 0.2
     },
     {
       "symbol": "ORIENTELEC",
@@ -2798,8 +3007,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 175.46,
-      "pct": 0.03
+      "ltp": 180.03,
+      "pct": 2.6
     },
     {
       "symbol": "TARACHAND",
@@ -2811,8 +3020,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 56.01,
-      "pct": -0.57
+      "ltp": 55.92,
+      "pct": -0.16
     },
     {
       "symbol": "TARACHAND",
@@ -2824,8 +3033,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 56.01,
-      "pct": -0.57
+      "ltp": 55.92,
+      "pct": -0.16
     },
     {
       "symbol": "CANFINHOME",
@@ -2837,8 +3046,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 867.95,
-      "pct": 3.66
+      "ltp": 882.35,
+      "pct": 1.66
     },
     {
       "symbol": "M&MFIN",
@@ -2850,8 +3059,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 315.8,
-      "pct": 0.13
+      "ltp": 315.15,
+      "pct": -0.21
     },
     {
       "symbol": "BHARATFORG",
@@ -2863,8 +3072,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2144.1,
-      "pct": -1.23
+      "ltp": 2108.8,
+      "pct": -1.65
     },
     {
       "symbol": "CHEMBOND",
@@ -2876,8 +3085,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 188.97,
-      "pct": 1.59
+      "ltp": 187.18,
+      "pct": -0.95
     },
     {
       "symbol": "TTKHLTCARE",
@@ -2889,8 +3098,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 916.35,
-      "pct": -1.17
+      "ltp": 907.5,
+      "pct": -0.97
     },
     {
       "symbol": "DBOL",
@@ -2902,8 +3111,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 111.56,
-      "pct": -2.63
+      "ltp": 110.87,
+      "pct": -0.62
     },
     {
       "symbol": "ASIANPAINT",
@@ -2915,8 +3124,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 23.0,
-      "ltp": 2635.7,
-      "pct": -0.8
+      "ltp": 2716.4,
+      "pct": 3.06
     },
     {
       "symbol": "ASIANPAINT",
@@ -2928,8 +3137,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2635.7,
-      "pct": -0.8
+      "ltp": 2716.4,
+      "pct": 3.06
     },
     {
       "symbol": "HAPPSTMNDS",
@@ -2941,8 +3150,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 341.05,
-      "pct": 1.01
+      "ltp": 336.9,
+      "pct": -1.22
     },
     {
       "symbol": "POKARNA",
@@ -2954,8 +3163,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1037.2,
-      "pct": -2.4
+      "ltp": 1023.3,
+      "pct": -1.34
     },
     {
       "symbol": "GLOBAL",
@@ -2967,8 +3176,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 103.95,
-      "pct": -0.79
+      "ltp": 101.93,
+      "pct": -1.94
     },
     {
       "symbol": "UNIONBANK",
@@ -2980,8 +3189,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 172.43,
-      "pct": -1.22
+      "ltp": 174.88,
+      "pct": 1.42
     },
     {
       "symbol": "ELGIEQUIP",
@@ -2993,8 +3202,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 598.1,
-      "pct": -1.68
+      "ltp": 605.85,
+      "pct": 1.3
     },
     {
       "symbol": "CUMMINSIND",
@@ -3006,8 +3215,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5659.5,
-      "pct": 2.13
+      "ltp": 5663.0,
+      "pct": 0.06
     },
     {
       "symbol": "NESCO",
@@ -3019,8 +3228,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1078.4,
-      "pct": -1.4
+      "ltp": 1076.9,
+      "pct": -0.14
     },
     {
       "symbol": "GREENLAM",
@@ -3032,8 +3241,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 258.24,
-      "pct": -0.57
+      "ltp": 255.4,
+      "pct": -1.1
     },
     {
       "symbol": "DOLATALGO",
@@ -3045,8 +3254,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 72.48,
-      "pct": 0.43
+      "ltp": 72.63,
+      "pct": 0.21
     },
     {
       "symbol": "SUNDARMFIN",
@@ -3058,8 +3267,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4506.7,
-      "pct": -0.9
+      "ltp": 4568.9,
+      "pct": 1.38
     },
     {
       "symbol": "RAINBOW",
@@ -3071,8 +3280,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1414.2,
-      "pct": 0.62
+      "ltp": 1422.3,
+      "pct": 0.57
     },
     {
       "symbol": "GLOSTERLTD",
@@ -3084,8 +3293,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 731.85,
-      "pct": 1.15
+      "ltp": 741.75,
+      "pct": 1.35
     },
     {
       "symbol": "NH",
@@ -3097,8 +3306,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1971.7,
-      "pct": 3.62
+      "ltp": 1959.6,
+      "pct": -0.61
     },
     {
       "symbol": "JUBLFOOD",
@@ -3110,8 +3319,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 417.6,
-      "pct": -0.02
+      "ltp": 421.45,
+      "pct": 0.92
     },
     {
       "symbol": "HINDALCO",
@@ -3123,8 +3332,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 956.6,
-      "pct": -0.75
+      "ltp": 939.7,
+      "pct": -1.77
     },
     {
       "symbol": "20MICRONS",
@@ -3158,8 +3367,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 154.97,
-      "pct": 0.52
+      "ltp": 155.44,
+      "pct": 0.3
     },
     {
       "symbol": "BIKAJI",
@@ -3171,8 +3380,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 650.75,
-      "pct": 1.27
+      "ltp": 648.1,
+      "pct": -0.41
     },
     {
       "symbol": "HAPPYFORGE",
@@ -3184,8 +3393,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1537.8,
-      "pct": 0.64
+      "ltp": 1532.1,
+      "pct": -0.37
     },
     {
       "symbol": "VEEDOL",
@@ -3197,8 +3406,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1443.3,
-      "pct": -0.37
+      "ltp": 1434.8,
+      "pct": -0.59
     },
     {
       "symbol": "XPROINDIA",
@@ -3210,8 +3419,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1395.3,
-      "pct": 2.28
+      "ltp": 1427.4,
+      "pct": 2.3
     },
     {
       "symbol": "MOTHERSON",
@@ -3223,8 +3432,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 148.11,
-      "pct": -1.63
+      "ltp": 147.51,
+      "pct": -0.41
     },
     {
       "symbol": "HONAUT",
@@ -3236,8 +3445,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 39735.0,
-      "pct": 1.83
+      "ltp": 39655.0,
+      "pct": -0.2
     },
     {
       "symbol": "LMW",
@@ -3249,8 +3458,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 15720.0,
-      "pct": -1.58
+      "ltp": 15894.0,
+      "pct": 1.11
     },
     {
       "symbol": "TSFINV",
@@ -3262,8 +3471,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 440.15,
-      "pct": -0.86
+      "ltp": 451.0,
+      "pct": 2.47
     },
     {
       "symbol": "CRAMC",
@@ -3275,8 +3484,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 246.94,
-      "pct": 0.01
+      "ltp": 250.59,
+      "pct": 1.48
     },
     {
       "symbol": "SAFARI",
@@ -3288,8 +3497,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1594.0,
-      "pct": 0.47
+      "ltp": 1619.7,
+      "pct": 1.61
     },
     {
       "symbol": "SGIL",
@@ -3301,8 +3510,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 585.7,
-      "pct": 4.51
+      "ltp": 585.45,
+      "pct": -0.04
     },
     {
       "symbol": "DHANUKA",
@@ -3314,8 +3523,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1055.2,
-      "pct": 0.01
+      "ltp": 1063.2,
+      "pct": 0.76
     },
     {
       "symbol": "NELCAST",
@@ -3327,8 +3536,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 135.84,
-      "pct": -0.24
+      "ltp": 135.17,
+      "pct": -0.49
     },
     {
       "symbol": "ZYDUSWELL",
@@ -3340,8 +3549,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 575.4,
-      "pct": 1.04
+      "ltp": 568.5,
+      "pct": -1.2
     },
     {
       "symbol": "DODLA",
@@ -3353,8 +3562,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1122.7,
-      "pct": 0.12
+      "ltp": 1117.3,
+      "pct": -0.48
     },
     {
       "symbol": "WELSPUNLIV",
@@ -3366,8 +3575,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 158.84,
-      "pct": -1.97
+      "ltp": 165.26,
+      "pct": 4.04
     },
     {
       "symbol": "BAJAJELEC",
@@ -3379,8 +3588,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 319.5,
-      "pct": 0.76
+      "ltp": 319.8,
+      "pct": 0.09
+    },
+    {
+      "symbol": "THANGAMAYL",
+      "company": "Thangamayil Jewellery Limited",
+      "subject": "Announcement - Thangamayil Jewellery Limited has informed the Exchange that Record date for the purpose of Dividend  is 22-Jul-2026.",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 5945.5,
+      "pct": -7.08
     },
     {
       "symbol": "WELENT",
@@ -3392,8 +3614,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 601.45,
-      "pct": 4.75
+      "ltp": 610.35,
+      "pct": 1.48
     },
     {
       "symbol": "INDIANHUME",
@@ -3405,8 +3627,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 329.15,
-      "pct": -1.1
+      "ltp": 327.25,
+      "pct": -0.58
     },
     {
       "symbol": "UNITDSPR",
@@ -3418,8 +3640,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1350.4,
-      "pct": 0.66
+      "ltp": 1352.4,
+      "pct": 0.15
     },
     {
       "symbol": "JSWSTEEL",
@@ -3431,8 +3653,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1226.4,
-      "pct": -0.49
+      "ltp": 1216.2,
+      "pct": -0.83
     },
     {
       "symbol": "NILKAMAL",
@@ -3444,8 +3666,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1259.2,
-      "pct": -0.43
+      "ltp": 1261.6,
+      "pct": 0.19
     },
     {
       "symbol": "AKUMS",
@@ -3457,8 +3679,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 623.15,
-      "pct": -0.24
+      "ltp": 630.85,
+      "pct": 1.24
     },
     {
       "symbol": "SKFINDIA",
@@ -3470,8 +3692,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1672.5,
-      "pct": 1.01
+      "ltp": 1667.9,
+      "pct": -0.28
     },
     {
       "symbol": "JSWDULUX",
@@ -3483,8 +3705,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3228.1,
-      "pct": -1.07
+      "ltp": 3224.0,
+      "pct": -0.13
     },
     {
       "symbol": "REDINGTON",
@@ -3496,8 +3718,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 276.18,
-      "pct": 0.24
+      "ltp": 273.65,
+      "pct": -0.92
     },
     {
       "symbol": "ZFCVINDIA",
@@ -3509,8 +3731,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2566.0,
-      "pct": -4.47
+      "ltp": 2485.6,
+      "pct": -3.13
     },
     {
       "symbol": "SKFINDUS",
@@ -3522,8 +3744,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2891.8,
-      "pct": 0.76
+      "ltp": 2867.7,
+      "pct": -0.83
     },
     {
       "symbol": "SKFINDUS",
@@ -3535,8 +3757,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2891.8,
-      "pct": 0.76
+      "ltp": 2867.7,
+      "pct": -0.83
     },
     {
       "symbol": "BBL",
@@ -3548,8 +3770,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2884.9,
-      "pct": 3.61
+      "ltp": 2825.0,
+      "pct": -2.08
     },
     {
       "symbol": "PFIZER",
@@ -3561,25 +3783,25 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4439.4,
-      "pct": 0.78
+      "ltp": 4473.6,
+      "pct": 0.77
     },
     {
       "symbol": "DRREDDY",
       "company": "Dr. Reddy's Laboratories Limited",
-      "subject": "Final Dividend - Rs 8.00 per equity share",
+      "subject": "Announcement - Dr. Reddy's Laboratories Limited has informed the Exchange that Record date for the purpose of Final Dividend  is 10-Jul-2026.",
       "ex_date": "10-Jul-2026",
       "record_date": "10-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1357.1,
-      "pct": -1.35
+      "ltp": 1339.9,
+      "pct": -1.27
     },
     {
       "symbol": "SHRIPISTON",
-      "company": "Shriram Pistons & Rings Limited",
+      "company": "SPR Auto Technologies Limited",
       "subject": "Announcement - Shriram Pistons & Rings Limited has informed the Exchange that Record date for the purpose of Dividend  is 20-Jul-2026.",
       "ex_date": "20-Jul-2026",
       "record_date": "20-Jul-2026",
@@ -3587,8 +3809,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4187.4,
-      "pct": 4.45
+      "ltp": 4380.2,
+      "pct": 4.6
     },
     {
       "symbol": "HERITGFOOD",
@@ -3600,34 +3822,34 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 328.25,
-      "pct": -0.62
+      "ltp": 333.2,
+      "pct": 1.51
     },
     {
       "symbol": "NDRAUTO",
       "company": "Ndr Auto Components Limited",
-      "subject": "Final Dividend - Rs 4.00 per equity share and Final Dividend - Rs 6.00 per equity share",
+      "subject": "Announcement - Ndr Auto Components Limited has informed the Exchange that Record date for the purpose of Dividend  is 20-Jul-2026.",
       "ex_date": "20-Jul-2026",
       "record_date": "20-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 821.1,
-      "pct": 0.85
+      "ltp": 834.3,
+      "pct": 1.61
     },
     {
       "symbol": "DLINKINDIA",
       "company": "D-Link (India) Limited",
-      "subject": "Special Dividend - Rs 7.50 per equity share and Final Dividend - Rs 20.00 per equity share",
+      "subject": "Announcement - D-Link (India) Limited has informed the Exchange that Record date for the purpose of Dividend  is 10-Jul-2026.",
       "ex_date": "10-Jul-2026",
       "record_date": "10-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 514.65,
-      "pct": -0.74
+      "ltp": 517.5,
+      "pct": 0.55
     },
     {
       "symbol": "GRINDWELL",
@@ -3639,8 +3861,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2166.1,
-      "pct": 0.9
+      "ltp": 2153.8,
+      "pct": -0.57
     },
     {
       "symbol": "GRINDWELL",
@@ -3652,8 +3874,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2166.1,
-      "pct": 0.9
+      "ltp": 2153.8,
+      "pct": -0.57
     },
     {
       "symbol": "CERA",
@@ -3665,21 +3887,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 6451.5,
-      "pct": -0.19
+      "ltp": 6441.0,
+      "pct": -0.16
     },
     {
       "symbol": "IMPAL",
       "company": "India Motor Parts and Accessories Limited",
-      "subject": "Final Dividend - Rs 23.00 per equity share",
+      "subject": "Announcement - India Motor Parts and Accessories Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Jul-2026.",
       "ex_date": "14-Jul-2026",
       "record_date": "14-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1102.1,
-      "pct": 0.41
+      "ltp": 1105.0,
+      "pct": 0.26
     },
     {
       "symbol": "BIOCON",
@@ -3691,21 +3913,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 418.3,
-      "pct": 0.73
+      "ltp": 418.2,
+      "pct": -0.02
     },
     {
       "symbol": "GCSL",
       "company": "Gretex Corporate Services Limited",
-      "subject": "Final Dividend - Rs 0.70 per equity share",
+      "subject": "Announcement - Gretex Corporate Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 430.75,
-      "pct": 2.41
+      "ltp": 429.9,
+      "pct": -0.2
     },
     {
       "symbol": "VMART",
@@ -3717,8 +3939,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 779.05,
-      "pct": 3.13
+      "ltp": 796.55,
+      "pct": 2.25
     },
     {
       "symbol": "THERMAX",
@@ -3730,8 +3952,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 5159.5,
-      "pct": 0.67
+      "ltp": 5120.5,
+      "pct": -0.76
     },
     {
       "symbol": "BSE",
@@ -3743,8 +3965,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3865.6,
-      "pct": 0.15
+      "ltp": 3944.1,
+      "pct": 2.03
     },
     {
       "symbol": "DABUR",
@@ -3756,34 +3978,21 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 422.2,
-      "pct": -0.96
+      "ltp": 444.75,
+      "pct": 5.34
     },
     {
       "symbol": "SHANTIGEAR",
       "company": "Shanthi Gears Limited",
-      "subject": "Final Dividend - Rs 2.00 per equity share",
+      "subject": "Announcement - Shanthi Gears Limited has informed the Exchange that Record date for the purpose of Dividend  is 17-Jul-2026.",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
-      "offer_price": 0.0,
-      "ltp": 443.85,
-      "pct": 0.77
-    },
-    {
-      "symbol": "BAJAJHLDNG",
-      "company": "Bajaj Holdings & Investment Limited",
-      "subject": "Announcement - Bajaj Holdings & Investment Limited has informed the Exchange that Record date for the purpose of Final Dividend is 30 June 2026",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "",
-      "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 10603.0,
-      "pct": 0.1
+      "ltp": 450.75,
+      "pct": 1.55
     },
     {
       "symbol": "COROMANDEL",
@@ -3795,21 +4004,20 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2005.0,
-      "pct": 4.76
+      "ltp": 1993.2,
+      "pct": -0.59
     },
     {
       "symbol": "HARSHA",
       "company": "Harsha Engineers International Limited",
-      "subject": "Final Dividend - Rs 1.50 per equity share",
+      "subject": "Announcement - Harsha Engineers International Limited has informed the Exchange that Record date for the purpose of Dividend & AGM  is 09-Jul-2026.",
       "ex_date": "09-Jul-2026",
       "record_date": "09-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN-BACKFILL",
+      "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 419.7,
-      "pct": 2.4
+      "ltp": 419.7
     },
     {
       "symbol": "BHARATSE",
@@ -3821,8 +4029,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 189.87,
-      "pct": 1.29
+      "ltp": 222.58,
+      "pct": 17.23
     },
     {
       "symbol": "BLUESTARCO",
@@ -3834,8 +4042,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1628.3,
-      "pct": -0.44
+      "ltp": 1606.4,
+      "pct": -1.34
     },
     {
       "symbol": "FAIRCHEMOR",
@@ -3847,8 +4055,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 670.25,
-      "pct": 4.13
+      "ltp": 731.9,
+      "pct": 9.2
     },
     {
       "symbol": "NEWGEN",
@@ -3860,8 +4068,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 471.55,
-      "pct": 0.7
+      "ltp": 473.7,
+      "pct": 0.46
     },
     {
       "symbol": "RAYMONDREL",
@@ -3873,8 +4081,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 619.2,
-      "pct": -0.76
+      "ltp": 639.1,
+      "pct": 3.21
     },
     {
       "symbol": "M&M",
@@ -3886,8 +4094,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3068.8,
-      "pct": -0.78
+      "ltp": 3130.0,
+      "pct": 1.99
     },
     {
       "symbol": "CAMS",
@@ -3899,8 +4107,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 796.85,
-      "pct": 1.04
+      "ltp": 792.2,
+      "pct": -0.58
     },
     {
       "symbol": "ARMANFIN",
@@ -3912,8 +4120,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1694.0,
-      "pct": 1.31
+      "ltp": 1703.4,
+      "pct": 0.55
     },
     {
       "symbol": "EXIDEIND",
@@ -3925,21 +4133,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 387.6,
-      "pct": 0.27
-    },
-    {
-      "symbol": "BAJAJFINSV",
-      "company": "Bajaj Finserv Limited",
-      "subject": "Announcement - Bajaj Finserv Limited has informed the Exchange that Record date for the purpose of Dividend  is 30-Jun-2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1780.2,
-      "pct": 1.19
+      "ltp": 390.35,
+      "pct": 0.71
     },
     {
       "symbol": "CHOLAFIN",
@@ -3951,8 +4146,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1789.8,
-      "pct": 0.89
+      "ltp": 1803.3,
+      "pct": 0.75
     },
     {
       "symbol": "MPHASIS",
@@ -3964,8 +4159,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 2161.6,
-      "pct": -2.09
+      "ltp": 2126.8,
+      "pct": -1.61
     },
     {
       "symbol": "GEOJITFSL",
@@ -3977,21 +4172,21 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 77.63,
-      "pct": 0.6
+      "ltp": 78.31,
+      "pct": 0.88
     },
     {
-      "symbol": "BAJFINANCE",
-      "company": "Bajaj Finance Limited",
-      "subject": "Announcement - Bajaj Finance Limited has informed the Exchange that Record date for the purpose of Dividend  is 30-Jun-2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
+      "symbol": "SARLAPOLY",
+      "company": "Sarla Performance Fibers Limited",
+      "subject": "Final Dividend - Rs 110.00 per equity share",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN",
+      "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 1004.75,
-      "pct": 2.31
+      "ltp": 99.31,
+      "pct": 1.19
     },
     {
       "symbol": "MAHLIFE",
@@ -4003,8 +4198,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 366.45,
-      "pct": -0.16
+      "ltp": 372.7,
+      "pct": 1.71
     },
     {
       "symbol": "AGI",
@@ -4016,8 +4211,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 689.3,
-      "pct": 0.66
+      "ltp": 700.85,
+      "pct": 1.68
     },
     {
       "symbol": "AXISBANK",
@@ -4029,8 +4224,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1345.7,
-      "pct": -0.82
+      "ltp": 1368.7,
+      "pct": 1.71
     },
     {
       "symbol": "SPLPETRO",
@@ -4042,8 +4237,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 713.95,
-      "pct": -2.34
+      "ltp": 725.05,
+      "pct": 1.55
     },
     {
       "symbol": "SHRIRAMFIN",
@@ -4055,8 +4250,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1042.15,
-      "pct": 0.92
+      "ltp": 1048.1,
+      "pct": 0.57
     },
     {
       "symbol": "BEPL",
@@ -4068,8 +4263,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 99.42,
-      "pct": 0.55
+      "ltp": 98.18,
+      "pct": -1.25
     },
     {
       "symbol": "SHRIRAMFIN",
@@ -4081,8 +4276,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1042.15,
-      "pct": 0.92
+      "ltp": 1048.1,
+      "pct": 0.57
     },
     {
       "symbol": "M&MFIN",
@@ -4094,8 +4289,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 315.8,
-      "pct": 0.13
+      "ltp": 315.15,
+      "pct": -0.21
     },
     {
       "symbol": "WENDT",
@@ -4107,8 +4302,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL",
       "offer_price": 0.0,
-      "ltp": 8246.0,
-      "pct": 4.57
+      "ltp": 8103.5,
+      "pct": -1.73
     },
     {
       "symbol": "MAHLOG",
@@ -4120,8 +4315,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 373.9,
-      "pct": 0.4
+      "ltp": 371.4,
+      "pct": -0.67
     },
     {
       "symbol": "LTM",
@@ -4133,8 +4328,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3538.0,
-      "pct": -4.02
+      "ltp": 3546.7,
+      "pct": 0.25
     },
     {
       "symbol": "TECHM",
@@ -4146,21 +4341,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1404.7,
-      "pct": -2.03
-    },
-    {
-      "symbol": "MAHSCOOTER",
-      "company": "Maharashtra Scooters Limited",
-      "subject": "Announcement - Maharashtra Scooters Limited has informed the Exchange that Record date for the purpose of Final Dividend is 30-Jun-2026.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "30-Jun-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 12501.0,
-      "pct": 0.94
+      "ltp": 1362.2,
+      "pct": -3.03
     },
     {
       "symbol": "NESTLEIND",
@@ -4172,8 +4354,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 1405.2,
-      "pct": 1.29
+      "ltp": 1453.8,
+      "pct": 3.46
     },
     {
       "symbol": "SMLMAH",
@@ -4185,8 +4367,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 4098.0,
-      "pct": 1.76
+      "ltp": 3960.5,
+      "pct": -3.36
     },
     {
       "symbol": "VSTIND",
@@ -4198,8 +4380,7 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 260.3,
-      "pct": -0.08
+      "ltp": 260.3
     },
     {
       "symbol": "WIPRO",
@@ -4211,8 +4392,8 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 170.39,
-      "pct": -2.9
+      "ltp": 170.13,
+      "pct": -0.15
     },
     {
       "symbol": "SWARAJENG",
@@ -4224,21 +4405,99 @@
       "bc_end": "",
       "source": "NSE-ANN",
       "offer_price": 0.0,
-      "ltp": 3997.6,
-      "pct": 0.92
+      "ltp": 4038.7,
+      "pct": 1.03
     },
     {
-      "symbol": "SBICARD",
-      "company": "SBI Cards and Payment Services Limited",
-      "subject": "Announcement - SBI Cards and Payment Services Limited has informed the Exchange regarding the extension of term of Mr. Ved Prakash as Executive Vice President & Head- Internal Audit for a period of 4 months from March 01, 2026 to June ",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
+      "symbol": "MSUMI",
+      "company": "Motherson Sumi Wiring India Limited",
+      "subject": "Final Dividend - Rs 0.58 per equity share",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
       "bc_start": "",
       "bc_end": "",
-      "source": "NSE-ANN",
+      "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 593.2,
-      "pct": -1.45
+      "ltp": 41.12,
+      "pct": 2.49
+    },
+    {
+      "symbol": "UNIENTER",
+      "company": "Uniphos Enterprises Limited",
+      "subject": "Final Dividend - Rs 3.50 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 106.29,
+      "pct": -1.55
+    },
+    {
+      "symbol": "JKLAKSHMI",
+      "company": "JK Lakshmi Cement Limited",
+      "subject": "Final Dividend - Rs 6.50 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 582.45,
+      "pct": -3.86
+    },
+    {
+      "symbol": "WEIZMANIND",
+      "company": "Weizmann Limited",
+      "subject": "Final Dividend - Rs 0.50 per equity share",
+      "ex_date": "16-Jul-2026",
+      "record_date": "16-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 81.94,
+      "pct": -4.15
+    },
+    {
+      "symbol": "SARLAPOLY",
+      "company": "Sarla Performance Fibers Limited",
+      "subject": "Final Dividend - Rs 110.00 per equity share",
+      "ex_date": "01-Jul-2026",
+      "record_date": "01-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 99.31,
+      "pct": 1.19
+    },
+    {
+      "symbol": "BHEL",
+      "company": "Bharat Heavy Electricals Limited",
+      "subject": "Final Dividend - Rs 1.40 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 413.95,
+      "pct": -0.04
+    },
+    {
+      "symbol": "RAMRAT",
+      "company": "Ram Ratna Wires Limited",
+      "subject": "Final Dividend - Rs 2.50 per equity share",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 406.55,
+      "pct": -0.09
     },
     {
       "symbol": "ZENSARTECH",
@@ -4250,8 +4509,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 425.3,
-      "pct": -1.87
+      "ltp": 426.05,
+      "pct": 0.18
     },
     {
       "symbol": "PRUDENT",
@@ -4263,34 +4522,21 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2994.2,
-      "pct": 1.33
+      "ltp": 2975.0,
+      "pct": -0.64
     },
     {
-      "symbol": "MRF",
-      "company": "MRF Limited",
-      "subject": "Final Dividend - Rs 229.00 per equity share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
+      "symbol": "ABSLAMC",
+      "company": "Aditya Birla Sun Life AMC Limited",
+      "subject": "Final Dividend - Rs 25.50 per equity share",
+      "ex_date": "22-Jul-2026",
+      "record_date": "22-Jul-2026",
       "bc_start": "",
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 127820.0,
-      "pct": 3.04
-    },
-    {
-      "symbol": "TITAN",
-      "company": "Titan Company Limited",
-      "subject": "Final Dividend - Rs 15.00 per equity share",
-      "ex_date": "09-Jul-2026",
-      "record_date": "09-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 4404.0,
-      "pct": 2.96
+      "ltp": 1144.6,
+      "pct": -0.87
     },
     {
       "symbol": "AEROFLEX",
@@ -4302,8 +4548,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 471.6,
-      "pct": 0.55
+      "ltp": 488.5,
+      "pct": 3.58
     },
     {
       "symbol": "MGEL",
@@ -4315,8 +4561,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 15.91,
-      "pct": -0.56
+      "ltp": 16.52,
+      "pct": 3.83
     },
     {
       "symbol": "SOBHA",
@@ -4328,8 +4574,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1378.5,
-      "pct": -0.63
+      "ltp": 1410.4,
+      "pct": 2.31
     },
     {
       "symbol": "MWL",
@@ -4341,8 +4587,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 375.75,
-      "pct": 1.84
+      "ltp": 377.85,
+      "pct": 0.56
     },
     {
       "symbol": "SMARTLINK",
@@ -4354,47 +4600,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 180.02,
-      "pct": 4.86
-    },
-    {
-      "symbol": "SURYODAY",
-      "company": "Suryoday Small Finance Bank Limited",
-      "subject": "Final Dividend - Rs 1.50 per equity share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 175.61,
-      "pct": 1.19
-    },
-    {
-      "symbol": "CDSL",
-      "company": "Central Depository Services (India) Limited",
-      "subject": "Final Dividend - Rs 12.75 per equity share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 1305.5,
-      "pct": 0.59
-    },
-    {
-      "symbol": "UPL",
-      "company": "UPL Limited",
-      "subject": "Final Dividend - Rs 6.00 per equity share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 571.2,
-      "pct": 0.49
+      "ltp": 179.14,
+      "pct": -0.49
     },
     {
       "symbol": "UTIAMC",
@@ -4406,47 +4613,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 935.1,
-      "pct": 0.88
-    },
-    {
-      "symbol": "ABREL",
-      "company": "Aditya Birla Real Estate Limited",
-      "subject": "Final Dividend - Rs 2.50 per equity share and Final Dividend - Rs 8136.00 per equity share",
-      "ex_date": "14-Jul-2026",
-      "record_date": "14-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 1323.6,
-      "pct": 0.65
-    },
-    {
-      "symbol": "KHAICHEM",
-      "company": "Khaitan Chemicals & Fertilizers Limited",
-      "subject": "Final Dividend - Rs 0.05 per equity share",
-      "ex_date": "14-Jul-2026",
-      "record_date": "14-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 53.54,
-      "pct": -3.58
-    },
-    {
-      "symbol": "BFINVEST",
-      "company": "BF Investment Limited",
-      "subject": "Final Dividend - Rs 10.00 per equity share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 446.7,
-      "pct": -0.03
+      "ltp": 944.65,
+      "pct": 1.02
     },
     {
       "symbol": "TCS",
@@ -4458,8 +4626,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2031.5,
-      "pct": -3.17
+      "ltp": 1982.6,
+      "pct": -2.41
     },
     {
       "symbol": "KRISHNADEF",
@@ -4497,8 +4665,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 42.44,
-      "pct": 0.47
+      "ltp": 42.35,
+      "pct": -0.21
     },
     {
       "symbol": "ROSSARI",
@@ -4510,8 +4678,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 525.35,
-      "pct": 0.45
+      "ltp": 527.1,
+      "pct": 0.33
     },
     {
       "symbol": "HESTERBIO",
@@ -4523,21 +4691,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2165.9,
-      "pct": -1.49
-    },
-    {
-      "symbol": "DCMSRIND",
-      "company": "DCM Shriram Industries Limited",
-      "subject": "Final Dividend - Rs 0.40 per equity share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 37.72,
-      "pct": 1.26
+      "ltp": 2198.6,
+      "pct": 1.51
     },
     {
       "symbol": "SUNDRMBRAK",
@@ -4549,8 +4704,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 826.25,
-      "pct": 2.52
+      "ltp": 813.4,
+      "pct": -1.56
     },
     {
       "symbol": "SUMICHEM",
@@ -4562,8 +4717,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 420.85,
-      "pct": 0.23
+      "ltp": 435.1,
+      "pct": 3.39
     },
     {
       "symbol": "DYCL",
@@ -4575,8 +4730,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 367.75,
-      "pct": -0.5
+      "ltp": 364.7,
+      "pct": -0.83
     },
     {
       "symbol": "SOMATEX",
@@ -4588,8 +4743,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 88.33,
-      "pct": -3.09
+      "ltp": 89.38,
+      "pct": 1.19
     },
     {
       "symbol": "TARACHAND",
@@ -4601,8 +4756,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 56.01,
-      "pct": -0.57
+      "ltp": 55.92,
+      "pct": -0.16
     },
     {
       "symbol": "TTKHLTCARE",
@@ -4614,8 +4769,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 916.35,
-      "pct": -1.17
+      "ltp": 907.5,
+      "pct": -0.97
     },
     {
       "symbol": "DBOL",
@@ -4627,8 +4782,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 111.56,
-      "pct": -2.63
+      "ltp": 110.87,
+      "pct": -0.62
     },
     {
       "symbol": "GLOBAL",
@@ -4640,8 +4795,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 103.95,
-      "pct": -0.79
+      "ltp": 101.93,
+      "pct": -1.94
     },
     {
       "symbol": "ELGIEQUIP",
@@ -4653,34 +4808,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 598.1,
-      "pct": -1.68
-    },
-    {
-      "symbol": "GREENLAM",
-      "company": "Greenlam Industries Limited",
-      "subject": "Final Dividend - Rs 0.40 per equity share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 258.24,
-      "pct": -0.57
-    },
-    {
-      "symbol": "GLOSTERLTD",
-      "company": "Gloster Limited",
-      "subject": "Final Dividend - Rs 20.00 per equity share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 731.85,
-      "pct": 1.15
+      "ltp": 605.85,
+      "pct": 1.3
     },
     {
       "symbol": "JUBLFOOD",
@@ -4692,8 +4821,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 417.6,
-      "pct": -0.02
+      "ltp": 421.45,
+      "pct": 0.92
     },
     {
       "symbol": "20MICRONS",
@@ -4716,8 +4845,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 154.97,
-      "pct": 0.52
+      "ltp": 155.44,
+      "pct": 0.3
     },
     {
       "symbol": "HAPPYFORGE",
@@ -4729,8 +4858,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1537.8,
-      "pct": 0.64
+      "ltp": 1532.1,
+      "pct": -0.37
     },
     {
       "symbol": "XPROINDIA",
@@ -4742,8 +4871,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1395.3,
-      "pct": 2.28
+      "ltp": 1427.4,
+      "pct": 2.3
     },
     {
       "symbol": "CRAMC",
@@ -4755,8 +4884,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 246.94,
-      "pct": 0.01
+      "ltp": 250.59,
+      "pct": 1.48
     },
     {
       "symbol": "DHANUKA",
@@ -4768,8 +4897,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1055.2,
-      "pct": 0.01
+      "ltp": 1063.2,
+      "pct": 0.76
     },
     {
       "symbol": "NELCAST",
@@ -4781,21 +4910,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 135.84,
-      "pct": -0.24
-    },
-    {
-      "symbol": "BAJAJELEC",
-      "company": "Bajaj Electricals Limited",
-      "subject": "Final Dividend - Rs 3.00 per equity share",
-      "ex_date": "17-Jul-2026",
-      "record_date": "17-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 319.5,
-      "pct": 0.76
+      "ltp": 135.17,
+      "pct": -0.49
     },
     {
       "symbol": "NILKAMAL",
@@ -4807,21 +4923,8 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 1259.2,
-      "pct": -0.43
-    },
-    {
-      "symbol": "SKFINDUS",
-      "company": "SKF India (Industrial) Limited",
-      "subject": "Final Dividend - Rs 10.00 per equity share",
-      "ex_date": "03-Jul-2026",
-      "record_date": "03-Jul-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 2891.8,
-      "pct": 0.76
+      "ltp": 1261.6,
+      "pct": 0.19
     },
     {
       "symbol": "BBL",
@@ -4833,8 +4936,85 @@
       "bc_end": "",
       "source": "NSE-ANN-BACKFILL+CACHE",
       "offer_price": 0.0,
-      "ltp": 2884.9,
-      "pct": 3.61
+      "ltp": 2825.0,
+      "pct": -2.08
+    },
+    {
+      "symbol": "NDRAUTO",
+      "company": "Ndr Auto Components Limited",
+      "subject": "Final Dividend - Rs 4.00 per equity share and Final Dividend - Rs 6.00 per equity share",
+      "ex_date": "20-Jul-2026",
+      "record_date": "20-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 834.3,
+      "pct": 1.61
+    },
+    {
+      "symbol": "DLINKINDIA",
+      "company": "D-Link (India) Limited",
+      "subject": "Special Dividend - Rs 7.50 per equity share and Final Dividend - Rs 20.00 per equity share",
+      "ex_date": "10-Jul-2026",
+      "record_date": "10-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 517.5,
+      "pct": 0.55
+    },
+    {
+      "symbol": "IMPAL",
+      "company": "India Motor Parts and Accessories Limited",
+      "subject": "Final Dividend - Rs 23.00 per equity share",
+      "ex_date": "14-Jul-2026",
+      "record_date": "14-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 1105.0,
+      "pct": 0.26
+    },
+    {
+      "symbol": "GCSL",
+      "company": "Gretex Corporate Services Limited",
+      "subject": "Final Dividend - Rs 0.70 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 429.9,
+      "pct": -0.2
+    },
+    {
+      "symbol": "SHANTIGEAR",
+      "company": "Shanthi Gears Limited",
+      "subject": "Final Dividend - Rs 2.00 per equity share",
+      "ex_date": "17-Jul-2026",
+      "record_date": "17-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 450.75,
+      "pct": 1.55
+    },
+    {
+      "symbol": "HARSHA",
+      "company": "Harsha Engineers International Limited",
+      "subject": "Final Dividend - Rs 1.50 per equity share",
+      "ex_date": "09-Jul-2026",
+      "record_date": "09-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 419.7
     }
   ],
   "corporate_sources": {},
@@ -4842,42 +5022,49 @@
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-06-30T17:30:55.272617",
+      "last_attempt": "2026-07-01T17:52:21.095125",
       "last_count": 4,
-      "last_success": "2026-06-30T17:30:55.272617",
+      "last_success": "2026-07-01T17:52:21.095125",
       "message": ""
     },
     "NSE_CA": {
       "status": "ok",
-      "last_attempt": "2026-06-29T21:02:00.239803",
-      "last_count": 94,
-      "last_success": "2026-06-29T21:02:00.239803",
+      "last_attempt": "2026-06-30T21:01:42.001798",
+      "last_count": 90,
+      "last_success": "2026-06-30T21:01:42.001798",
       "message": ""
     },
     "NSE_BM": {
       "status": "no-data",
-      "last_attempt": "2026-06-29T21:02:00.820169",
+      "last_attempt": "2026-06-30T21:01:42.529379",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "NSE_ANN": {
       "status": "ok",
-      "last_attempt": "2026-06-29T21:02:02.245198",
-      "last_count": 28,
-      "last_success": "2026-06-29T21:02:02.245198",
+      "last_attempt": "2026-06-30T21:01:57.009863",
+      "last_count": 212,
+      "last_success": "2026-06-30T21:01:57.009863",
       "message": ""
     },
     "NSE_ER": {
       "status": "no-data",
-      "last_attempt": "2026-06-29T21:02:18.362299",
+      "last_attempt": "2026-06-30T21:02:12.982642",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "BSE_CA": {
       "status": "no-data",
-      "last_attempt": "2026-06-29T21:02:21.105278",
+      "last_attempt": "2026-06-30T21:02:15.927556",
+      "last_count": 0,
+      "last_success": "",
+      "message": ""
+    },
+    "DIV_CSV": {
+      "status": "no-data",
+      "last_attempt": "2026-06-30T21:02:15.928548",
       "last_count": 0,
       "last_success": "",
       "message": ""
