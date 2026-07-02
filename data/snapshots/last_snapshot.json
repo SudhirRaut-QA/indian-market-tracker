@@ -1,34 +1,400 @@
 {
-  "timestamp": "2026-06-30T22:28:40.008288",
-  "fii_dii": null,
-  "indices": null,
-  "market_status": null,
-  "forex": null,
+  "timestamp": "2026-06-30 21:00:03 IST",
+  "fii_dii": {
+    "timestamp": "2026-06-30T21:00:06.055817",
+    "date": "30-Jun-2026",
+    "fii": {
+      "buy": 23273.71,
+      "sell": 25830.46,
+      "net": -2556.75
+    },
+    "dii": {
+      "buy": 23432.58,
+      "sell": 16590.24,
+      "net": 6842.34
+    },
+    "total_net": 4285.59,
+    "signal": "DII Defensive",
+    "interpretation": "FII selling, DII buying — DII supporting"
+  },
+  "indices": {
+    "NIFTY 50": {
+      "last": 23865.75,
+      "change": -80.5,
+      "pct": -0.34,
+      "open": 24032.05,
+      "high": 24035.55,
+      "low": 23829.2,
+      "prev_close": 23946.25,
+      "advances": "25",
+      "declines": "25",
+      "unchanged": "0"
+    },
+    "NIFTY NEXT 50": {
+      "last": 71629.45,
+      "change": 119.15,
+      "pct": 0.17,
+      "open": 71716.9,
+      "high": 71970.05,
+      "low": 71358.45,
+      "prev_close": 71510.3,
+      "advances": "32",
+      "declines": "18",
+      "unchanged": "0"
+    },
+    "NIFTY BANK": {
+      "last": 57542.9,
+      "change": -184.45,
+      "pct": -0.32,
+      "open": 58011.95,
+      "high": 58011.95,
+      "low": 57456.65,
+      "prev_close": 57727.35,
+      "advances": "8",
+      "declines": "6",
+      "unchanged": "0"
+    },
+    "NIFTY FINANCIAL SERVICES": {
+      "last": 26554.55,
+      "change": -43.8,
+      "pct": -0.16,
+      "open": 26724.85,
+      "high": 26729.7,
+      "low": 26505.75,
+      "prev_close": 26598.35,
+      "advances": "11",
+      "declines": "9",
+      "unchanged": "0"
+    },
+    "NIFTY MIDCAP 50": {
+      "last": 17594.9,
+      "change": 73.9,
+      "pct": 0.42,
+      "open": 17568.2,
+      "high": 17669,
+      "low": 17475.55,
+      "prev_close": 17521,
+      "advances": "33",
+      "declines": "16",
+      "unchanged": "1"
+    },
+    "INDIA VIX": {
+      "last": 13.6,
+      "change": -0.01,
+      "pct": -0.07,
+      "open": 13.61,
+      "high": 13.97,
+      "low": 13.15,
+      "prev_close": 13.61,
+      "advances": 0,
+      "declines": 0,
+      "unchanged": 0
+    },
+    "NIFTY SMALLCAP 50": {
+      "last": 9332.55,
+      "change": 97.5,
+      "pct": 1.06,
+      "open": 9264.15,
+      "high": 9355.25,
+      "low": 9251.5,
+      "prev_close": 9235.05,
+      "advances": "39",
+      "declines": "11",
+      "unchanged": "0"
+    },
+    "NIFTY AUTO": {
+      "last": 26479.8,
+      "change": 62.2,
+      "pct": 0.24,
+      "open": 26537,
+      "high": 26664.3,
+      "low": 26067.7,
+      "prev_close": 26417.6,
+      "advances": "9",
+      "declines": "5",
+      "unchanged": "1"
+    },
+    "NIFTY FMCG": {
+      "last": 48794.2,
+      "change": -333.45,
+      "pct": -0.68,
+      "open": 49119.8,
+      "high": 49159.4,
+      "low": 48712.7,
+      "prev_close": 49127.65,
+      "advances": "7",
+      "declines": "8",
+      "unchanged": "0"
+    },
+    "NIFTY IT": {
+      "last": 26299.05,
+      "change": -739.45,
+      "pct": -2.73,
+      "open": 26989.95,
+      "high": 27032.2,
+      "low": 26208.5,
+      "prev_close": 27038.5,
+      "advances": "1",
+      "declines": "9",
+      "unchanged": "0"
+    },
+    "NIFTY METAL": {
+      "last": 12519.15,
+      "change": -25.85,
+      "pct": -0.21,
+      "open": 12529.25,
+      "high": 12573.05,
+      "low": 12442.1,
+      "prev_close": 12545,
+      "advances": "7",
+      "declines": "8",
+      "unchanged": "0"
+    },
+    "NIFTY PHARMA": {
+      "last": 25326.4,
+      "change": 98.5,
+      "pct": 0.39,
+      "open": 25274.75,
+      "high": 25476.55,
+      "low": 25173.05,
+      "prev_close": 25227.9,
+      "advances": "16",
+      "declines": "4",
+      "unchanged": "0"
+    },
+    "NIFTY PSU BANK": {
+      "last": 8492.65,
+      "change": -61.2,
+      "pct": -0.72,
+      "open": 8583.15,
+      "high": 8598.7,
+      "low": 8481.4,
+      "prev_close": 8553.85,
+      "advances": "5",
+      "declines": "7",
+      "unchanged": "0"
+    },
+    "NIFTY REALTY": {
+      "last": 829.55,
+      "change": 10.7,
+      "pct": 1.31,
+      "open": 823.25,
+      "high": 835.3,
+      "low": 818.55,
+      "prev_close": 818.85,
+      "advances": "8",
+      "declines": "2",
+      "unchanged": "0"
+    },
+    "NIFTY OIL & GAS": {
+      "last": 11030.25,
+      "change": 18.2,
+      "pct": 0.17,
+      "open": 11040.85,
+      "high": 11069.2,
+      "low": 10952.25,
+      "prev_close": 11012.05,
+      "advances": "10",
+      "declines": "5",
+      "unchanged": "0"
+    },
+    "NIFTY100 LOW VOLATILITY 30": {
+      "last": 19683.1,
+      "change": -50.35,
+      "pct": -0.26,
+      "open": 19779.15,
+      "high": 19786.4,
+      "low": 19638.75,
+      "prev_close": 19733.45,
+      "advances": "14",
+      "declines": "16",
+      "unchanged": "0"
+    },
+    "NIFTY200 MOMENTUM 30": {
+      "last": 30912.9,
+      "change": -25.05,
+      "pct": -0.08,
+      "open": 30909.9,
+      "high": 31047.6,
+      "low": 30704.8,
+      "prev_close": 30937.95,
+      "advances": "16",
+      "declines": "14",
+      "unchanged": "0"
+    },
+    "NIFTY HIGH BETA 50": {
+      "last": 4296,
+      "change": 25.5,
+      "pct": 0.6,
+      "open": 4284.35,
+      "high": 4316.9,
+      "low": 4271.05,
+      "prev_close": 4270.5,
+      "advances": "37",
+      "declines": "13",
+      "unchanged": "0"
+    },
+    "NIFTY COMMODITIES": {
+      "last": 9792.95,
+      "change": -26.95,
+      "pct": -0.27,
+      "open": 9825.55,
+      "high": 9837.75,
+      "low": 9756.9,
+      "prev_close": 9819.9,
+      "advances": "14",
+      "declines": "16",
+      "unchanged": "0"
+    },
+    "NIFTY ENERGY": {
+      "last": 39740.5,
+      "change": 22.5,
+      "pct": 0.06,
+      "open": 39784.75,
+      "high": 39848.05,
+      "low": 39521.2,
+      "prev_close": 39718,
+      "advances": "25",
+      "declines": "15",
+      "unchanged": "0"
+    },
+    "NIFTY INDIA DEFENCE": {
+      "last": 9519.4,
+      "change": 128.4,
+      "pct": 1.37,
+      "open": 9368.9,
+      "high": 9575.95,
+      "low": 9307.95,
+      "prev_close": 9391,
+      "advances": "17",
+      "declines": "2",
+      "unchanged": "0"
+    }
+  },
+  "market_status": {
+    "Capital Market": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026 15:30",
+      "index": "NIFTY 50",
+      "last": 23865.75,
+      "variation": -80.5,
+      "pct": -0.34
+    },
+    "Currency": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "Commodity": {
+      "status": "Open",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "Debt": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "pct": ""
+    },
+    "currencyfuture": {
+      "status": "Closed",
+      "trade_date": "30-Jun-2026",
+      "index": "",
+      "last": "94.9025",
+      "variation": "",
+      "pct": ""
+    }
+  },
+  "forex": {
+    "usdinr": 94.5644,
+    "usdeur": 0.8773,
+    "usdgbp": 0.7556,
+    "usdjpy": 162.1795,
+    "date": "2026-06-30"
+  },
   "commodities": {},
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4046.3,
-      "pct": 0.39
+      "last": 4038.9,
+      "pct": 0.21
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 3.324,
-      "pct": -0.57
+      "last": 3.319,
+      "pct": -0.72
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 60.245,
-      "pct": 3.25
+      "last": 60.02,
+      "pct": 2.87
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 69.85,
-      "pct": -2.88
+      "last": 70.26,
+      "pct": -2.31
     }
   },
-  "global_indices": {},
-  "global_sentiment": {},
+  "global_indices": {
+    "S&P 500": {
+      "symbol": "^GSPC",
+      "last": 7479.92,
+      "pct": 1.55
+    },
+    "NASDAQ": {
+      "symbol": "^IXIC",
+      "last": 26100.012,
+      "pct": 2.0
+    },
+    "DOW": {
+      "symbol": "^DJI",
+      "last": 52328.25,
+      "pct": 1.28
+    },
+    "NIKKEI": {
+      "symbol": "^N225",
+      "last": 69468.11,
+      "pct": 0.42
+    },
+    "HANG SENG": {
+      "symbol": "^HSI",
+      "last": 22881.02,
+      "pct": -1.95
+    },
+    "FTSE": {
+      "symbol": "^FTSE",
+      "last": 10522.32,
+      "pct": 0.9
+    }
+  },
+  "global_sentiment": {
+    "fear_greed": {
+      "score": 29.46,
+      "rating": "fear",
+      "previous_close": 27.0285714285714,
+      "timestamp": "2026-06-30T15:28:49+00:00"
+    },
+    "macro": {
+      "DXY": {
+        "symbol": "DX-Y.NYB",
+        "last": 101.139,
+        "pct": -0.29
+      },
+      "BRENT": {
+        "symbol": "BZ=F",
+        "last": 73.81,
+        "pct": -1.93
+      }
+    }
+  },
   "quality_lookup": {},
   "sectors": {},
   "option_chain": {},
@@ -1201,58 +1567,6 @@
       "offer_price": 0.0,
       "ltp": 1789.8,
       "pct": 0.89
-    },
-    {
-      "symbol": "HINDUNILVR",
-      "company": "Hindustan Unilever Limited",
-      "subject": "Announcement - Hindustan Unilever Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2118.2,
-      "pct": -1.54
-    },
-    {
-      "symbol": "AVROIND",
-      "company": "AVRO INDIA LIMITED",
-      "subject": "Announcement - AVRO INDIA LIMITED has informed the Exchange regarding Proceedings of Extraordinary General Meeting held on Jun 30, 2026. Further, the company has submitted the Exchange a copy of Srutinizers report along with voting res",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 10.35,
-      "pct": 1.67
-    },
-    {
-      "symbol": "CYIENTDLM",
-      "company": "Cyient DLM Limited",
-      "subject": "Announcement - Cyient Dlm Limited has submitted the Exchange a copy Srutinizers report of  Annual General Meeting held on Jun 30, 2026. Further, the company has informed the Exchange regarding voting results.",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 460.3,
-      "pct": -0.21
-    },
-    {
-      "symbol": "SALONA",
-      "company": "Salona Cotspin Limited",
-      "subject": "Announcement - Salona Cotspin Limited has informed the Exchange regarding Outcome of Board Meeting held on Jun 30, 2026 regarding appointment of Mr Manoj Kumar Jhajharia as Managing Director and Mr Shyam Lal Agarwala as Chairman and Di",
-      "ex_date": "30-Jun-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 258.85,
-      "pct": 0.88
     },
     {
       "symbol": "THYROCARE",
@@ -3292,7 +3606,7 @@
     {
       "symbol": "NDRAUTO",
       "company": "Ndr Auto Components Limited",
-      "subject": "Final Dividend - Rs 4.00 per equity share",
+      "subject": "Final Dividend - Rs 4.00 per equity share and Final Dividend - Rs 6.00 per equity share",
       "ex_date": "20-Jul-2026",
       "record_date": "20-Jul-2026",
       "bc_start": "",
@@ -3942,7 +4256,7 @@
     {
       "symbol": "PRUDENT",
       "company": "Prudent Corporate Advisory Services Limited",
-      "subject": "Final Dividend - Rs 3.50 per equity share",
+      "subject": "Final Dividend - Rs 13900.00 per equity share and Final Dividend - Rs 3.50 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
@@ -3994,7 +4308,7 @@
     {
       "symbol": "MGEL",
       "company": "Mangalam Global Enterprise Limited",
-      "subject": "Final Dividend - Rs 0.01 per equity share",
+      "subject": "Final Dividend - Rs 5.00 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
@@ -4020,7 +4334,7 @@
     {
       "symbol": "MWL",
       "company": "Mangalam Worldwide Limited",
-      "subject": "Final Dividend - Rs 0.30 per equity share",
+      "subject": "Final Dividend - Rs 5.00 per equity share and Final Dividend - Rs 10.00 per equity share",
       "ex_date": "17-Jul-2026",
       "record_date": "17-Jul-2026",
       "bc_start": "",
@@ -4098,7 +4412,7 @@
     {
       "symbol": "ABREL",
       "company": "Aditya Birla Real Estate Limited",
-      "subject": "Final Dividend - Rs 2.50 per equity share",
+      "subject": "Final Dividend - Rs 2.50 per equity share and Final Dividend - Rs 8136.00 per equity share",
       "ex_date": "14-Jul-2026",
       "record_date": "14-Jul-2026",
       "bc_start": "",
@@ -4393,6 +4707,19 @@
       "offer_price": 0.0
     },
     {
+      "symbol": "LXCHEM",
+      "company": "Laxmi Organic Industries Limited",
+      "subject": "Final Dividend - Rs 2.00 per equity share",
+      "ex_date": "21-Jul-2026",
+      "record_date": "21-Jul-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 154.97,
+      "pct": 0.52
+    },
+    {
       "symbol": "HAPPYFORGE",
       "company": "Happy Forgings Limited",
       "subject": "Final Dividend - Rs 4.00 per equity share",
@@ -4510,64 +4837,53 @@
       "pct": 3.61
     }
   ],
-  "corporate_sources": {
-    "NSE": 90,
-    "NSE-ANN": 210,
-    "NSE-ANN-BACKFILL+CACHE": 45
-  },
+  "corporate_sources": {},
   "earnings_calendar": [],
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-06-30T22:28:41.353513",
+      "last_attempt": "2026-06-30T17:30:55.272617",
       "last_count": 4,
-      "last_success": "2026-06-30T22:28:41.353513",
+      "last_success": "2026-06-30T17:30:55.272617",
       "message": ""
     },
     "NSE_CA": {
       "status": "ok",
-      "last_attempt": "2026-06-30T22:28:45.634071",
-      "last_count": 90,
-      "last_success": "2026-06-30T22:28:45.634071",
+      "last_attempt": "2026-06-29T21:02:00.239803",
+      "last_count": 94,
+      "last_success": "2026-06-29T21:02:00.239803",
       "message": ""
     },
     "NSE_BM": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T22:28:46.383989",
+      "last_attempt": "2026-06-29T21:02:00.820169",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "NSE_ANN": {
       "status": "ok",
-      "last_attempt": "2026-06-30T22:28:58.592856",
-      "last_count": 216,
-      "last_success": "2026-06-30T22:28:58.592856",
+      "last_attempt": "2026-06-29T21:02:02.245198",
+      "last_count": 28,
+      "last_success": "2026-06-29T21:02:02.245198",
       "message": ""
     },
     "NSE_ER": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T22:29:15.740711",
+      "last_attempt": "2026-06-29T21:02:18.362299",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "BSE_CA": {
       "status": "no-data",
-      "last_attempt": "2026-06-30T22:29:38.984042",
-      "last_count": 0,
-      "last_success": "",
-      "message": ""
-    },
-    "DIV_CSV": {
-      "status": "no-data",
-      "last_attempt": "2026-06-30T22:29:38.984042",
+      "last_attempt": "2026-06-29T21:02:21.105278",
       "last_count": 0,
       "last_success": "",
       "message": ""
     }
   },
-  "insider_trading": [],
+  "insider_trading": null,
   "bulk_deals": null,
   "block_deals": null,
   "errors": []
