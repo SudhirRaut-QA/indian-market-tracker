@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-10-01 22:22:10 IST",
+  "timestamp": "2026-10-02T14:41:05.748403",
   "fii_dii": {
-    "timestamp": "2026-10-01T22:22:13.096011",
+    "timestamp": "2026-10-02T14:41:08.568146",
     "date": "01-Oct-2026",
     "fii": {
       "buy": 12260.26,
@@ -273,7 +273,7 @@
   },
   "market_status": {
     "Capital Market": {
-      "status": "Closed",
+      "status": "Close",
       "trade_date": "01-Oct-2026 15:30",
       "index": "NIFTY 50",
       "last": 22421.95,
@@ -281,7 +281,7 @@
       "pct": -0.88
     },
     "Currency": {
-      "status": "Closed",
+      "status": "Close",
       "trade_date": "01-Oct-2026",
       "index": "",
       "last": "",
@@ -289,7 +289,7 @@
       "pct": ""
     },
     "Commodity": {
-      "status": "Open",
+      "status": "Close",
       "trade_date": "01-Oct-2026",
       "index": "",
       "last": "",
@@ -297,7 +297,7 @@
       "pct": ""
     },
     "Debt": {
-      "status": "Closed",
+      "status": "Close",
       "trade_date": "01-Oct-2026",
       "index": "",
       "last": "",
@@ -313,7 +313,7 @@
       "pct": -1.34
     },
     "currencyfuture": {
-      "status": "Closed",
+      "status": "Close",
       "trade_date": "01-Oct-2026",
       "index": "",
       "last": "96.5425",
@@ -332,74 +332,74 @@
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4195.8,
-      "pct": 0.66
+      "last": 4211.6,
+      "pct": 1.04
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 2.967,
-      "pct": -1.1
+      "last": 2.937,
+      "pct": -2.1
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 60.95,
-      "pct": -0.44
+      "last": 61.4,
+      "pct": 0.29
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 91.83,
-      "pct": -0.83
+      "last": 89.51,
+      "pct": -3.34
     }
   },
   "global_indices": {
     "S&P 500": {
       "symbol": "^GSPC",
-      "last": 7641.69,
-      "pct": -0.81
+      "last": 7666.45,
+      "pct": -0.49
     },
     "NASDAQ": {
       "symbol": "^IXIC",
-      "last": 26796.242,
-      "pct": -0.53
+      "last": 26871.6,
+      "pct": -0.25
     },
     "DOW": {
       "symbol": "^DJI",
-      "last": 50799.63,
-      "pct": -1.07
+      "last": 50926.56,
+      "pct": -0.82
     },
     "NIKKEI": {
       "symbol": "^N225",
-      "last": 66753.72,
-      "pct": 0.59
+      "last": 68309.46,
+      "pct": 3.69
     },
     "HANG SENG": {
       "symbol": "^HSI",
-      "last": 24613.27,
-      "pct": -0.89
+      "last": 23972.29,
+      "pct": -3.19
     },
     "FTSE": {
       "symbol": "^FTSE",
-      "last": 10428.27,
-      "pct": -2.36
+      "last": 10500.96,
+      "pct": -1.82
     }
   },
   "global_sentiment": {
     "fear_greed": {
-      "score": 26.8,
+      "score": 27.17,
       "rating": "fear",
-      "previous_close": 30.8285714285714,
-      "timestamp": "2026-10-01T16:51:29+00:00"
+      "previous_close": 28.0857142857143,
+      "timestamp": "2026-10-02T08:55:01+00:00"
     },
     "macro": {
       "DXY": {
         "symbol": "DX-Y.NYB",
-        "last": 102.151,
-        "pct": 0.94
+        "last": 101.931,
+        "pct": 0.72
       },
       "BRENT": {
         "symbol": "BZ=F",
-        "last": 101.11,
-        "pct": -3.96
+        "last": 99.36,
+        "pct": -5.62
       }
     }
   },
@@ -407,732 +407,55 @@
   "sectors": {},
   "option_chain": {},
   "preopen": null,
-  "corporate_actions": [
-    {
-      "symbol": "IGL",
-      "company": "Indraprastha Gas Limited",
-      "subject": "Dividend - Rs 1.50 Per Share",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 142.79,
-      "pct": -1.94
-    },
-    {
-      "symbol": "RSYSTEMS",
-      "company": "R Systems International Limited",
-      "subject": "Interim Dividend - Rs 8 Per Share",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 263.6,
-      "pct": -5.82
-    },
-    {
-      "symbol": "NATCOPHARM",
-      "company": "Natco Pharma Limited",
-      "subject": "Rights 2:21 @ Premium Rs 748/-",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 821.3,
-      "pct": -0.75
-    },
-    {
-      "symbol": "KMSUGAR",
-      "company": "K.M.Sugar Mills Limited",
-      "subject": "Demerger",
-      "ex_date": "01-Oct-2026",
-      "record_date": "02-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 27.74,
-      "pct": -17.64
-    },
-    {
-      "symbol": "NMDC",
-      "company": "NMDC Limited",
-      "subject": "Dividend - Re 1 Per Share",
-      "ex_date": "05-Oct-2026",
-      "record_date": "05-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 74.64,
-      "pct": -2.48
-    },
-    {
-      "symbol": "VERANDA",
-      "company": "Veranda Learning Solutions Limited",
-      "subject": "Demerger",
-      "ex_date": "06-Oct-2026",
-      "record_date": "06-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 213.8,
-      "pct": -3.15
-    },
-    {
-      "symbol": "BLSE",
-      "company": "BLS E-Services Limited",
-      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 5/- Per Share",
-      "ex_date": "06-Oct-2026",
-      "record_date": "06-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 322.05,
-      "pct": -1.99
-    },
-    {
-      "symbol": "PTC",
-      "company": "PTC India Limited",
-      "subject": "Dividend - Rs 5.50 Per Share",
-      "ex_date": "07-Oct-2026",
-      "record_date": "07-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 154.79,
-      "pct": -0.49
-    },
-    {
-      "symbol": "BUILDPRO",
-      "company": "Shankara Buildpro Limited",
-      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
-      "ex_date": "08-Oct-2026",
-      "record_date": "08-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 1249.2,
-      "pct": 1.48
-    },
-    {
-      "symbol": "BHAGYANGR",
-      "company": "Bhagyanagar India Limited",
-      "subject": "Demerger",
-      "ex_date": "08-Oct-2026",
-      "record_date": "08-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 402.65,
-      "pct": -2.07
-    },
-    {
-      "symbol": "MOLDTKPAC",
-      "company": "Mold-Tek Packaging Limited",
-      "subject": "Bonus 1:1",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "-",
-      "bc_end": "-",
-      "source": "NSE",
-      "offer_price": 0.0,
-      "ltp": 658.85,
-      "pct": -0.26
-    },
-    {
-      "symbol": "SUNTECK",
-      "company": "Sunteck Realty Limited",
-      "subject": "Announcement - Sunteck Realty Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 279.45,
-      "pct": 0.74
-    },
-    {
-      "symbol": "JUBLINGREA",
-      "company": "Jubilant Ingrevia Limited",
-      "subject": "Announcement - Jubilant Ingrevia Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 638.0,
-      "pct": -2.33
-    },
-    {
-      "symbol": "XTGLOBAL",
-      "company": "Xtglobal Infotech Limited",
-      "subject": "Announcement - Sir/Madam, In continuation of our earlier intimation regarding declaration of Interim Dividend, we wish to inform you that the Company has today, 1 October 2026, completed the payment of Interim Dividend of &#8377;0.05 (",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 28.69,
-      "pct": -1.71
-    },
-    {
-      "symbol": "JUBLINGREA",
-      "company": "Jubilant Ingrevia Limited",
-      "subject": "Announcement - Jubilant Ingrevia Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026 for incorporation of a wholly owned subsidiary",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 638.0,
-      "pct": -2.33
-    },
-    {
-      "symbol": "BLISSGVS",
-      "company": "Bliss GVS Pharma Limited",
-      "subject": "Announcement - Bliss GVS Pharma Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 683.6,
-      "pct": -1.56
-    },
-    {
-      "symbol": "AMBER",
-      "company": "Amber Enterprises India Limited",
-      "subject": "Announcement - Pursuant to Regulation 30 of SEBI LODR Regulations, we wish to update the exchange on the Scheme of Amalgamation of AmberPR Technoplast India Private Limited with and into the Company. In context of hearing held on 25th ",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 6500.0,
-      "pct": -2.59
-    },
-    {
-      "symbol": "FINOPB",
-      "company": "Fino Payments Bank Limited",
-      "subject": "Announcement - Fino Payments Bank Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 128.22,
-      "pct": 0.79
-    },
-    {
-      "symbol": "NAVKARURB",
-      "company": "Navkar Urbanstructure Limited",
-      "subject": "Announcement - Navkar Urbanstructure Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 0.85,
-      "pct": -1.16
-    },
-    {
-      "symbol": "GFSTEELS",
-      "company": "Grand Foundry Limited",
-      "subject": "Announcement - Grand Foundry Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 38.29,
-      "pct": 1.97
-    },
-    {
-      "symbol": "TCS",
-      "company": "Tata Consultancy Services Limited",
-      "subject": "Announcement - Tata Consultancy Services Limited has informed the Exchange regarding Outcome of Meeting of Investment Committee, as empowered by the Board, held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2075.0,
-      "pct": 1.19
-    },
-    {
-      "symbol": "FINKURVE",
-      "company": "Finkurve Financial Services Limited",
-      "subject": "Announcement - Finkurve Financial Services Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 70.53,
-      "pct": 3.84
-    },
-    {
-      "symbol": "KSHINTL",
-      "company": "KSH International Limited",
-      "subject": "Announcement - KSH International Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1028.2,
-      "pct": 2.71
-    },
-    {
-      "symbol": "AARTIIND",
-      "company": "Aarti Industries Limited",
-      "subject": "Announcement - Aarti Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026 - Fund Raising (Enabling Approval).",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 465.1,
-      "pct": -2.23
-    },
-    {
-      "symbol": "GLAND",
-      "company": "Gland Pharma Limited",
-      "subject": "Announcement - Gland Pharma Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2874.4,
-      "pct": -0.86
-    },
-    {
-      "symbol": "MOMSBELIEF",
-      "company": "Rays of Belief Limited",
-      "subject": "Announcement - Rays of Belief Limited has informed the Exchange regarding a press release dated October 01, 2026, titled \"Rays of Belief Ltd (Mom s Belief) Unaudited Financial Results (Standalone & Consolidated) for the Quarter ended J",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 226.92,
-      "pct": -3.29
-    },
-    {
-      "symbol": "REMSONSIND",
-      "company": "Remsons Industries Limited",
-      "subject": "Announcement - Remsons Industries Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 112.55,
-      "pct": -1.21
-    },
-    {
-      "symbol": "HIKAL",
-      "company": "Hikal Limited",
-      "subject": "Announcement - Hikal Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 218.14,
-      "pct": 0.11
-    },
-    {
-      "symbol": "SALSTEEL",
-      "company": "S.A.L. Steel Limited",
-      "subject": "Announcement - S.A.L. Steel Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 98.92,
-      "pct": -0.14
-    },
-    {
-      "symbol": "NECCLTD",
-      "company": "North Eastern Carrying Corporation Limited",
-      "subject": "Announcement - North Eastern Carrying Corporation Limited has informed the Exchange regarding Outcome of Board Meeting held on October 01, 2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 18.41,
-      "pct": -0.05
-    },
-    {
-      "symbol": "LUPIN",
-      "company": "Lupin Limited",
-      "subject": "Announcement - Lupin Limited has informed the Exchange about Multicare Pharmaceuticals Philippines, Inc. ('MPPI') has completed buyback of 30,559 shares, pursuant to which MPPI has become a step-down wholly owned subsidiary of the Comp",
-      "ex_date": "01-Oct-2026",
-      "record_date": "",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2031.2,
-      "pct": 0.05
-    },
-    {
-      "symbol": "MOLDTECH",
-      "company": "Mold-Tek Technologies Limited",
-      "subject": "Announcement - Mold-Tek Technologies Limited has informed the Exchange that Record date for the purpose of Bonus  is 09-Oct-2026.",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 204.78,
-      "pct": -0.67
-    },
-    {
-      "symbol": "MOLDTKPAC",
-      "company": "Mold-Tek Packaging Limited",
-      "subject": "Announcement - Mold-Tek Packaging Limited has informed the Exchange that Record date for the purpose of Bonus  is 09-Oct-2026.",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 658.85,
-      "pct": -0.26
-    },
-    {
-      "symbol": "RSYSTEMS",
-      "company": "R Systems International Limited",
-      "subject": "Announcement - R Systems International Limited has informed the Exchange that Record date for the purpose of Dividend  is 01-Oct-2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 263.6,
-      "pct": -5.82
-    },
-    {
-      "symbol": "BHAGYANGR",
-      "company": "Bhagyanagar India Limited",
-      "subject": "Announcement - Bhagyanagar India Limited has informed the Exchange that Record date for the purpose of Merger/HiveOff  is 08-Oct-2026.",
-      "ex_date": "08-Oct-2026",
-      "record_date": "08-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 402.65,
-      "pct": -2.07
-    },
-    {
-      "symbol": "NATCOPHARM",
-      "company": "Natco Pharma Limited",
-      "subject": "Announcement - Natco Pharma Limited has informed the Exchange that Record date for the purpose of Rights  is 01-Oct-2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 821.3,
-      "pct": -0.75
-    },
-    {
-      "symbol": "BANSALWIRE",
-      "company": "Bansal Wire Industries Limited",
-      "subject": "Announcement - Bansal Wire Industries Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 16-Oct-2026.",
-      "ex_date": "16-Oct-2026",
-      "record_date": "16-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 323.05,
-      "pct": -0.12
-    },
-    {
-      "symbol": "VERANDA",
-      "company": "Veranda Learning Solutions Limited",
-      "subject": "Announcement - Veranda Learning Solutions Limited has informed the Exchange regarding a press release dated September 24, 2026, titled \"Veranda Learning Solutions Limited fixes October 6, 2026 as Record Date for Commerce Vertical Demer",
-      "ex_date": "06-Oct-2026",
-      "record_date": "06-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 213.8,
-      "pct": -3.15
-    },
-    {
-      "symbol": "TCS",
-      "company": "Tata Consultancy Services Limited",
-      "subject": "Announcement - Tata Consultancy Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Oct-2026.",
-      "ex_date": "14-Oct-2026",
-      "record_date": "14-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 2075.0,
-      "pct": 1.19
-    },
-    {
-      "symbol": "JSWDULUX",
-      "company": "JSW Dulux Limited",
-      "subject": "Announcement - JSW Dulux Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 22-Oct-2026.",
-      "ex_date": "22-Oct-2026",
-      "record_date": "22-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 3020.6,
-      "pct": -1.9
-    },
-    {
-      "symbol": "KMSUGAR",
-      "company": "K.M.Sugar Mills Limited",
-      "subject": "Announcement - K.M.Sugar Mills Limited has informed the Exchange that Record date for the purpose of Merger/HiveOf  is 02-Oct-2026.",
-      "ex_date": "02-Oct-2026",
-      "record_date": "02-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 27.74,
-      "pct": -17.64
-    },
-    {
-      "symbol": "BLSE",
-      "company": "BLS E-Services Limited",
-      "subject": "Announcement - BLS E-Services Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 06-Oct-2026.",
-      "ex_date": "06-Oct-2026",
-      "record_date": "06-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 322.05,
-      "pct": -1.99
-    },
-    {
-      "symbol": "SKYWAYS",
-      "company": "Skyways Air Services Limited",
-      "subject": "Announcement - Skyways Air Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 09-Oct-2026.",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 110.29,
-      "pct": -2.62
-    },
-    {
-      "symbol": "BUILDPRO",
-      "company": "Shankara Buildpro Limited",
-      "subject": "Announcement - Shankara Buildpro Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 08-Oct-2026.",
-      "ex_date": "08-Oct-2026",
-      "record_date": "08-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1249.2,
-      "pct": 1.48
-    },
-    {
-      "symbol": "IGL",
-      "company": "Indraprastha Gas Limited",
-      "subject": "Announcement - Indraprastha Gas Limited has informed the Exchange that Record date for the purpose of Final Dividend for FY 2025-26  is 01-Oct-2026.",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 142.79,
-      "pct": -1.94
-    },
-    {
-      "symbol": "NMDC",
-      "company": "NMDC Limited",
-      "subject": "Announcement - NMDC Limited has informed the Exchange that Record date for the purpose of Dividend  is 05-Oct-2026.",
-      "ex_date": "05-Oct-2026",
-      "record_date": "05-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 74.64,
-      "pct": -2.48
-    },
-    {
-      "symbol": "PTC",
-      "company": "PTC India Limited",
-      "subject": "Announcement - PTC India Limited has informed the Exchange that Record date for the purpose of final Dividend (if declared) is 07-Oct-2026.",
-      "ex_date": "07-Oct-2026",
-      "record_date": "07-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 154.79,
-      "pct": -0.49
-    },
-    {
-      "symbol": "KAJARIACER",
-      "company": "Kajaria Ceramics Limited",
-      "subject": "Announcement - The Board of Directors of the Company, at their meeting held on April 30, 2026, had recommended final dividend of Rs. 6/- per equity shares of face value of Re. 1/- each and the final dividend, if declared at the 40th An",
-      "ex_date": "14-Oct-2026",
-      "record_date": "14-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1225.1,
-      "pct": -0.81
-    },
-    {
-      "symbol": "ACCELYA",
-      "company": "Accelya Solutions India Limited",
-      "subject": "Announcement - Accelya Solutions India Limited has informed the Exchange that Record date for the purpose of Dividend  is 09-Oct-2026.",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN",
-      "offer_price": 0.0,
-      "ltp": 1094.2,
-      "pct": 0.36
-    },
-    {
-      "symbol": "XTGLOBAL",
-      "company": "Xtglobal Infotech Limited",
-      "subject": "Interim Dividend - Rs 0.05 per equity share",
-      "ex_date": "01-Oct-2026",
-      "record_date": "01-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 28.69,
-      "pct": -1.71
-    },
-    {
-      "symbol": "TCS",
-      "company": "Tata Consultancy Services Limited",
-      "subject": "Interim Dividend - Rs 12.00 per equity share",
-      "ex_date": "14-Oct-2026",
-      "record_date": "14-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 2075.0,
-      "pct": 1.19
-    },
-    {
-      "symbol": "ACCELYA",
-      "company": "Accelya Solutions India Limited",
-      "subject": "Final Dividend - Rs 35.00 per equity share",
-      "ex_date": "09-Oct-2026",
-      "record_date": "09-Oct-2026",
-      "bc_start": "",
-      "bc_end": "",
-      "source": "NSE-ANN-BACKFILL+CACHE",
-      "offer_price": 0.0,
-      "ltp": 1094.2,
-      "pct": 0.36
-    }
-  ],
+  "corporate_actions": null,
   "corporate_sources": {},
   "earnings_calendar": [],
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-10-01T22:12:45.621600",
+      "last_attempt": "2026-10-02T14:42:44.748253",
       "last_count": 4,
-      "last_success": "2026-10-01T22:12:45.621600",
+      "last_success": "2026-10-02T14:42:44.748253",
       "message": ""
     },
     "NSE_CA": {
       "status": "ok",
-      "last_attempt": "2026-09-30T21:46:36.182729",
-      "last_count": 10,
-      "last_success": "2026-09-30T21:46:36.182729",
+      "last_attempt": "2026-10-01T22:23:49.841739",
+      "last_count": 11,
+      "last_success": "2026-10-01T22:23:49.841739",
       "message": ""
     },
     "NSE_BM": {
       "status": "no-data",
-      "last_attempt": "2026-09-30T21:46:36.806578",
+      "last_attempt": "2026-10-01T22:23:50.385422",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "NSE_ANN": {
       "status": "ok",
-      "last_attempt": "2026-09-30T21:46:56.194084",
-      "last_count": 76,
-      "last_success": "2026-09-30T21:46:56.194084",
+      "last_attempt": "2026-10-01T22:24:04.919895",
+      "last_count": 40,
+      "last_success": "2026-10-01T22:24:04.919895",
       "message": ""
     },
     "NSE_ER": {
       "status": "no-data",
-      "last_attempt": "2026-09-30T21:47:12.716610",
+      "last_attempt": "2026-10-01T22:24:21.068041",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "BSE_CA": {
       "status": "no-data",
-      "last_attempt": "2026-09-30T21:47:16.792156",
+      "last_attempt": "2026-10-01T22:24:24.242289",
       "last_count": 0,
       "last_success": "",
       "message": ""
     },
     "DIV_CSV": {
       "status": "no-data",
-      "last_attempt": "2026-09-30T21:47:16.793053",
+      "last_attempt": "2026-10-01T22:24:24.242996",
       "last_count": 0,
       "last_success": "",
       "message": ""
