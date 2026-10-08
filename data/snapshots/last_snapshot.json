@@ -1,51 +1,51 @@
 {
-  "timestamp": "2026-10-08T15:10:51.656566",
+  "timestamp": "2026-10-08 22:35:40 IST",
   "fii_dii": {
-    "timestamp": "2026-10-08T15:10:53.913742",
-    "date": "07-Oct-2026",
+    "timestamp": "2026-10-08T22:35:42.901026",
+    "date": "08-Oct-2026",
     "fii": {
-      "buy": 12577.96,
-      "sell": 18699.33,
-      "net": -6121.37
+      "buy": 15725.45,
+      "sell": 28669.03,
+      "net": -12943.58
     },
     "dii": {
-      "buy": 18707.03,
-      "sell": 14110.46,
-      "net": 4596.57
+      "buy": 22987.97,
+      "sell": 12284.86,
+      "net": 10703.11
     },
-    "total_net": -1524.8000000000002,
+    "total_net": -2240.4699999999993,
     "signal": "DII Defensive",
     "interpretation": "FII selling, DII buying — DII supporting"
   },
   "indices": {
     "NIFTY 50": {
-      "last": 22191.4,
-      "change": -411.65,
-      "pct": -1.82,
+      "last": 22231.8,
+      "change": -371.25,
+      "pct": -1.64,
       "open": 22599.05,
       "high": 22599.05,
       "low": 22179.9,
       "prev_close": 22603.05,
-      "advances": "4",
-      "declines": "46",
+      "advances": "3",
+      "declines": "47",
       "unchanged": "0"
     },
     "NIFTY NEXT 50": {
-      "last": 67627.95,
-      "change": -1776.05,
-      "pct": -2.56,
+      "last": 67614.5,
+      "change": -1789.5,
+      "pct": -2.58,
       "open": 69365.1,
       "high": 69383.9,
-      "low": 67605.1,
+      "low": 67591.3,
       "prev_close": 69404,
       "advances": "1",
       "declines": "49",
       "unchanged": "0"
     },
     "NIFTY BANK": {
-      "last": 54438.4,
-      "change": -617.15,
-      "pct": -1.12,
+      "last": 54515.05,
+      "change": -540.5,
+      "pct": -0.98,
       "open": 55042.9,
       "high": 55043,
       "low": 54383.15,
@@ -55,21 +55,21 @@
       "unchanged": "0"
     },
     "NIFTY FINANCIAL SERVICES": {
-      "last": 24601,
-      "change": -315.4,
-      "pct": -1.27,
+      "last": 24640.45,
+      "change": -275.95,
+      "pct": -1.11,
       "open": 24882,
       "high": 24888.05,
       "low": 24567.05,
       "prev_close": 24916.4,
-      "advances": "4",
-      "declines": "16",
+      "advances": "3",
+      "declines": "17",
       "unchanged": "0"
     },
     "NIFTY MIDCAP 50": {
-      "last": 16539.05,
-      "change": -451.8,
-      "pct": -2.66,
+      "last": 16530.9,
+      "change": -459.95,
+      "pct": -2.71,
       "open": 16964.3,
       "high": 16964.3,
       "low": 16522.7,
@@ -79,9 +79,9 @@
       "unchanged": "0"
     },
     "INDIA VIX": {
-      "last": 15.33,
-      "change": 1.44,
-      "pct": 10.4,
+      "last": 15.31,
+      "change": 1.42,
+      "pct": 10.26,
       "open": 13.89,
       "high": 15.48,
       "low": 11.97,
@@ -91,33 +91,33 @@
       "unchanged": 0
     },
     "NIFTY SMALLCAP 50": {
-      "last": 9496.15,
-      "change": -232.35,
-      "pct": -2.39,
+      "last": 9486.8,
+      "change": -241.7,
+      "pct": -2.48,
       "open": 9733,
       "high": 9735.35,
-      "low": 9489.7,
+      "low": 9477.3,
       "prev_close": 9728.5,
       "advances": "2",
       "declines": "48",
       "unchanged": "0"
     },
     "NIFTY AUTO": {
-      "last": 24550,
-      "change": -588.9,
-      "pct": -2.34,
+      "last": 24512.7,
+      "change": -626.2,
+      "pct": -2.49,
       "open": 25101.65,
       "high": 25115.25,
-      "low": 24538.95,
+      "low": 24512.7,
       "prev_close": 25138.9,
       "advances": "0",
       "declines": "15",
       "unchanged": "0"
     },
     "NIFTY FMCG": {
-      "last": 43798.4,
-      "change": -1002.45,
-      "pct": -2.24,
+      "last": 43898.05,
+      "change": -902.8,
+      "pct": -2.02,
       "open": 44709.8,
       "high": 44944.55,
       "low": 43764.55,
@@ -127,9 +127,9 @@
       "unchanged": "0"
     },
     "NIFTY IT": {
-      "last": 27724.25,
-      "change": -33.55,
-      "pct": -0.12,
+      "last": 27736.6,
+      "change": -21.2,
+      "pct": -0.08,
       "open": 27920.9,
       "high": 28378.9,
       "low": 27658,
@@ -139,21 +139,21 @@
       "unchanged": "0"
     },
     "NIFTY METAL": {
-      "last": 11871,
-      "change": -435.7,
-      "pct": -3.54,
+      "last": 11870.05,
+      "change": -436.65,
+      "pct": -3.55,
       "open": 12310.45,
       "high": 12312.1,
-      "low": 11859.3,
+      "low": 11856.55,
       "prev_close": 12306.7,
       "advances": "0",
       "declines": "15",
       "unchanged": "0"
     },
     "NIFTY PHARMA": {
-      "last": 25786.45,
-      "change": -650.1,
-      "pct": -2.46,
+      "last": 25823.25,
+      "change": -613.3,
+      "pct": -2.32,
       "open": 26462.15,
       "high": 26501.4,
       "low": 25763.05,
@@ -163,33 +163,33 @@
       "unchanged": "0"
     },
     "NIFTY PSU BANK": {
-      "last": 8005.9,
-      "change": -82.8,
-      "pct": -1.02,
+      "last": 7995.95,
+      "change": -92.75,
+      "pct": -1.15,
       "open": 8087.95,
       "high": 8145.95,
-      "low": 7997.7,
+      "low": 7995.85,
       "prev_close": 8088.7,
       "advances": "1",
       "declines": "11",
       "unchanged": "0"
     },
     "NIFTY REALTY": {
-      "last": 798.9,
-      "change": -23.7,
-      "pct": -2.88,
+      "last": 796.6,
+      "change": -26,
+      "pct": -3.16,
       "open": 822.25,
       "high": 822.55,
-      "low": 797.4,
+      "low": 796.6,
       "prev_close": 822.6,
       "advances": "0",
       "declines": "10",
       "unchanged": "0"
     },
     "NIFTY OIL & GAS": {
-      "last": 10339.35,
-      "change": -283.45,
-      "pct": -2.67,
+      "last": 10354.65,
+      "change": -268.15,
+      "pct": -2.52,
       "open": 10619.2,
       "high": 10619.2,
       "low": 10326.15,
@@ -199,45 +199,45 @@
       "unchanged": "0"
     },
     "NIFTY100 LOW VOLATILITY 30": {
-      "last": 18331.2,
-      "change": -348.7,
-      "pct": -1.87,
+      "last": 18351.2,
+      "change": -328.7,
+      "pct": -1.76,
       "open": 18666,
       "high": 18672.2,
       "low": 18322.7,
       "prev_close": 18679.9,
-      "advances": "1",
-      "declines": "29",
+      "advances": "0",
+      "declines": "30",
       "unchanged": "0"
     },
     "NIFTY200 MOMENTUM 30": {
-      "last": 28842.45,
-      "change": -845.45,
+      "last": 28841.4,
+      "change": -846.5,
       "pct": -2.85,
       "open": 29674.4,
       "high": 29676.8,
-      "low": 28823.65,
+      "low": 28822.65,
       "prev_close": 29687.9,
       "advances": "0",
       "declines": "30",
       "unchanged": "0"
     },
     "NIFTY HIGH BETA 50": {
-      "last": 4053.8,
-      "change": -115.5,
-      "pct": -2.77,
+      "last": 4051.25,
+      "change": -118.05,
+      "pct": -2.83,
       "open": 4163.35,
       "high": 4164.25,
-      "low": 4051.85,
+      "low": 4050.8,
       "prev_close": 4169.3,
       "advances": "1",
       "declines": "49",
       "unchanged": "0"
     },
     "NIFTY COMMODITIES": {
-      "last": 8850.75,
-      "change": -256.5,
-      "pct": -2.82,
+      "last": 8851.4,
+      "change": -255.85,
+      "pct": -2.81,
       "open": 9102.7,
       "high": 9102.7,
       "low": 8845.4,
@@ -247,9 +247,9 @@
       "unchanged": "0"
     },
     "NIFTY ENERGY": {
-      "last": 35608.05,
-      "change": -1075.4,
-      "pct": -2.93,
+      "last": 35649.3,
+      "change": -1034.15,
+      "pct": -2.82,
       "open": 36691.45,
       "high": 36691.45,
       "low": 35582.5,
@@ -259,9 +259,9 @@
       "unchanged": "0"
     },
     "NIFTY INDIA DEFENCE": {
-      "last": 8944.65,
-      "change": -270.7,
-      "pct": -2.94,
+      "last": 8961.25,
+      "change": -254.1,
+      "pct": -2.76,
       "open": 9208.15,
       "high": 9213.7,
       "low": 8930.45,
@@ -273,15 +273,15 @@
   },
   "market_status": {
     "Capital Market": {
-      "status": "Open",
-      "trade_date": "08-Oct-2026 15:09",
+      "status": "Closed",
+      "trade_date": "08-Oct-2026 15:30",
       "index": "NIFTY 50",
-      "last": 22187.55,
-      "variation": -415.5,
-      "pct": -1.84
+      "last": 22231.8,
+      "variation": -371.25,
+      "pct": -1.64
     },
     "Currency": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "08-Oct-2026",
       "index": "",
       "last": "",
@@ -297,7 +297,7 @@
       "pct": ""
     },
     "Debt": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "08-Oct-2026",
       "index": "",
       "last": "",
@@ -308,15 +308,15 @@
       "status": "",
       "trade_date": "",
       "index": "NIFTY50 USD",
-      "last": 7944.05,
+      "last": 7958.3,
       "variation": 0,
-      "pct": -1.83
+      "pct": -1.66
     },
     "currencyfuture": {
-      "status": "Open",
+      "status": "Closed",
       "trade_date": "08-Oct-2026",
       "index": "",
-      "last": "96.9825",
+      "last": "97.1300",
       "variation": "",
       "pct": ""
     }
@@ -332,74 +332,74 @@
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4148.4,
-      "pct": -0.2
+      "last": 4147.2,
+      "pct": -0.23
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 3.236,
-      "pct": 5.54
+      "last": 3.153,
+      "pct": 2.84
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 59.2,
-      "pct": -2.74
+      "last": 59.105,
+      "pct": -2.9
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 91.58,
-      "pct": 2.4
+      "last": 91.03,
+      "pct": 1.79
     }
   },
   "global_indices": {
     "S&P 500": {
       "symbol": "^GSPC",
-      "last": 7801.77,
-      "pct": 1.96
+      "last": 7747.04,
+      "pct": 1.05
     },
     "NASDAQ": {
       "symbol": "^IXIC",
-      "last": 27538.69,
-      "pct": 2.52
+      "last": 27182.744,
+      "pct": 1.16
     },
     "DOW": {
       "symbol": "^DJI",
-      "last": 51179.87,
-      "pct": 0.54
+      "last": 51048.16,
+      "pct": 0.24
     },
     "NIKKEI": {
       "symbol": "^N225",
-      "last": 69042.11,
-      "pct": 1.07
+      "last": 70035.71,
+      "pct": 2.53
     },
     "HANG SENG": {
       "symbol": "^HSI",
-      "last": 23785.79,
-      "pct": -3.36
+      "last": 24130.5,
+      "pct": -1.96
     },
     "FTSE": {
       "symbol": "^FTSE",
-      "last": 10411.28,
-      "pct": -0.16
+      "last": 10441.6,
+      "pct": 0.13
     }
   },
   "global_sentiment": {
     "fear_greed": {
-      "score": 44.66,
+      "score": 38.69,
       "rating": "fear",
       "previous_close": 44.5428571428571,
-      "timestamp": "2026-10-08T09:24:46+00:00"
+      "timestamp": "2026-10-08T17:04:27+00:00"
     },
     "macro": {
       "DXY": {
         "symbol": "DX-Y.NYB",
-        "last": 102.353,
-        "pct": 0.18
+        "last": 102.262,
+        "pct": 0.09
       },
       "BRENT": {
         "symbol": "BZ=F",
-        "last": 104.08,
-        "pct": 3.75
+        "last": 103.52,
+        "pct": 3.19
       }
     }
   },
@@ -407,15 +407,573 @@
   "sectors": {},
   "option_chain": {},
   "preopen": null,
-  "corporate_actions": null,
+  "corporate_actions": [
+    {
+      "symbol": "SHARDUL",
+      "company": "Shardul Securities Limited",
+      "subject": "Buy Back",
+      "ex_date": "08-Oct-2026",
+      "record_date": "08-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 57.02,
+      "pct": -2.23
+    },
+    {
+      "symbol": "BHAGYANGR",
+      "company": "Bhagyanagar India Limited",
+      "subject": "Demerger",
+      "ex_date": "08-Oct-2026",
+      "record_date": "08-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 41.4,
+      "pct": -90.89
+    },
+    {
+      "symbol": "BUILDPRO",
+      "company": "Shankara Buildpro Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "ex_date": "08-Oct-2026",
+      "record_date": "08-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 250.2,
+      "pct": -80.78
+    },
+    {
+      "symbol": "ACCELYA",
+      "company": "Accelya Solutions India Limited",
+      "subject": "Dividend - Rs 35 Per Share",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 1094.4,
+      "pct": -0.52
+    },
+    {
+      "symbol": "706GS2046",
+      "company": "GOVERNMENT OF INDIA",
+      "subject": "Interest Payment",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0
+    },
+    {
+      "symbol": "SKYWAYS",
+      "company": "Skyways Air Services Limited",
+      "subject": "Interim Dividend - Re 0.25 Per Share",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 111.14,
+      "pct": -3.12
+    },
+    {
+      "symbol": "TCI",
+      "company": "Transport Corporation of India Limited",
+      "subject": "Buy Back",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 877.05,
+      "pct": -0.97
+    },
+    {
+      "symbol": "MOLDTECH",
+      "company": "Mold-Tek Technologies Limited",
+      "subject": "Bonus 1:1",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 209.95,
+      "pct": -5.0
+    },
+    {
+      "symbol": "MOLDTKPAC",
+      "company": "Mold-Tek Packaging Limited",
+      "subject": "Bonus 1:1",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 652.1,
+      "pct": -2.26
+    },
+    {
+      "symbol": "BANSALWIRE",
+      "company": "Bansal Wire Industries Limited",
+      "subject": "Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share",
+      "ex_date": "16-Oct-2026",
+      "record_date": "16-Oct-2026",
+      "bc_start": "-",
+      "bc_end": "-",
+      "source": "NSE",
+      "offer_price": 0.0,
+      "ltp": 313.2,
+      "pct": -3.33
+    },
+    {
+      "symbol": "JAIPURKURT",
+      "company": "Nandani Creation Limited",
+      "subject": "Announcement - Nandani Creation Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 32.4,
+      "pct": 13.68
+    },
+    {
+      "symbol": "VENUSPIPES",
+      "company": "Venus Pipes & Tubes Limited",
+      "subject": "Announcement - Venus Pipes & Tubes Limited has submitted the Exchange a copy Srutinizers report of  Extraordinary General Meeting held on October 08, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2119.8,
+      "pct": -5.3
+    },
+    {
+      "symbol": "BHAGYANGR",
+      "company": "Bhagyanagar India Limited",
+      "subject": "Announcement - Bhagyanagar India Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 41.4,
+      "pct": -90.89
+    },
+    {
+      "symbol": "CUMMINSIND",
+      "company": "Cummins India Limited",
+      "subject": "Announcement - Cummins India Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 4740.9,
+      "pct": -2.69
+    },
+    {
+      "symbol": "DOLATALGO",
+      "company": "Dolat Algotech Limited",
+      "subject": "Announcement - Dolat Algotech Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026 has inter-alia considered and approved the following matters: 1. Appointment of Statutory AuditorsBased on the ",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 59.72,
+      "pct": -3.18
+    },
+    {
+      "symbol": "DOLATALGO",
+      "company": "Dolat Algotech Limited",
+      "subject": "Announcement - Dolat Algotech Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026 has that the Board of Directors of the Company in their Board meeting held on 08th October, 2026, has inter-ali",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 59.72,
+      "pct": -3.18
+    },
+    {
+      "symbol": "RAYMONDREL",
+      "company": "Raymond Realty Limited",
+      "subject": "Announcement - Raymond Realty Limited has submitted the Exchange a copy Srutinizers report of  Extraordinary General Meeting held on October 08, 2026. Further, the company has informed the Exchange regarding voting results.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 679.9,
+      "pct": -3.12
+    },
+    {
+      "symbol": "TCS",
+      "company": "Tata Consultancy Services Limited",
+      "subject": "Announcement - Tata Consultancy Services Limited has informed the Exchange that Board of Directors at its meeting held on October 8, 2026, declared Interim Dividend of Rs. 12 per equity share.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 12.0,
+      "ltp": 2076.0,
+      "pct": -0.21
+    },
+    {
+      "symbol": "SHIVAMAUTO",
+      "company": "Shivam Autotech Limited",
+      "subject": "Announcement - Shivam Autotech Limited has informed the Exchange regarding Outcome of Board Meeting held on October 08, 2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 16.84,
+      "pct": 0.96
+    },
+    {
+      "symbol": "VEDL",
+      "company": "Vedanta Limited",
+      "subject": "Announcement - Vedanta Limited has informed the Exchange that Board of Directors on October 08, 2026, declared Interim Dividend of Rs. 5 per equity share.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 5.0,
+      "ltp": 253.1,
+      "pct": -3.18
+    },
+    {
+      "symbol": "OLAELEC",
+      "company": "Ola Electric Mobility Limited",
+      "subject": "Announcement - Ola Electric Mobility Limited has informed the Exchange that Record date for the purpose of Rights Issue  is 13-Oct-2026.",
+      "ex_date": "13-Oct-2026",
+      "record_date": "13-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 34.63,
+      "pct": -4.65
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "company": "Anand Rathi Wealth Limited",
+      "subject": "Announcement - Anand Rathi Wealth Limited has informed the Exchange that Record date for the purpose of Interim Dividend is 14-Oct-2026.",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2138.9,
+      "pct": 0.55
+    },
+    {
+      "symbol": "CANFINHOME",
+      "company": "Can Fin Homes Limited",
+      "subject": "Announcement - Can Fin Homes Limited has informed the Exchange about Schedule of meet- Earnings Conference Call (Group Call) has been arranged by M/s Investec Capital Services (India) Private Ltd on Monday, October 12, 2026 at 03:00 PM",
+      "ex_date": "12-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 723.75,
+      "pct": -0.45
+    },
+    {
+      "symbol": "IRFC",
+      "company": "Indian Railway Finance Corporation Limited",
+      "subject": "Announcement - Indian Railway Finance Corporation Limited has informed the Exchange that Record date for the purpose of Dividend  is 23-Oct-2026.",
+      "ex_date": "23-Oct-2026",
+      "record_date": "23-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 74.3,
+      "pct": -2.43
+    },
+    {
+      "symbol": "WIPRO",
+      "company": "Wipro Limited",
+      "subject": "Announcement - WIPRO LIMITED TO ANNOUNCE RESULTS FOR THE SECOND QUARTER ENDED SEPTEMBER 30, 2026, ON OCTOBER 15, 2026",
+      "ex_date": "15-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 158.38,
+      "pct": -0.76
+    },
+    {
+      "symbol": "ASIANPAINT",
+      "company": "Asian Paints Limited",
+      "subject": "Announcement - Asian Paints Limited has informed the Exchange regarding 'This is to inform you that a meeting of the Board of Directors of the Company will be held on Thursday, 29th October 2026, inter alia, to consider the declaration",
+      "ex_date": "29-Oct-2026",
+      "record_date": "29-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2311.6,
+      "pct": -2.55
+    },
+    {
+      "symbol": "ANGELONE",
+      "company": "Angel One Limited",
+      "subject": "Announcement - Angel One Limited has informed the Exchange that Record date for the purpose of Dividend  is 22-Oct-2026.",
+      "ex_date": "22-Oct-2026",
+      "record_date": "22-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 295.0,
+      "pct": -2.32
+    },
+    {
+      "symbol": "PRIVISCL",
+      "company": "Privi Speciality Chemicals Limited",
+      "subject": "Announcement - Privi Speciality Chemicals Limited has informed the Exchange about Notice of Meeting of Equity Shareholders (Meeting) of the Company in the matter of Scheme of Amalgamation scheduled to be held on  on Tuesday, October 27",
+      "ex_date": "27-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 3446.3,
+      "pct": -2.07
+    },
+    {
+      "symbol": "TMCV",
+      "company": "Tata Motors Limited",
+      "subject": "Announcement - Tata Motors Limited has informed the Exchange about the conference call on financial results for Q2FY27 with the investor/analysts to be held on October 23, 2026",
+      "ex_date": "23-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 413.2,
+      "pct": -3.44
+    },
+    {
+      "symbol": "VEDL",
+      "company": "Vedanta Limited",
+      "subject": "Announcement - Vedanta Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Oct-2026.",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 253.1,
+      "pct": -3.18
+    },
+    {
+      "symbol": "MAHLOG",
+      "company": "Mahindra Logistics Limited",
+      "subject": "Announcement - In compliance with Regulation 30(6) read with Schedule III and other applicable provisions of the SEBI Listing Regulations, we hereby inform you that an earnings conference call for the Unaudited Standalone and Consolida",
+      "ex_date": "23-Oct-2026",
+      "record_date": "",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 395.4,
+      "pct": -3.83
+    },
+    {
+      "symbol": "MOLDTECH",
+      "company": "Mold-Tek Technologies Limited",
+      "subject": "Announcement - Mold-Tek Technologies Limited has informed the Exchange that Record date for the purpose of Bonus  is 09-Oct-2026.",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 209.95,
+      "pct": -5.0
+    },
+    {
+      "symbol": "MOLDTKPAC",
+      "company": "Mold-Tek Packaging Limited",
+      "subject": "Announcement - Mold-Tek Packaging Limited has informed the Exchange that Record date for the purpose of Bonus  is 09-Oct-2026.",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 652.1,
+      "pct": -2.26
+    },
+    {
+      "symbol": "BHAGYANGR",
+      "company": "Bhagyanagar India Limited",
+      "subject": "Announcement - Bhagyanagar India Limited has informed the Exchange that Record date for the purpose of Merger/HiveOff  is 08-Oct-2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "08-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 41.4,
+      "pct": -90.89
+    },
+    {
+      "symbol": "BANSALWIRE",
+      "company": "Bansal Wire Industries Limited",
+      "subject": "Announcement - Bansal Wire Industries Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 16-Oct-2026.",
+      "ex_date": "16-Oct-2026",
+      "record_date": "16-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 313.2,
+      "pct": -3.33
+    },
+    {
+      "symbol": "TCS",
+      "company": "Tata Consultancy Services Limited",
+      "subject": "Announcement - Tata Consultancy Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 14-Oct-2026.",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2076.0,
+      "pct": -0.21
+    },
+    {
+      "symbol": "JSWDULUX",
+      "company": "JSW Dulux Limited",
+      "subject": "Announcement - JSW Dulux Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 22-Oct-2026.",
+      "ex_date": "22-Oct-2026",
+      "record_date": "22-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 2989.1,
+      "pct": -1.29
+    },
+    {
+      "symbol": "SKYWAYS",
+      "company": "Skyways Air Services Limited",
+      "subject": "Announcement - Skyways Air Services Limited has informed the Exchange that Record date for the purpose of Dividend  is 09-Oct-2026.",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 111.14,
+      "pct": -3.12
+    },
+    {
+      "symbol": "BUILDPRO",
+      "company": "Shankara Buildpro Limited",
+      "subject": "Announcement - Shankara Buildpro Limited has informed the Exchange that Record date for the purpose of Split/Subdivision  is 08-Oct-2026.",
+      "ex_date": "08-Oct-2026",
+      "record_date": "08-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 250.2,
+      "pct": -80.78
+    },
+    {
+      "symbol": "KAJARIACER",
+      "company": "Kajaria Ceramics Limited",
+      "subject": "Announcement - The Board of Directors of the Company, at their meeting held on April 30, 2026, had recommended final dividend of Rs. 6/- per equity shares of face value of Re. 1/- each and the final dividend, if declared at the 40th An",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1210.6,
+      "pct": -1.27
+    },
+    {
+      "symbol": "ACCELYA",
+      "company": "Accelya Solutions India Limited",
+      "subject": "Announcement - Accelya Solutions India Limited has informed the Exchange that Record date for the purpose of Dividend  is 09-Oct-2026.",
+      "ex_date": "09-Oct-2026",
+      "record_date": "09-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN",
+      "offer_price": 0.0,
+      "ltp": 1094.4,
+      "pct": -0.52
+    },
+    {
+      "symbol": "VEDL",
+      "company": "Vedanta Limited",
+      "subject": "Interim Dividend - Rs 5.00 per equity share",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 253.1,
+      "pct": -3.18
+    },
+    {
+      "symbol": "TCS",
+      "company": "Tata Consultancy Services Limited",
+      "subject": "Interim Dividend - Rs 12.00 per equity share",
+      "ex_date": "14-Oct-2026",
+      "record_date": "14-Oct-2026",
+      "bc_start": "",
+      "bc_end": "",
+      "source": "NSE-ANN-BACKFILL+CACHE",
+      "offer_price": 0.0,
+      "ltp": 2076.0,
+      "pct": -0.21
+    }
+  ],
   "corporate_sources": {},
   "earnings_calendar": [],
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-10-08T15:12:27.935154",
+      "last_attempt": "2026-10-08T22:26:54.431453",
       "last_count": 4,
-      "last_success": "2026-10-08T15:12:27.935154",
+      "last_success": "2026-10-08T22:26:54.431453",
       "message": ""
     },
     "NSE_CA": {
