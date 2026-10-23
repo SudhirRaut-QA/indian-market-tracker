@@ -1,49 +1,49 @@
 {
   "MCX_DRV": {
     "status": "ok",
-    "last_attempt": "2026-10-23T13:42:26.910062",
+    "last_attempt": "2026-10-23T21:01:55.159979",
     "last_count": 4,
-    "last_success": "2026-10-23T13:42:26.910062",
+    "last_success": "2026-10-23T21:01:55.159979",
     "message": ""
   },
   "NSE_CA": {
     "status": "ok",
-    "last_attempt": "2026-10-22T21:01:47.854524",
-    "last_count": 17,
-    "last_success": "2026-10-22T21:01:47.854524",
+    "last_attempt": "2026-10-23T21:01:56.598839",
+    "last_count": 19,
+    "last_success": "2026-10-23T21:01:56.598839",
     "message": ""
   },
   "NSE_BM": {
     "status": "no-data",
-    "last_attempt": "2026-10-22T21:01:48.565301",
+    "last_attempt": "2026-10-23T21:01:57.721301",
     "last_count": 0,
     "last_success": "",
     "message": ""
   },
   "NSE_ANN": {
     "status": "ok",
-    "last_attempt": "2026-10-22T21:02:04.555106",
-    "last_count": 85,
-    "last_success": "2026-10-22T21:02:04.555106",
+    "last_attempt": "2026-10-23T21:02:11.822570",
+    "last_count": 98,
+    "last_success": "2026-10-23T21:02:11.822570",
     "message": ""
   },
   "NSE_ER": {
     "status": "no-data",
-    "last_attempt": "2026-10-22T21:02:20.780675",
+    "last_attempt": "2026-10-23T21:02:27.960344",
     "last_count": 0,
     "last_success": "",
     "message": ""
   },
   "BSE_CA": {
     "status": "no-data",
-    "last_attempt": "2026-10-22T21:02:24.441245",
+    "last_attempt": "2026-10-23T21:02:32.025847",
     "last_count": 0,
     "last_success": "",
     "message": ""
   },
   "DIV_CSV": {
     "status": "no-data",
-    "last_attempt": "2026-10-22T21:02:24.442016",
+    "last_attempt": "2026-10-23T21:02:32.026417",
     "last_count": 0,
     "last_success": "",
     "message": ""
