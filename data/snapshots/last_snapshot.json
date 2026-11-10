@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-11-09T15:57:00.009863",
+  "timestamp": "2026-11-10T16:04:55.267175",
   "fii_dii": {
-    "timestamp": "2026-11-09T15:57:02.641324",
-    "date": "08-Nov-2026",
+    "timestamp": "2026-11-10T16:04:57.925873",
+    "date": "09-Nov-2026",
     "fii": {
-      "buy": 52.39,
-      "sell": 52.64,
-      "net": -0.25
+      "buy": 20310.99,
+      "sell": 13098.77,
+      "net": 7212.22
     },
     "dii": {
-      "buy": 331.11,
-      "sell": 1031.42,
-      "net": -700.31
+      "buy": 12764.97,
+      "sell": 19937.5,
+      "net": -7172.53
     },
-    "total_net": -700.56,
-    "signal": "Bearish",
-    "interpretation": "Both FII & DII SELLING"
+    "total_net": 39.69000000000051,
+    "signal": "FII Bullish",
+    "interpretation": "FII buying, DII selling — FII-led rally"
   },
   "indices": {
     "NIFTY 50": {
@@ -273,7 +273,7 @@
   },
   "market_status": {
     "Capital Market": {
-      "status": "Closed",
+      "status": "Close",
       "trade_date": "09-Nov-2026 15:30",
       "index": "NIFTY 50",
       "last": 25044.65,
@@ -281,7 +281,7 @@
       "pct": 0.23
     },
     "Currency": {
-      "status": "Open",
+      "status": "Close",
       "trade_date": "09-Nov-2026",
       "index": "",
       "last": "",
@@ -290,14 +290,14 @@
     },
     "Commodity": {
       "status": "Open",
-      "trade_date": "09-Nov-2026",
+      "trade_date": "10-Nov-2026",
       "index": "",
       "last": "",
       "variation": "",
       "pct": ""
     },
     "Debt": {
-      "status": "Open",
+      "status": "Close",
       "trade_date": "09-Nov-2026",
       "index": "",
       "last": "",
@@ -313,93 +313,93 @@
       "pct": 0.2
     },
     "currencyfuture": {
-      "status": "Open",
+      "status": "Close",
       "trade_date": "09-Nov-2026",
       "index": "",
-      "last": "94.0950",
+      "last": "94.0000",
       "variation": "",
       "pct": ""
     }
   },
   "forex": {
-    "usdinr": 94.0041,
-    "usdeur": 0.8969,
-    "usdgbp": 0.7487,
-    "usdjpy": 158.48,
-    "date": "2026-11-08"
+    "usdinr": 93.8665,
+    "usdeur": 0.896,
+    "usdgbp": 0.7474,
+    "usdjpy": 158.2968,
+    "date": "2026-11-09"
   },
   "commodities": {},
   "mcx_drivers": {
     "GC=F": {
       "name": "Gold Futures",
-      "last": 4106.3,
-      "pct": 0.82
+      "last": 4085.7,
+      "pct": -0.68
     },
     "NG=F": {
       "name": "Natural Gas Futures",
-      "last": 3.035,
-      "pct": 2.57
+      "last": 3.24,
+      "pct": 9.94
     },
     "SI=F": {
       "name": "Silver Futures",
-      "last": 52.575,
-      "pct": 0.87
+      "last": 52.435,
+      "pct": 0.39
     },
     "CL=F": {
       "name": "Crude Oil Futures",
-      "last": 90.27,
-      "pct": 2.44
+      "last": 84.85,
+      "pct": -6.26
     }
   },
   "global_indices": {
     "S&P 500": {
       "symbol": "^GSPC",
-      "last": 7376.86,
-      "pct": -2.68
+      "last": 7549.94,
+      "pct": 0.11
     },
     "NASDAQ": {
       "symbol": "^IXIC",
-      "last": 24579.43,
-      "pct": -3.37
+      "last": 25253.14,
+      "pct": 0.35
     },
     "DOW": {
       "symbol": "^DJI",
-      "last": 51285.73,
-      "pct": -0.94
+      "last": 52389.75,
+      "pct": 0.78
     },
     "NIKKEI": {
       "symbol": "^N225",
-      "last": 58775.5,
-      "pct": -6.83
+      "last": 60459.58,
+      "pct": -2.78
     },
     "HANG SENG": {
       "symbol": "^HSI",
-      "last": 24448.95,
-      "pct": 4.51
+      "last": 24557.04,
+      "pct": 4.38
     },
     "FTSE": {
       "symbol": "^FTSE",
-      "last": 10735.57,
-      "pct": -0.24
+      "last": 10817.53,
+      "pct": 1.68
     }
   },
   "global_sentiment": {
     "fear_greed": {
-      "score": 24.05,
-      "rating": "extreme fear",
-      "previous_close": 22.0792756539235,
-      "timestamp": "2026-11-09T10:08:01+00:00"
+      "score": 33.23,
+      "rating": "fear",
+      "previous_close": 31.7142857142857,
+      "timestamp": "2026-11-10T10:18:46+00:00"
     },
     "macro": {
       "DXY": {
         "symbol": "DX-Y.NYB",
-        "last": 101.82,
-        "pct": 0.31
+        "last": 101.735,
+        "pct": 0.18
       },
       "BRENT": {
         "symbol": "BZ=F",
-        "last": 97.36,
-        "pct": 2.9
+        "last": 90.12,
+        "pct": -8.31
       }
     }
   },
@@ -413,9 +413,9 @@
   "feed_health": {
     "MCX_DRV": {
       "status": "ok",
-      "last_attempt": "2026-11-09T15:58:37.284206",
+      "last_attempt": "2026-11-10T16:06:35.190872",
       "last_count": 4,
-      "last_success": "2026-11-09T15:58:37.284206",
+      "last_success": "2026-11-10T16:06:35.190872",
       "message": ""
     },
     "NSE_CA": {
